@@ -1,0 +1,48 @@
+---
+import Container from "@components/ui/Container.astro";
+import JobCard from "@components/jobs/JobCard.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import { remoteJobs } from "@data/jobs";
+---
+<section class="section-remote-jobs relative isolate overflow-x-clip py-20 sm:py-28">
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-40"></div>
+
+  <Container size="xl">
+    <div class="grid gap-12 lg:grid-cols-12 lg:items-start">
+      <div class="lg:col-span-5 lg:sticky lg:top-28">
+        <SectionEyebrow number={9} label="Remote-first" />
+        <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+          Work from <span class="font-display italic font-normal text-emerald-600">anywhere</span> — everywhere.
+        </h2>
+        <p class="mt-5 max-w-md text-lg text-ink-600">
+          Thousands of fully-remote roles across every timezone. Filter by region, hours, and compensation model — hired the way modern teams actually work.
+        </p>
+
+        <div class="mt-8 grid grid-cols-2 gap-4">
+          {[
+            { k: "42,180", v: "Remote roles" },
+            { k: "120+",   v: "Countries hiring" },
+            { k: "$142K",  v: "Avg. remote salary" },
+            { k: "3.8×",   v: "More applications" },
+          ].map((s) => (
+            <div class="rounded-2xl border border-ink-200 bg-white p-4">
+              <p class="text-2xl font-semibold tracking-tight text-ink-900">{s.k}</p>
+              <p class="mt-1 text-sm text-ink-500">{s.v}</p>
+            </div>
+          ))}
+        </div>
+
+        <a href="/jobs?remote=true" class="mt-8 inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-[14.5px] font-medium text-ink-50 transition-all hover:bg-brand-600 hover:shadow-brand">
+          Browse remote jobs
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7 3m4 4l-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <div class="lg:col-span-7">
+        <div class="grid gap-4 sm:grid-cols-2">
+          {remoteJobs.slice(0, 6).map((j) => <JobCard job={j} variant="compact" />)}
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

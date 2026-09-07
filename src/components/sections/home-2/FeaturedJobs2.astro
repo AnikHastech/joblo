@@ -1,0 +1,73 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import BrandLogo from "@components/common/BrandLogo.astro";
+import Badge from "@components/ui/Badge.astro";
+import { featuredJobs } from "@data/jobs";
+import { getCompany } from "@data/companies";
+
+const items = featuredJobs.slice(0, 5);
+---
+<section class="section-featured-jobs-2 pb-20 sm:pb-28 bg-white dark:!bg-white/[0.02]">
+  <Container size="xl">
+    <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+      <div class="max-w-2xl">
+        <SectionEyebrow number={2} label="Featured this week" />
+        <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+          Roles worth <span class="font-display italic font-normal">saying yes to.</span>
+        </h2>
+      </div>
+      <a href="/jobs" class="inline-flex items-center gap-2 text-[14.5px] font-semibold text-brand-700 hover:gap-3 transition-all">
+        View all featured
+        <Icon name="arrowRight" size={14} />
+      </a>
+    </div>
+
+    <!-- Horizontal list rows instead of grid cards -->
+    <ul class="mt-10 divide-y divide-ink-100 rounded-2xl border border-ink-200/70 bg-white overflow-hidden dark:divide-white/[0.06] dark:border-white/[0.08] dark:!bg-white/[0.035]">
+      {items.map((j) => {
+        const company = getCompany(j.companyId);
+        const salary = `${j.currency === "USD" ? "$" : j.currency === "EUR" ? "€" : j.currency + " "}${(j.salaryMin/1000).toFixed(0)}k–${(j.salaryMax/1000).toFixed(0)}k`;
+        const posted = j.postedDaysAgo === 1 ? "1d" : `${j.postedDaysAgo}d`;
+        return (
+          <li class="group">
+            <a href={`/jobs/${j.slug}`} class="grid grid-cols-12 items-center gap-3 p-4 transition-colors hover:bg-ink-50/70 sm:gap-6 sm:p-6 dark:hover:!bg-white/[0.04]">
+              <!-- Company mark -->
+              <div class="col-span-3 sm:col-span-1">
+                <BrandLogo slug={company.slug} size="md" />
+              </div>
+              <!-- Title + company -->
+              <div class="col-span-9 min-w-0 sm:col-span-4">
+                <p class="text-[12px] text-ink-500 flex items-center gap-1">
+                  {company.name}
+                  {company.verified && <Icon name="checkCircle" size={11} strokeWidth={2.2} class="text-brand-500" />}
+                </p>
+                <h3 class="mt-0.5 truncate text-[16px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors sm:text-[17px]">
+                  {j.title}
+                </h3>
+              </div>
+              <!-- Meta -->
+              <div class="col-span-12 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12.5px] text-ink-600 sm:col-span-3">
+                <span class="inline-flex items-center gap-1.5"><Icon name="mapPin" size={12} />{j.location}</span>
+                {j.remote && <span class="inline-flex items-center gap-1.5 text-emerald-700"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Remote</span>}
+              </div>
+              <!-- Salary -->
+              <div class="col-span-6 sm:col-span-2">
+                <p class="text-[10.5px] uppercase tracking-widest text-ink-400">Salary</p>
+                <p class="font-semibold text-ink-900 tabular-nums">{salary}</p>
+              </div>
+              <!-- Posted + action -->
+              <div class="col-span-6 flex items-center justify-end gap-3 sm:col-span-2">
+                <span class="text-[12.5px] text-ink-500 tabular-nums">{posted} ago</span>
+                <span class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-all group-hover:border-ink-900 group-hover:bg-ink-900 group-hover:text-ink-50 dark:border-white/15">
+                  <Icon name="arrowUpRight" size={13} strokeWidth={2} />
+                </span>
+              </div>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </Container>
+</section>

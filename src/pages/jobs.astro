@@ -1,0 +1,308 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import JobsHero from "@components/jobs/JobsHero.astro";
+import FilterSidebar from "@components/jobs/FilterSidebar.astro";
+import JobsToolbar from "@components/jobs/JobsToolbar.astro";
+import JobCard from "@components/jobs/JobCard.astro";
+import Pagination from "@components/jobs/Pagination.astro";
+import Icon from "@components/ui/Icon.astro";
+import { jobs } from "@data/jobs";
+import { getCompany } from "@data/companies";
+import { site } from "@data/site";
+
+// Real data — server renders ALL jobs, client JS handles pagination
+const perPage = 12;
+const totalJobs = jobs.length;
+const totalPages = Math.max(1, Math.ceil(totalJobs / perPage));
+const displayJobs = jobs;  // render all; client will show/hide per page
+
+// Location text → slug mapping
+const cityToSlug: Record<string, string> = {
+  "San Francisco": "san-francisco",
+  "New York":      "new-york",
+  "London":        "london",
+  "Berlin":        "berlin",
+  "Tokyo":         "tokyo",
+  "Singapore":     "singapore",
+};
+const getLocSlug = (loc: string): string => {
+  if (loc.toLowerCase().includes("remote")) return "remote";
+  for (const [city, slug] of Object.entries(cityToSlug)) {
+    if (loc.includes(city)) return slug;
+  }
+  return "";
+};
+
+// Industry: use company.industry directly (lowercased for consistent comparison)
+---
+<BaseLayout
+  title={`All jobs · ${site.name}`}
+  description="Browse thousands of curated tech roles from verified companies — filter by category, location, salary, and more."
+>
+  <JobsHero />
+
+  <section class="pt-4 pb-24 sm:pb-32">
+    <Container size="xl">
+      <div class="grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
+        <!-- Sidebar (sticky on desktop) -->
+        <div class="hidden lg:sticky lg:top-28 lg:col-span-3 lg:block lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pb-4 lg:pr-1">
+          <FilterSidebar />
+        </div>
+
+        <!-- Results column -->
+        <div class="lg:col-span-9" data-per-page={perPage} data-total-jobs={totalJobs}>
+          <JobsToolbar total={totalJobs} showing={Math.min(perPage, totalJobs)} />
+
+          <!-- Job cards grid -->
+          <div id="jobs-grid" class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {displayJobs.map((j) => {
+              const company = getCompany(j.companyId);
+              const industry = company.industry.toLowerCase();
+              return (
+                <div
+                  class="job-item"
+                  data-category={j.categorySlug}
+                  data-location={getLocSlug(j.location)}
+                  data-remote={String(j.remote)}
+                  data-type={j.type.toLowerCase()}
+                  data-experience={j.experience.toLowerCase()}
+                  data-salary-min={j.salaryMin}
+                  data-salary-max={j.salaryMax}
+                  data-posted-days={j.postedDaysAgo}
+                  data-industry={industry}
+                  data-search={`${j.title} ${j.tags.join(" ")} ${company.name} ${j.type} ${j.experience}`.toLowerCase()}
+                  data-loc-text={j.location.toLowerCase()}
+                >
+                  <JobCard job={j} />
+                </div>
+              );
+            })}
+          </div>
+
+          <!-- Empty state (shown when no jobs match) -->
+          <div id="jobs-empty" hidden class="mt-10 rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 p-12 text-center dark:!border-white/10 dark:!bg-white/[0.02]">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-ink-100 text-ink-500 dark:!bg-white/[0.06]">
+              <Icon name="search" size={20} />
+            </div>
+            <p class="mt-4 text-[15.5px] font-semibold text-ink-900">No roles match these filters</p>
+            <p class="mt-2 text-[13.5px] text-ink-500">Try clearing some filters or broadening your criteria.</p>
+            <button type="button" id="jobs-empty-reset" class="mt-5 inline-flex items-center gap-1.5 rounded-full bg-ink-900 px-4 py-2 text-[13px] font-semibold text-ink-50 transition-colors hover:bg-brand-600">
+              Clear all filters
+            </button>
+          </div>
+
+          <!-- Pagination -->
+          {totalPages > 1 && (
+            <div class="mt-12 border-t border-ink-200 pt-8 dark:!border-white/10">
+              <Pagination current={1} total={totalPages} />
+            </div>
+          )}
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
+
+<script>
+  // ═══ Client-side pagination ═══════════════════════════════════
+  const resultsColumn = document.querySelector<HTMLElement>("[data-per-page]");
+  const paginationNav = document.querySelector<HTMLElement>("nav[aria-label='Pagination']");
+
+  const perPage = Number(resultsColumn?.dataset.perPage ?? 12);
+  const jobItems = document.querySelectorAll<HTMLElement>("#jobs-grid .job-item");
+
+  const getPage = () => {
+    const p = parseInt(new URLSearchParams(window.location.search).get("page") ?? "1", 10) || 1;
+    const totalPages = Math.max(1, Math.ceil(jobItems.length / perPage));
+    return Math.min(Math.max(1, p), totalPages);
+  };
+
+  const applyPagination = () => {
+    const page = getPage();
+    const start = (page - 1) * perPage;
+    const end   = start + perPage;
+    jobItems.forEach((item, i) => {
+      // Only paginate items that haven't been filtered out
+      if (item.dataset.filteredOut === "true") return;
+      item.hidden = i < start || i >= end;
+    });
+
+    // Update pagination active state
+    paginationNav?.querySelectorAll<HTMLAnchorElement>("a[href*='?page=']").forEach((a) => {
+      const match = a.href.match(/[?&]page=(\d+)/);
+      if (!match) return;
+      const linkPage = Number(match[1]);
+      const isCurrent = linkPage === page;
+      if (a.textContent?.trim().match(/^\d+$/)) {
+        // Numbered page button
+        a.className = isCurrent
+          ? "flex h-10 w-10 items-center justify-center rounded-full text-[13.5px] font-medium tabular-nums transition-colors !bg-ink-900 !text-ink-50 shadow-sm"
+          : "flex h-10 w-10 items-center justify-center rounded-full text-[13.5px] font-medium tabular-nums transition-colors border border-ink-200 bg-white text-ink-700 hover:border-ink-400 hover:text-ink-900 dark:border-white/10 dark:!bg-white/[0.03]";
+        if (isCurrent) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      }
+    });
+
+    // Update page X of Y label
+    const pageLabel = paginationNav?.querySelector<HTMLElement>("p");
+    if (pageLabel) {
+      const nums = pageLabel.querySelectorAll("span");
+      if (nums[0]) nums[0].textContent = String(page);
+    }
+
+    // Update visible count in toolbar
+    const visibleCount = Array.from(jobItems).filter((item) =>
+      item.dataset.filteredOut !== "true" && !item.hidden
+    ).length;
+    const visibleEl = document.querySelector<HTMLElement>("#jobs-visible-count");
+    if (visibleEl) visibleEl.textContent = visibleCount.toString();
+  };
+
+  // Intercept pagination clicks — update URL without full reload
+  paginationNav?.querySelectorAll<HTMLAnchorElement>("a[href*='?page=']").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      const href = a.getAttribute("href");
+      if (!href) return;
+      e.preventDefault();
+      history.pushState({}, "", href);
+      applyPagination();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  window.addEventListener("popstate", applyPagination);
+  applyPagination();
+
+  // ═══ Job filtering engine ══════════════════════════════════════
+  const sidebar   = document.querySelector<HTMLElement>(".job-filters");
+  const items     = document.querySelectorAll<HTMLElement>("#jobs-grid .job-item");
+  const empty     = document.getElementById("jobs-empty");
+  const grid      = document.getElementById("jobs-grid");
+  const activeBadge = document.getElementById("filter-active-count");
+  const clearBtn    = document.getElementById("filter-clear-all");
+  const emptyReset  = document.getElementById("jobs-empty-reset");
+
+  if (sidebar && items.length) {
+    const inputs = sidebar.querySelectorAll<HTMLInputElement>("input[type='checkbox'], input[type='radio']");
+
+    // Salary range map (value → [min, max])
+    const salaryRanges: Record<string, [number, number]> = {
+      "0-80":     [0,      80000],
+      "80-120":   [80000,  120000],
+      "120-160":  [120000, 160000],
+      "160-220":  [160000, 220000],
+      "220-plus": [220000, Infinity],
+    };
+
+    // Date map (value → max days ago)
+    const dateMap: Record<string, number> = {
+      "today": 1, "3d": 3, "week": 7, "month": 30, "any": Infinity,
+    };
+
+    const getChecked = (name: string): Set<string> => {
+      const set = new Set<string>();
+      sidebar.querySelectorAll<HTMLInputElement>(`input[name="${name}"]:checked`).forEach((i) => set.add(i.value));
+      return set;
+    };
+    const getSingle = (name: string): string | null => {
+      const el = sidebar.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`);
+      return el?.value ?? null;
+    };
+
+    // URL params (q, location) — set by hero SearchBar submissions
+    const urlParams = new URLSearchParams(window.location.search);
+    const qText = (urlParams.get("q") ?? "").toLowerCase().trim();
+    const locText = (urlParams.get("location") ?? "").toLowerCase().trim();
+
+    const applyFilters = () => {
+      const categories = getChecked("category");
+      const locations  = getChecked("location");
+      const types      = getChecked("type");
+      const experiences= getChecked("experience");
+      const industries = getChecked("industry");
+      const remoteOnly = (sidebar.querySelector<HTMLInputElement>('input[name="remote"]'))?.checked ?? false;
+      const salary     = getSingle("salary");
+      const date       = getSingle("date");
+
+      let matched = 0;
+      items.forEach((item) => {
+        const d = item.dataset;
+        let show = true;
+
+        // ── URL-driven keyword & location match (from hero SearchBar) ──
+        if (qText) {
+          const hay = d.search ?? "";
+          if (!hay.includes(qText)) show = false;
+        }
+        if (show && locText) {
+          // "remote" matches remote flag OR text
+          if (locText === "remote") {
+            if (d.remote !== "true" && !(d.locText ?? "").includes("remote")) show = false;
+          } else if (!(d.locText ?? "").includes(locText)) show = false;
+        }
+
+        if (show && categories.size && !categories.has(d.category ?? "")) show = false;
+        if (show && locations.size && !locations.has(d.location ?? "")) show = false;
+        if (show && types.size && !types.has(d.type ?? "")) show = false;
+        if (show && experiences.size && !experiences.has(d.experience ?? "")) show = false;
+        if (show && industries.size && !industries.has(d.industry ?? "")) show = false;
+        if (show && remoteOnly && d.remote !== "true") show = false;
+
+        if (show && salary) {
+          const [fMin, fMax] = salaryRanges[salary] ?? [0, Infinity];
+          const jMin = Number(d.salaryMin);
+          const jMax = Number(d.salaryMax);
+          // Overlap check: filter range and job range intersect
+          if (jMax < fMin || jMin > fMax) show = false;
+        }
+
+        if (show && date) {
+          const maxDays = dateMap[date] ?? Infinity;
+          if (Number(d.postedDays) > maxDays) show = false;
+        }
+
+        item.dataset.filteredOut = show ? "false" : "true";
+        if (show) matched++;
+      });
+
+      // Update active filter count
+      const activeCount =
+        categories.size + locations.size + types.size + experiences.size + industries.size +
+        (remoteOnly ? 1 : 0) + (salary ? 1 : 0) + (date ? 1 : 0);
+      if (activeBadge) {
+        activeBadge.textContent = `${activeCount} active`;
+        activeBadge.setAttribute("aria-hidden", String(activeCount === 0));
+        activeBadge.classList.toggle("hidden", activeCount === 0);
+      }
+
+      // Reset to page 1 when filters change
+      if (window.location.search.includes("page=")) {
+        history.replaceState({}, "", window.location.pathname);
+      }
+
+      // Re-apply pagination (respects new filtered state)
+      applyPagination();
+
+      // Empty state
+      if (empty && grid) {
+        empty.hidden = matched !== 0;
+        grid.hidden  = matched === 0;
+      }
+    };
+
+    inputs.forEach((input) => input.addEventListener("change", applyFilters));
+
+    const clearAll = () => {
+      inputs.forEach((i) => { i.checked = false; });
+      // Also clear URL params so the ?q= / ?location= go away
+      if (window.location.search) history.replaceState({}, "", window.location.pathname);
+      window.location.reload();  // simplest: honor query-cleared state
+    };
+    clearBtn?.addEventListener("click", clearAll);
+    emptyReset?.addEventListener("click", clearAll);
+
+    // Apply once on load in case ?q= / ?location= came in via SearchBar
+    if (qText || locText) applyFilters();
+  }
+</script>

@@ -1,0 +1,410 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import Icon from "@components/ui/Icon.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import { blogPosts, getRelatedPosts } from "@data/blog";
+import { site } from "@data/site";
+import { articleSchema, breadcrumbSchema } from "@lib/schema";
+
+export function getStaticPaths() {
+  return blogPosts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const related = getRelatedPosts(post.slug, 3);
+
+// Derived editorial content
+const wordCount = post.body.join(" ").split(/\s+/).filter(Boolean).length;
+const sectionCount = Math.max(4, post.body.length);
+
+const takeaways = [
+  "Skip the objective statement — recruiters don't read them anymore.",
+  "Lead every bullet with a measurable impact number, not a duty.",
+  "Two pages is fine if you've earned it; one page is a strong default.",
+  "Optimize for the human reader first, ATS parser second.",
+];
+
+const articleFacts = [
+  { icon: "clock",    label: "Reading time", value: `${post.readMinutes} min`         },
+  { icon: "quote",    label: "Word count",   value: wordCount.toLocaleString()        },
+  { icon: "briefcase",label: "Sections",     value: String(sectionCount)               },
+  { icon: "sparkles", label: "Level",        value: "Intermediate"                     },
+];
+
+const factTone: Record<string, string> = {
+  brand:   "bg-brand-50 text-brand-700 ring-brand-100/60 dark:!bg-brand-500/12 dark:text-brand-400 dark:ring-brand-500/20",
+};
+
+const faqs = [
+  { q: "How long should my resume be?",              a: "One page if you have under 8 years of relevant experience. Two pages max otherwise — every extra line has to earn its place." },
+  { q: "Do I still need a cover letter in 2026?",     a: "Only when the role explicitly asks for one, or when you're changing industries and need to explain the story. Otherwise, skip it." },
+  { q: "What about ATS keyword stuffing?",            a: "Mirror the exact phrasing from the job description — but only where it's honest. Naked keyword lists at the bottom look like tricks." },
+  { q: "Should I include a photo?",                    a: "In the US and UK: no. In parts of Europe, LATAM, and East Asia: often yes. Follow the local norm." },
+];
+
+const schema = [
+  articleSchema(post, post.coverUrl, post.body.join("\n\n")),
+  breadcrumbSchema([
+    { name: "Home",     url: "/" },
+    { name: "Insights", url: "/blog" },
+    { name: post.title, url: `/blog/${post.slug}` },
+  ]),
+];
+---
+<BaseLayout
+  title={`${post.title} · ${site.name}`}
+  description={post.excerpt}
+  ogImage={post.coverUrl}
+  schema={schema}
+>
+  <!-- Reading progress bar -->
+  <div id="reading-progress" class="pointer-events-none fixed left-0 right-0 top-0 z-40 h-[3px] bg-transparent">
+    <div id="reading-progress-bar" class="h-full w-0 bg-gradient-to-r from-brand-500 via-brand-400 to-accent-500 transition-[width] duration-100"></div>
+  </div>
+
+  <!-- Hero -->
+  <section class="section-article-hero pt-14 pb-8 sm:pt-20">
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <a href="/blog" class="hover:text-ink-900 transition-colors">Insights</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="line-clamp-1 font-medium text-ink-800">{post.title}</span>
+      </nav>
+
+      <div class="mt-8 max-w-3xl">
+        <div class="flex items-center gap-2 text-[12.5px] text-ink-500">
+          <a href={`/blog?category=${post.category}`} class="rounded-full bg-brand-50 px-3 py-1 text-[11.5px] font-semibold text-brand-700 dark:!bg-brand-500/15 dark:text-brand-400">{post.category}</a>
+          <span>·</span>
+          <span>{post.readMinutes} min read</span>
+          <span>·</span>
+          <span>{post.date}</span>
+        </div>
+        <h1 class="mt-5 text-[28px] font-semibold leading-[1.08] tracking-tight text-ink-900 sm:text-[36px] md:text-[48px] lg:text-[58px]">
+          {post.title}
+        </h1>
+        <p class="mt-5 max-w-2xl text-[18px] leading-[1.55] text-ink-600">
+          {post.excerpt}
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+          <img src={post.authorAvatar} alt={post.author} width="48" height="48" class="h-12 w-12 rounded-xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+          <div class="min-w-0">
+            <p class="text-[14px] font-semibold text-ink-900">{post.author}</p>
+            {post.authorRole && <p class="text-[12.5px] text-ink-500">{post.authorRole}</p>}
+          </div>
+          <span class="hidden h-8 w-px bg-ink-200 sm:mx-2 sm:block dark:!bg-white/10"></span>
+          <div class="flex items-center gap-2">
+            <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.03]" aria-label="Share on X"><Icon name="twitter" size={13} /></button>
+            <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.03]" aria-label="Share on LinkedIn"><Icon name="linkedin" size={13} /></button>
+            <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.03]" aria-label="Copy link"><Icon name="send" size={13} /></button>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Cover -->
+  <section class="pb-8">
+    <Container size="xl">
+      <figure class="overflow-hidden rounded-3xl border border-ink-200/70 bg-ink-100 dark:!border-white/10">
+        <img src={post.coverUrl} alt="" width="1600" height="900" class="aspect-[16/9] w-full object-cover" />
+      </figure>
+    </Container>
+  </section>
+
+  <!-- Article facts strip -->
+  <section class="pb-12">
+    <Container size="xl">
+      <div class="mx-auto max-w-4xl">
+        <dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {articleFacts.map((f) => (
+            <div class="flex items-start gap-3 rounded-2xl border border-ink-200/70 bg-white p-3.5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+              <span class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ${factTone.brand}`}>
+                <Icon name={f.icon as any} size={15} strokeWidth={2} />
+              </span>
+              <div class="min-w-0">
+                <dt class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">{f.label}</dt>
+                <dd class="mt-0.5 truncate text-[13.5px] font-semibold text-ink-900 tabular-nums">{f.value}</dd>
+              </div>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Body + sidebar -->
+  <section class="pb-16 sm:pb-24">
+    <Container size="xl">
+      <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
+        <!-- Article body -->
+        <article class="lg:col-span-8">
+          <!-- Key takeaways -->
+          <div class="mb-10 rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/50 via-white to-accent-50/30 p-6 sm:p-7 dark:!border-white/[0.08] dark:!from-brand-500/[0.06] dark:!via-white/[0.02] dark:!to-accent-500/[0.05]">
+            <div class="flex items-center gap-2 text-brand-700 dark:!text-brand-400">
+              <Icon name="sparkles" size={14} strokeWidth={2} />
+              <p class="text-[10.5px] font-bold uppercase tracking-[0.22em]">Key takeaways</p>
+            </div>
+            <ul class="mt-4 space-y-2.5">
+              {takeaways.map((t) => (
+                <li class="flex items-start gap-2.5 text-[14.5px] leading-relaxed text-ink-800">
+                  <span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink-900 text-ink-50 dark:!bg-brand-500 dark:text-white">
+                    <Icon name="check" size={11} strokeWidth={2.5} />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="prose-article space-y-6 text-[17px] leading-[1.75] text-ink-700">
+            {post.body.map((p, i) => (
+              i === 0 ? (
+                <p class="text-[17px] leading-[1.6] text-ink-800 first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:font-display first-letter:text-[52px] first-letter:leading-[0.9] first-letter:text-brand-700 sm:text-[19px] sm:first-letter:text-[64px] dark:first-letter:text-brand-400">
+                  {p}
+                </p>
+              ) : (
+                <p>{p}</p>
+              )
+            ))}
+          </div>
+
+          <!-- Mid-article CTA -->
+          <div class="mt-10 overflow-hidden rounded-3xl border border-ink-200/70 bg-ink-900 p-5 text-ink-50 sm:p-7 dark:!border-white/[0.08] dark:!bg-[#0c0a09]">
+            <div class="grid gap-5 md:grid-cols-5 md:items-center">
+              <div class="md:col-span-3">
+                <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-brand-300 dark:!text-brand-400">Try it yourself</p>
+                <h3 class="mt-2 text-[18px] font-semibold leading-tight tracking-tight sm:text-[20px] lg:text-[22px]">
+                  Skip the blank page — <span class="font-display italic font-normal">start with a proven template</span>
+                </h3>
+                <p class="mt-2 text-[13px] leading-relaxed text-white/70 sm:text-[13.5px]">
+                  Our resume builder starts you off with the exact structure hiring managers scan for. Free to try.
+                </p>
+              </div>
+              <div class="flex flex-col gap-2 md:col-span-2">
+                <a href="/dashboard/resume" class="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-4 text-[13px] font-semibold text-ink-900 transition-colors hover:bg-brand-500 hover:!text-white sm:text-[13.5px]">
+                  Open resume builder
+                  <Icon name="arrowRight" size={13} />
+                </a>
+                <a href="/register" class="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/25 px-4 text-[13px] font-medium text-white transition-colors hover:border-white/60 hover:bg-white/[0.08]">
+                  Create a free account
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pull quote -->
+          <figure class="mt-10 relative rounded-3xl border-l-2 border-brand-500 bg-brand-50/40 p-6 pl-8 sm:p-8 sm:pl-10 dark:!bg-brand-500/[0.08]">
+            <span aria-hidden="true" class="absolute -top-1 left-6 font-display text-[72px] leading-none text-brand-300 dark:!text-brand-500/40 select-none">"</span>
+            <blockquote class="relative font-display text-[20px] italic leading-[1.5] text-ink-900 sm:text-[24px]">
+              A good resume doesn't win the job — it wins the interview. Aim for the interview, not the applause.
+            </blockquote>
+            <figcaption class="mt-4 text-[12.5px] text-ink-600">
+              — {post.author}{post.authorRole ? `, ${post.authorRole}` : ""}
+            </figcaption>
+          </figure>
+
+          <!-- Callout -->
+          <figure class="mt-10 relative rounded-3xl border-l-2 border-accent-500 bg-accent-50/40 p-6 pl-8 sm:p-8 sm:pl-10 dark:!bg-accent-500/10">
+            <span class="absolute -top-3 left-6 rounded-full bg-white px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-widest text-ink-500 ring-1 ring-ink-200 dark:!bg-ink-100 dark:ring-white/10">Takeaway</span>
+            <blockquote class="font-display text-[22px] italic leading-snug text-ink-900 sm:text-[26px]">
+              "{post.excerpt}"
+            </blockquote>
+          </figure>
+
+          <!-- Tags -->
+          <div class="mt-10 flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Filed under</span>
+            {post.tags.map((t) => (
+              <a href={`/blog?tag=${encodeURIComponent(t)}`} class="rounded-full border border-ink-200 bg-white px-3 py-1 text-[12.5px] text-ink-700 transition-colors hover:border-ink-900 hover:bg-ink-900 hover:text-ink-50 dark:!border-white/10 dark:!bg-white/[0.04]">
+                {t}
+              </a>
+            ))}
+          </div>
+
+          <!-- FAQ -->
+          <div class="mt-12">
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-ink-500">Frequently asked</p>
+            <h3 class="mt-2 text-[22px] font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+              Quick answers to <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">common questions</span>
+            </h3>
+            <ul id="blog-faq-list" class="mt-6 space-y-2.5">
+              {faqs.map((f, i) => (
+                <li>
+                  <details open={i === 0} class="blog-faq-details group rounded-2xl border border-ink-200/70 bg-white transition-colors open:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.03] dark:open:!border-brand-500/40">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none p-4 select-none sm:p-5">
+                      <div class="flex min-w-0 items-center gap-3">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-[11.5px] font-bold text-ink-700 tabular-nums dark:!bg-white/[0.06] dark:!text-ink-800 group-open:!bg-ink-900 group-open:!text-ink-50 dark:group-open:!bg-brand-500 dark:group-open:!text-white">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <p class="text-[14.5px] font-semibold text-ink-900">{f.q}</p>
+                      </div>
+                      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-transform group-open:rotate-180 dark:!border-white/10">
+                        <Icon name="chevronDown" size={12} />
+                      </span>
+                    </summary>
+                    <div class="blog-faq-body grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
+                      <div class="overflow-hidden">
+                        <div class="px-4 pb-4 pl-[3.75rem] sm:px-5 sm:pb-5 sm:pl-[4.75rem]">
+                          <p class="text-[13.5px] leading-[1.7] text-ink-600 border-l-2 border-ink-200 pl-3 dark:!border-white/10">{f.a}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Reader engagement bar -->
+          <div class="mt-12 flex flex-col items-start gap-4 rounded-2xl border border-ink-200/70 bg-white p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-5">
+              <button type="button" class="inline-flex items-center gap-2 text-[13px] font-medium text-ink-800 transition-colors hover:text-brand-700">
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-ink-100 text-ink-700 transition-colors group-hover:bg-brand-100 dark:!bg-white/[0.06]">
+                  <Icon name="star" size={14} />
+                </span>
+                <span><span class="font-semibold text-ink-900 tabular-nums">1,284</span> liked this</span>
+              </button>
+              <button type="button" class="inline-flex items-center gap-2 text-[13px] font-medium text-ink-800 transition-colors hover:text-brand-700">
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-ink-100 text-ink-700 dark:!bg-white/[0.06]">
+                  <Icon name="quote" size={14} />
+                </span>
+                <span><span class="font-semibold text-ink-900 tabular-nums">96</span> comments</span>
+              </button>
+              <button type="button" class="inline-flex items-center gap-2 text-[13px] font-medium text-ink-800 transition-colors hover:text-brand-700">
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-ink-100 text-ink-700 dark:!bg-white/[0.06]">
+                  <Icon name="bookmark" size={14} />
+                </span>
+                <span><span class="font-semibold text-ink-900 tabular-nums">2.4k</span> saved</span>
+              </button>
+            </div>
+            <button type="button" class="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 transition-colors hover:bg-brand-600 sm:w-auto">
+              <Icon name="send" size={13} />
+              Share this piece
+            </button>
+          </div>
+
+          <!-- Author card -->
+          <div class="mt-12 flex items-start gap-4 rounded-3xl border border-ink-200/70 bg-white p-5 sm:gap-5 sm:p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <img src={post.authorAvatar} alt={post.author} width="64" height="64" class="h-12 w-12 shrink-0 rounded-2xl bg-ink-100 ring-1 ring-ink-200 sm:h-16 sm:w-16 dark:ring-white/10" />
+            <div>
+              <p class="text-[15px] font-semibold text-ink-900">{post.author}</p>
+              {post.authorRole && <p class="mt-0.5 text-[12.5px] text-ink-500">{post.authorRole}</p>}
+              <p class="mt-3 text-[13.5px] leading-relaxed text-ink-600">
+                Writing about {post.category.toLowerCase()} for {site.name}. Get in touch on any social channel — replies within 24 hours.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- Sidebar -->
+        <aside class="lg:col-span-4">
+          <div class="lg:sticky lg:top-28 space-y-5">
+            <!-- Table of contents (static demo) -->
+            <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">In this piece</p>
+              <ul class="mt-4 space-y-2 text-[13.5px] text-ink-700">
+                {post.body.slice(0, 4).map((p, i) => (
+                  <li class="flex gap-2">
+                    <span class="text-[11px] font-semibold tabular-nums text-brand-600">{String(i + 1).padStart(2, "0")}</span>
+                    <a href="#" class="line-clamp-1 hover:text-ink-900 transition-colors">{p.split(".")[0]}.</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-5 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+              <p class="text-[14px] font-semibold text-ink-900">Get pieces like this by email.</p>
+              <p class="mt-1 text-[12.5px] text-ink-500">Once a week. No fluff. Unsubscribe any time.</p>
+              <form class="mt-4 flex gap-2">
+                <input type="email" placeholder="you@work.com" class="h-10 flex-1 rounded-full border border-ink-200 bg-white px-4 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+                <button type="submit" class="inline-flex h-10 items-center gap-1 rounded-full bg-ink-900 px-4 text-[12.5px] font-semibold text-ink-50 transition-colors hover:bg-brand-600">
+                  Subscribe
+                  <Icon name="arrowRight" size={12} />
+                </button>
+              </form>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </Container>
+  </section>
+
+  <script>
+    // Blog FAQ — smooth accordion, single-open, first always open
+    const all = document.querySelectorAll<HTMLDetailsElement>("#blog-faq-list details");
+    all.forEach((d) => {
+      const body = d.querySelector<HTMLElement>(".blog-faq-body");
+      if (d.open && body) body.style.gridTemplateRows = "1fr";
+    });
+    const openIt = (d: HTMLDetailsElement) => {
+      const body = d.querySelector<HTMLElement>(".blog-faq-body");
+      if (!body) return;
+      d.open = true;
+      requestAnimationFrame(() => { body.style.gridTemplateRows = "1fr"; });
+    };
+    const closeIt = (d: HTMLDetailsElement) => {
+      const body = d.querySelector<HTMLElement>(".blog-faq-body");
+      if (!body) return;
+      body.style.gridTemplateRows = "0fr";
+      // Fallback timer so `open` always clears even if transitionend is missed.
+      window.setTimeout(() => { d.open = false; }, 320);
+    };
+    all.forEach((d) => {
+      d.querySelector<HTMLElement>("summary")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (d.open) return;
+        all.forEach((other) => { if (other !== d && other.open) closeIt(other); });
+        openIt(d);
+      });
+    });
+
+    // Reading progress bar
+    const bar = document.getElementById("reading-progress-bar");
+    if (bar) {
+      const update = () => {
+        const doc = document.documentElement;
+        const scrolled = doc.scrollTop || document.body.scrollTop;
+        const height = doc.scrollHeight - doc.clientHeight;
+        const pct = height > 0 ? Math.min(100, (scrolled / height) * 100) : 0;
+        bar.style.width = pct.toFixed(1) + "%";
+      };
+      update();
+      window.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+    }
+  </script>
+
+  <!-- Related -->
+  <section class="pb-24 sm:pb-32">
+    <Container size="xl">
+      <div class="border-t border-ink-200 pt-14 dark:!border-white/10">
+        <SectionEyebrow number="09" label="Keep reading" />
+        <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-4xl">
+          More <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">from us</span>
+        </h2>
+        <div class="mt-10 grid gap-6 md:grid-cols-3">
+          {related.map((r) => (
+            <a href={`/blog/${r.slug}`} class="group flex flex-col overflow-hidden rounded-3xl border border-ink-200/70 bg-white transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+              <div class="relative aspect-[16/10] overflow-hidden">
+                <img src={r.coverUrl} alt="" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" />
+              </div>
+              <div class="flex flex-1 flex-col p-5">
+                <div class="flex items-center gap-2 text-[11.5px] text-ink-500">
+                  <span class="rounded-full bg-brand-50 px-2 py-0.5 text-[10.5px] font-semibold text-brand-700 dark:!bg-brand-500/15 dark:text-brand-400">{r.category}</span>
+                  <span>·</span>
+                  <span>{r.readMinutes} min</span>
+                </div>
+                <h3 class="mt-3 text-[16px] font-semibold leading-snug text-ink-900 group-hover:text-brand-700 transition-colors">{r.title}</h3>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>

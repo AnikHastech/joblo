@@ -1,0 +1,207 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+
+// 90-second product tour. Poster is Unsplash editorial (corporate workspace).
+// Placeholder demo uses Simon Sinek's "How great leaders inspire action" TED
+// talk — a well-known hiring/culture reference. Swap the ID for your own tour.
+const videoId = "qp0HIF3SfI4";
+const poster = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&auto=format&fit=crop&q=75";
+
+const chips = [
+  { icon: "clock",    label: "90 seconds"   },
+  { icon: "sparkles", label: "AI matching"  },
+  { icon: "shield",   label: "Verified only" },
+];
+
+const highlights = [
+  "See how AI matching turns 128k roles into the 5 that actually fit",
+  "Watch how a verified employer replies inside 4 hours (median)",
+  "See the candidate → interview flow, from search to signed offer",
+];
+---
+<section class="section-video-demo scroll-mt-24 py-20 sm:py-28 bg-white border-y border-ink-200/60 dark:!bg-white/[0.02] dark:!border-white/[0.06]">
+  <Container size="xl">
+    <div class="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
+      <!-- Copy -->
+      <div class="lg:col-span-5">
+        <SectionEyebrow number={4} label="Watch it move" />
+        <h2 class="mt-3 text-[30px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl lg:text-[46px]">
+          A ninety-second <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">product tour</span>.
+        </h2>
+        <p class="mt-4 max-w-md text-[15.5px] leading-relaxed text-ink-600 sm:text-[16px]">
+          The fastest way to understand what makes Joblo different from every other job board. No sign-up. No fluff.
+        </p>
+
+        <ul class="mt-6 space-y-3">
+          {highlights.map((h) => (
+            <li class="flex items-start gap-3 text-[14px] leading-relaxed text-ink-800">
+              <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink-900 text-ink-50 dark:!bg-brand-500 dark:text-white">
+                <Icon name="check" size={12} strokeWidth={2.5} />
+              </span>
+              {h}
+            </li>
+          ))}
+        </ul>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            data-video-open
+            class="group inline-flex h-12 items-center gap-2 rounded-full bg-ink-900 px-5 text-[14.5px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md"
+          >
+            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-ink-900 transition-transform group-hover:scale-110">
+              <svg width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true">
+                <path d="M0 0v10l8-5-8-5z"/>
+              </svg>
+            </span>
+            Watch demo
+          </button>
+          <a href="/register" class="inline-flex h-12 items-center gap-1.5 text-[14px] font-medium text-ink-700 hover:text-brand-700 transition-colors">
+            Or skip it — start now
+            <Icon name="arrowRight" size={13} />
+          </a>
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          {chips.map((c) => (
+            <span class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1 text-[12px] font-medium text-ink-700 dark:!border-white/10 dark:!bg-white/[0.03]">
+              <Icon name={c.icon as any} size={11} class="text-ink-500" />
+              {c.label}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <!-- Video card -->
+      <div class="lg:col-span-7">
+        <button
+          type="button"
+          data-video-open
+          class="group relative block w-full overflow-hidden rounded-3xl border border-ink-200/70 bg-ink-100 text-left shadow-2xl shadow-ink-900/10 transition-transform hover:-translate-y-1 dark:!border-white/[0.08] dark:!bg-white/[0.04]"
+          aria-label="Play 90-second product demo"
+        >
+          <div class="relative aspect-[16/10] overflow-hidden">
+            <img
+              src={poster}
+              alt="Product tour poster"
+              loading="lazy"
+              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+            <!-- Gradient overlay for legibility -->
+            <span class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" aria-hidden="true"></span>
+
+            <!-- Corner tag -->
+            <span class="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-white/[0.95] px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-ink-900 backdrop-blur dark:!text-[#0c0a09]">
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+              </span>
+              Live tour
+            </span>
+
+            <!-- Duration -->
+            <span class="absolute right-5 top-5 rounded-full bg-white/[0.95] px-3 py-1 text-[11px] font-semibold tabular-nums text-ink-900 backdrop-blur dark:!text-[#0c0a09]">1:32</span>
+
+            <!-- Play button (centered) -->
+            <span class="absolute inset-0 flex items-center justify-center">
+              <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-white/[0.95] text-ink-900 shadow-2xl backdrop-blur transition-all group-hover:scale-110 dark:!text-[#0c0a09] sm:h-24 sm:w-24">
+                <span class="absolute inset-0 rounded-full bg-white/40 opacity-0 transition-opacity group-hover:animate-ping group-hover:opacity-75"></span>
+                <svg width="22" height="26" viewBox="0 0 22 26" fill="currentColor" class="relative ml-1" aria-hidden="true">
+                  <path d="M0 0v26l22-13-22-13z"/>
+                </svg>
+              </span>
+            </span>
+
+            <!-- Bottom title strip -->
+            <div class="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3">
+              <div class="min-w-0">
+                <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-white/80">Product tour</p>
+                <p class="mt-1 text-[16px] font-semibold text-white sm:text-[18px]">How Joblo finds you the roles that actually fit</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Below-video meta strip -->
+          <div class="flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-ink-900 text-[11px] font-bold text-ink-50 dark:!bg-brand-500 dark:!text-white">JB</span>
+              <div>
+                <p class="text-[12.5px] font-semibold text-ink-900">Joblo team</p>
+                <p class="text-[11px] text-ink-500">Filmed at HQ · Sep 2026</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-[11.5px] text-ink-500">
+              <span class="inline-flex items-center gap-1"><Icon name="users" size={11} /> 24.8k views</span>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </Container>
+</section>
+
+<!-- Video modal -->
+<div
+  id="video-demo-modal"
+  class="fixed inset-0 z-[100] hidden items-center justify-center bg-ink-950/85 p-4 backdrop-blur-sm dark:!bg-[#0c0a09]/90 sm:p-8"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Product demo video"
+>
+  <div class="relative w-full max-w-5xl">
+    <div class="relative overflow-hidden rounded-2xl bg-black shadow-2xl">
+      <button
+        type="button"
+        data-video-close
+        class="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink-900 shadow-lg transition-transform hover:scale-105 sm:h-11 sm:w-11"
+        aria-label="Close video"
+      >
+        <Icon name="close" size={16} strokeWidth={2} />
+      </button>
+      <div class="relative aspect-video">
+        <iframe
+          id="video-demo-iframe"
+          class="absolute inset-0 h-full w-full"
+          src=""
+          title="Joblo product tour"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ videoId }}>
+  (function () {
+    const modal = document.getElementById("video-demo-modal");
+    const iframe = document.getElementById("video-demo-iframe");
+    if (!modal || !iframe) return;
+
+    const openers = document.querySelectorAll("[data-video-open]");
+    const closers = modal.querySelectorAll("[data-video-close]");
+
+    const open = () => {
+      iframe.setAttribute("src", "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      document.body.style.overflow = "hidden";
+    };
+    const close = () => {
+      iframe.setAttribute("src", "");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.body.style.overflow = "";
+    };
+
+    openers.forEach((btn) => btn.addEventListener("click", open));
+    closers.forEach((btn) => btn.addEventListener("click", close));
+    modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modal.classList.contains("hidden")) close();
+    });
+  })();
+</script>

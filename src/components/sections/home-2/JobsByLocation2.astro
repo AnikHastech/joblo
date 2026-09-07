@@ -1,0 +1,80 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { locations } from "@data/locations";
+
+const flags: Record<string, string> = {
+  "remote": "🌍",
+  "san-francisco": "🇺🇸",
+  "new-york": "🇺🇸",
+  "london": "🇬🇧",
+  "berlin": "🇩🇪",
+  "tokyo": "🇯🇵",
+  "singapore": "🇸🇬",
+};
+---
+<section class="section-jobs-by-location-2 py-20 sm:py-28">
+  <Container size="xl">
+    <div class="mx-auto max-w-6xl text-center">
+      <SectionEyebrow number={8} label="Where teams hire" class="justify-center" />
+      <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+        Find work in the world's <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">creative hubs</span>.
+      </h2>
+      <p class="mt-4 text-lg text-ink-600">
+        From San Francisco to Singapore — one place, every skyline.
+      </p>
+    </div>
+
+    <!-- Table-style directory -->
+    <div class="mx-auto mt-14 max-w-6xl overflow-hidden rounded-2xl border border-ink-200/70 bg-white dark:border-white/[0.08] dark:!bg-white/[0.035]">
+      <div class="hidden border-b border-ink-100 bg-ink-50/60 px-6 py-3 text-[11px] font-bold uppercase tracking-widest text-ink-500 sm:grid sm:grid-cols-12 sm:gap-4 dark:border-white/[0.06] dark:!bg-white/[0.02]">
+        <span class="sm:col-span-5">Location</span>
+        <span class="sm:col-span-2">Open roles</span>
+        <span class="sm:col-span-2">Companies</span>
+        <span class="sm:col-span-2">Avg salary</span>
+        <span class="sm:col-span-1"></span>
+      </div>
+      <ul class="divide-y divide-ink-100 dark:divide-white/[0.06]">
+        {locations.map((l) => (
+          <li>
+            <a href={`/jobs?location=${l.slug}`} class="group grid grid-cols-2 items-center gap-3 px-6 py-4 transition-colors hover:bg-ink-50/70 sm:grid-cols-12 sm:gap-4 sm:py-5 dark:hover:!bg-white/[0.03]">
+              <div class="col-span-2 flex items-center gap-3 sm:col-span-5">
+                <div class="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg ring-1 ring-ink-200 dark:ring-white/10">
+                  <img
+                    src={l.imageUrl}
+                    alt=""
+                    loading="lazy"
+                    class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <span class="absolute bottom-0.5 right-0.5 rounded bg-black/60 px-1 text-[9px] font-semibold text-white backdrop-blur">{flags[l.slug] ?? "🌐"}</span>
+                </div>
+                <div>
+                  <p class="text-[15px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{l.city}</p>
+                  <p class="text-[12px] text-ink-500">{l.country}</p>
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <p class="text-[10.5px] uppercase tracking-widest text-ink-400 sm:hidden">Open roles</p>
+                <p class="font-semibold text-ink-900 tabular-nums">{l.jobs.toLocaleString()}</p>
+              </div>
+              <div class="sm:col-span-2">
+                <p class="text-[10.5px] uppercase tracking-widest text-ink-400 sm:hidden">Companies</p>
+                <p class="text-[14px] text-ink-700 tabular-nums">{l.companies?.toLocaleString() ?? "—"}</p>
+              </div>
+              <div class="sm:col-span-2">
+                <p class="text-[10.5px] uppercase tracking-widest text-ink-400 sm:hidden">Avg salary</p>
+                <p class="text-[14px] font-medium text-ink-800 tabular-nums">{l.avgSalary ?? "—"}</p>
+              </div>
+              <div class="hidden justify-end sm:col-span-1 sm:flex">
+                <span class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-all group-hover:border-ink-900 group-hover:bg-ink-900 group-hover:text-ink-50 dark:border-white/15">
+                  <Icon name="arrowUpRight" size={12} strokeWidth={2} />
+                </span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Container>
+</section>

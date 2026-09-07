@@ -1,0 +1,929 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import Badge from "@components/ui/Badge.astro";
+import BrandLogo from "@components/common/BrandLogo.astro";
+import { site } from "@data/site";
+import { companies } from "@data/companies";
+import { liveHireAvatars } from "@data/testimonials";
+import { team } from "@data/team";
+
+const heroAvatars = [
+  liveHireAvatars.Maya,
+  liveHireAvatars.Devon,
+  liveHireAvatars.Priya,
+  liveHireAvatars.Kenji,
+  liveHireAvatars.Elena,
+];
+
+// Doubled row for logo marquee
+const marqueeRow = [...companies, ...companies];
+
+const stats = [
+  { number: site.stats.candidates, label: "Active candidates", change: "+12% this quarter", icon: "users",     tone: "brand"   },
+  { number: site.stats.jobs,       label: "Curated jobs",      change: "1,240 posted this week", icon: "briefcase", tone: "accent"  },
+  { number: site.stats.companies,  label: "Hiring companies",  change: "84 new this month", icon: "building",  tone: "info"    },
+  { number: site.stats.hires,      label: "Successful hires",  change: "3.1× industry avg", icon: "award",     tone: "success" },
+];
+
+const values = [
+  { icon: "sparkles", tone: "brand",   title: "Craft over volume",   body: "One curated match beats a hundred spammy ones. Every listing is human-reviewed before it goes live." },
+  { icon: "shield",   tone: "success", title: "Respect for time",    body: "Your time is the scarce resource. We optimize for signal, not scroll depth." },
+  { icon: "users",    tone: "violet",  title: "Two-sided fairness",  body: "We work for candidates and employers equally. Neither wins unless both do." },
+  { icon: "bolt",     tone: "warning", title: "Ship, then iterate",  body: "We'd rather ship a rough version and learn than plan forever. The product improves weekly." },
+];
+
+const timeline = [
+  { year: "2021", tag: "Founded",     title: "Two designers and a data scientist",   body: "Tired of the same old job boards, we started building on weekends out of a shared studio in Oakland." },
+  { year: "2022", tag: "Beta",        title: "First 1,000 candidates",               body: "A small beta went unexpectedly well. Word spread through Slack groups — we didn't spend a dollar on ads." },
+  { year: "2023", tag: "Seed",        title: "30 early companies · $3M raised",      body: "Raised from operators, not funds. Onboarded thirty adopters who shaped what we became." },
+  { year: "2024", tag: "Series A",    title: "Marketplace at scale · $18M",          body: "Crossed 100K active candidates. Launched employer suite. Team of twelve, still mostly senior ICs." },
+  { year: "2025", tag: "Global",      title: "Opened to worldwide remote roles",     body: "Doubled our candidate base every quarter. Expanded to London, Singapore, and Berlin." },
+  { year: "2026", tag: "Today",       title: "Where we are now",                     body: `${site.stats.jobs} jobs, ${site.stats.companies} companies, ${site.stats.candidates} candidates. Team of 34 across 4 offices.`, live: true },
+];
+
+// Team roster imported from @data/team (also powers /team/[slug] details pages)
+
+const offices = [
+  {
+    city: "San Francisco", country: "USA", role: "Global HQ", people: 18, tz: "PT · UTC-8",
+    image: "https://images.unsplash.com/photo-1449034446853-66c86144b0ad?auto=format&fit=crop&w=800&q=80",
+    alt: "Golden Gate Bridge, San Francisco",
+    href: "/jobs?location=san-francisco",
+  },
+  {
+    city: "London", country: "UK", role: "EMEA", people: 8, tz: "GMT · UTC+0",
+    image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80",
+    alt: "London skyline with Big Ben",
+    href: "/jobs?location=london",
+  },
+  {
+    city: "Singapore", country: "Singapore", role: "APAC", people: 5, tz: "SGT · UTC+8",
+    image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=800&q=80",
+    alt: "Marina Bay Sands, Singapore",
+    href: "/jobs?location=singapore",
+  },
+  {
+    city: "Distributed", country: "Worldwide", role: "Remote-first", people: 3, tz: "Any timezone",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+    alt: "Earth from space — distributed team",
+    href: "/jobs?remote=true",
+  },
+];
+
+const openRoles = [
+  { title: "Senior Full-stack Engineer", location: "Remote — Americas",  team: "Engineering" },
+  { title: "Marketplace Analyst",         location: "San Francisco",     team: "Data" },
+  { title: "Content Marketing Manager",   location: "London",            team: "Growth" },
+];
+
+const toneChip: Record<string, string> = {
+  brand:   "bg-brand-50 text-brand-700 ring-brand-100/60 dark:!bg-brand-500/15 dark:!text-brand-400 dark:!ring-white/10",
+  accent:  "bg-accent-50 text-accent-700 ring-accent-100/60 dark:!bg-accent-500/15 dark:!text-accent-400 dark:!ring-white/10",
+  info:    "bg-sky-50 text-sky-700 ring-sky-100/60 dark:!bg-sky-500/15 dark:!text-sky-400 dark:!ring-white/10",
+  success: "bg-emerald-50 text-emerald-700 ring-emerald-100/60 dark:!bg-emerald-500/15 dark:!text-emerald-400 dark:!ring-white/10",
+  violet:  "bg-violet-50 text-violet-700 ring-violet-100/60 dark:!bg-violet-500/15 dark:!text-violet-400 dark:!ring-white/10",
+  warning: "bg-amber-50 text-amber-700 ring-amber-100/60 dark:!bg-amber-500/15 dark:!text-amber-400 dark:!ring-white/10",
+};
+---
+<BaseLayout
+  title={`About · ${site.name}`}
+  description={`We're a small team building the job marketplace the industry actually deserves — craft over volume, respect for time, and two-sided fairness aren't marketing slogans.`}
+>
+  <!-- ═════ HERO — editorial with side avatar cluster + live indicator ═════ -->
+  <section class="section-about-hero relative isolate overflow-hidden pt-14 pb-20 sm:pt-20 sm:pb-24">
+    <div class="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-60 mask-radial"></div>
+    <div class="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[640px] w-[960px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-200/50 via-accent-200/30 to-transparent blur-3xl dark:!from-brand-500/20 dark:!via-accent-500/15"></div>
+    <div class="pointer-events-none absolute top-24 -right-40 -z-10 h-[420px] w-[420px] rounded-full bg-accent-300/25 blur-3xl dark:!bg-accent-500/20"></div>
+
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="font-medium text-ink-800">About</span>
+      </nav>
+
+      <div class="mt-8 grid gap-12 lg:grid-cols-12 lg:items-center">
+        <!-- Left: Big editorial title -->
+        <div class="lg:col-span-7">
+          <div class="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white/60 px-3 py-1.5 backdrop-blur dark:!border-white/10 dark:!bg-white/[0.04]">
+            <span class="relative flex h-1.5 w-1.5">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            </span>
+            <span class="text-[11px] font-semibold uppercase tracking-widest text-ink-700">Since 2021 · Team of 34 · Four cities</span>
+          </div>
+
+          <h1 class="mt-6 text-[36px] font-semibold leading-[1.02] tracking-tight text-ink-900 xs:text-[42px] sm:text-[56px] md:text-[64px] lg:text-[80px] xl:text-[88px] sm:leading-[0.98]">
+            The marketplace the industry
+            <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 via-brand-500 to-accent-500 bg-clip-text text-transparent">actually deserves</span>.
+          </h1>
+
+          <p class="mt-5 max-w-2xl text-[15px] leading-[1.6] text-ink-600 sm:mt-6 sm:text-[17px] lg:text-[18px]">
+            We're a small team of designers, engineers, and researchers building the job marketplace we always wished existed — one that respects your time, treats both sides fairly, and only shows you work worth doing.
+          </p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-6">
+            <!-- Avatar cluster -->
+            <div class="flex -space-x-2.5">
+              {heroAvatars.map((src) => (
+                <img src={src} alt="" class="h-11 w-11 rounded-full bg-ink-100 ring-2 ring-white dark:!ring-ink-100" />
+              ))}
+              <span class="flex h-11 w-11 items-center justify-center rounded-full bg-ink-900 text-[11.5px] font-bold text-ink-50 ring-2 ring-white dark:!ring-ink-100 dark:!bg-brand-500">+29</span>
+            </div>
+            <p class="text-[13px] text-ink-600">
+              <span class="font-semibold text-ink-900">34 humans</span> across engineering, design, ops, and research — hiring 6 more this quarter.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="#story" class="group inline-flex h-12 items-center gap-2 rounded-full bg-ink-900 px-6 text-[14.5px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md">
+              Read our story
+              <Icon name="arrowRight" size={13} class="transition-transform group-hover:translate-x-0.5" />
+            </a>
+            <a href="#join" class="inline-flex h-12 items-center gap-2 rounded-full border border-ink-200 bg-white px-6 text-[14px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+              Join the team
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Floating polaroid stack of team -->
+        <div class="relative lg:col-span-5">
+          <div class="relative mx-auto h-[380px] max-w-md sm:h-[460px] lg:h-[500px]">
+            <!-- Back polaroid -->
+            <figure class="absolute left-2 top-4 w-44 rotate-[-6deg] rounded-2xl border border-ink-200/70 bg-white p-2.5 shadow-lg transition-transform hover:rotate-[-3deg] dark:!border-white/[0.08] dark:!bg-white/[0.06] sm:left-4 sm:w-52 sm:p-3 lg:w-56">
+              <div class="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-brand-500/60 to-accent-500/60 p-5 sm:p-6">
+                <img src={team[0].avatar} alt={team[0].name} class="h-full w-full object-contain" />
+              </div>
+              <figcaption class="mt-2.5 px-1 sm:mt-3">
+                <p class="text-[12.5px] font-semibold text-ink-900 sm:text-[13.5px]">{team[0].name}</p>
+                <p class="mt-0.5 text-[11px] text-ink-500 sm:text-[11.5px]">{team[0].role}</p>
+              </figcaption>
+            </figure>
+
+            <!-- Front polaroid -->
+            <figure class="absolute right-2 top-14 w-44 rotate-[4deg] rounded-2xl border border-ink-200/70 bg-white p-2.5 shadow-xl transition-transform hover:rotate-[2deg] dark:!border-white/[0.08] dark:!bg-white/[0.06] sm:right-8 sm:top-16 sm:w-52 sm:p-3 lg:w-56">
+              <div class="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-violet-500/60 to-brand-500/60 p-5 sm:p-6">
+                <img src={team[1].avatar} alt={team[1].name} class="h-full w-full object-contain" />
+              </div>
+              <figcaption class="mt-2.5 px-1 sm:mt-3">
+                <p class="text-[12.5px] font-semibold text-ink-900 sm:text-[13.5px]">{team[1].name}</p>
+                <p class="mt-0.5 text-[11px] text-ink-500 sm:text-[11.5px]">{team[1].role}</p>
+              </figcaption>
+            </figure>
+
+            <!-- Bottom polaroid -->
+            <figure class="absolute bottom-0 left-1/2 w-44 -translate-x-1/2 rotate-[-2deg] rounded-2xl border border-ink-200/70 bg-white p-2.5 shadow-lg transition-transform hover:rotate-0 dark:!border-white/[0.08] dark:!bg-white/[0.06] sm:w-52 sm:p-3 lg:w-56">
+              <div class="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-accent-500/60 to-rose-500/60 p-5 sm:p-6">
+                <img src={team[3].avatar} alt={team[3].name} class="h-full w-full object-contain" />
+              </div>
+              <figcaption class="mt-2.5 px-1 sm:mt-3">
+                <p class="text-[12.5px] font-semibold text-ink-900 sm:text-[13.5px]">{team[3].name}</p>
+                <p class="mt-0.5 text-[11px] text-ink-500 sm:text-[11.5px]">{team[3].role}</p>
+              </figcaption>
+            </figure>
+
+            <!-- Floating meta chip -->
+            <span class="absolute -top-1 right-0 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-semibold text-ink-800 shadow-md ring-1 ring-ink-200 backdrop-blur dark:!bg-ink-100 dark:!ring-white/10 sm:-top-2 sm:px-3 sm:py-1.5 sm:text-[11px]">
+              <Icon name="star" size={10} class="text-amber-500" />
+              4.9 team rating
+            </span>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═════ TRUSTED — logo marquee (matches Home) ═════ -->
+  <section class="section-about-trusted relative isolate overflow-hidden border-y border-ink-200/60 bg-gradient-to-r from-brand-50/50 via-white to-accent-50/40 py-12 dark:!border-white/10 dark:!from-brand-950/30 dark:!via-ink-100 dark:!to-accent-900/25">
+    <Container size="xl">
+      <p class="text-center text-[13px] font-medium uppercase tracking-[0.22em] text-ink-500">
+        Teams we've helped hire for
+      </p>
+      <div class="relative mt-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+        <div class="flex w-max animate-marquee gap-10 sm:gap-14">
+          {marqueeRow.map((c) => (
+            <a href={`/companies/${c.slug}`} class="group flex shrink-0 items-center gap-3 opacity-80 transition-all hover:opacity-100" aria-label={c.name}>
+              <BrandLogo slug={c.slug} size="sm" fallbackColor={c.brandColor} fallbackLetter={c.logo} class="transition-transform group-hover:scale-110" />
+              <span class="text-lg font-semibold tracking-tight text-ink-700 group-hover:text-ink-900 dark:text-ink-800">{c.name}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═════ STATS — rich bento with sparklines, avatars, live ticker ═════ -->
+  <section class="section-about-stats py-16 sm:py-20 lg:py-28">
+    <Container size="xl">
+      <div class="grid gap-6 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-5">
+          <SectionEyebrow number="02" label="By the numbers" />
+          <h2 class="mt-4 text-[32px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+            The <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">shape</span> of what we've built.
+          </h2>
+        </div>
+        <p class="lg:col-span-6 lg:col-start-7 text-[15.5px] leading-relaxed text-ink-600">
+          Every number here is updated in real time from the marketplace. No inflated vanity metrics — just the actual pulse of the platform this quarter.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:auto-rows-[1fr]">
+        <!-- ═══ Hero stat — 1.8M candidates ═══ (col-span-6, row-span-2) -->
+        <article class="group relative flex flex-col overflow-hidden rounded-3xl border border-ink-200/70 bg-white p-6 transition-all hover:border-ink-300 hover:shadow-lg dark:!border-white/[0.08] dark:!bg-white/[0.035] sm:col-span-2 sm:p-8 lg:col-span-6 lg:row-span-2 lg:p-10">
+          <!-- Ambient gradient bloom -->
+          <span aria-hidden="true" class="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-gradient-to-br from-brand-300/25 to-accent-300/20 blur-3xl dark:!from-brand-500/20 dark:!to-accent-500/15"></span>
+
+          <div class="relative flex items-start justify-between">
+            <span class="flex h-14 w-14 items-center justify-center rounded-2xl ring-1 bg-brand-50 text-brand-700 ring-brand-100/60 dark:!bg-brand-500/15 dark:!text-brand-400 dark:!ring-white/10">
+              <Icon name="users" size={22} />
+            </span>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400">
+                <Icon name="arrowUp" size={9} strokeWidth={2.5} />
+                +12% this quarter
+              </span>
+              <span class="text-[10.5px] font-semibold uppercase tabular-nums tracking-widest text-ink-400">01</span>
+            </div>
+          </div>
+
+          <p class="relative mt-6 text-[56px] font-semibold leading-none tracking-tight text-ink-900 tabular-nums sm:mt-8 sm:text-[80px] lg:text-[104px]">
+            1.8M
+          </p>
+          <p class="relative mt-4 text-[14.5px] font-semibold text-ink-800">Active candidates</p>
+          <p class="relative mt-1 max-w-md text-[13.5px] text-ink-500">The largest curated pool of engineers, designers, PMs, and operators — all human-reviewed.</p>
+
+          <!-- Sparkline (12-week trend) -->
+          <div class="relative mt-8">
+            <div class="flex items-baseline justify-between">
+              <p class="text-[10.5px] font-semibold uppercase tracking-widest text-ink-500">Last 12 weeks</p>
+              <p class="text-[10.5px] tabular-nums text-ink-400">1.42M → 1.80M</p>
+            </div>
+            <div class="mt-3 flex items-end gap-1.5 h-16">
+              {[8, 11, 9, 13, 12, 15, 17, 14, 19, 21, 22, 26].map((v, i, arr) => {
+                const max = Math.max(...arr);
+                return (
+                  <div class="group/bar flex-1 flex flex-col items-center justify-end">
+                    <div class="w-full rounded-t bg-gradient-to-t from-brand-200 to-brand-500 transition-all group-hover/bar:from-brand-300 group-hover/bar:to-accent-500 dark:!from-brand-500/40 dark:!to-brand-400" style={`height:${(v / max) * 100}%`}></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <!-- Category distribution stripe -->
+          <div class="relative mt-8">
+            <div class="flex items-baseline justify-between">
+              <p class="text-[10.5px] font-semibold uppercase tracking-widest text-ink-500">By discipline</p>
+              <p class="text-[10.5px] text-ink-400">6 disciplines</p>
+            </div>
+            <div class="mt-3 flex h-2 overflow-hidden rounded-full">
+              <div class="bg-brand-500" style="width:38%" title="Engineering 38%"></div>
+              <div class="bg-accent-500" style="width:24%" title="Design 24%"></div>
+              <div class="bg-violet-500" style="width:18%" title="Product 18%"></div>
+              <div class="bg-emerald-500" style="width:12%" title="Data 12%"></div>
+              <div class="bg-sky-500" style="width:5%" title="Sales 5%"></div>
+              <div class="bg-amber-500" style="width:3%" title="Other 3%"></div>
+            </div>
+            <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[11.5px]">
+              {[
+                { c: "bg-brand-500", n: "Engineering", v: "38%" },
+                { c: "bg-accent-500", n: "Design", v: "24%" },
+                { c: "bg-violet-500", n: "Product", v: "18%" },
+                { c: "bg-emerald-500", n: "Data", v: "12%" },
+              ].map((d) => (
+                <li class="inline-flex items-center gap-1.5 text-ink-700">
+                  <span class={`h-2 w-2 rounded-full ${d.c}`}></span>
+                  {d.n}
+                  <span class="tabular-nums text-ink-400">{d.v}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Recent activity chip -->
+          <div class="relative mt-auto pt-8">
+            <div class="flex items-center gap-3 rounded-2xl border border-ink-200/70 bg-ink-50/60 p-3 dark:!border-white/[0.08] dark:!bg-white/[0.04]">
+              <div class="flex -space-x-2">
+                {heroAvatars.slice(0, 3).map((a) => <img src={a} alt="" class="h-8 w-8 rounded-full ring-2 ring-white dark:!ring-ink-100" />)}
+              </div>
+              <p class="flex-1 text-[12px] text-ink-600"><span class="font-semibold text-ink-900">7 candidates</span> got hired via Joblo just this week</p>
+              <a href="/candidates" class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10" aria-label="Meet the candidates">
+                <Icon name="arrowUpRight" size={11} />
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- ═══ 02 · Curated jobs — 128K ═══ (col-span-3, row 1) -->
+        <article class="group relative flex flex-col rounded-3xl border border-ink-200/70 bg-white p-6 transition-all hover:-translate-y-1 hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.035] lg:col-span-3">
+          <div class="flex items-start justify-between">
+            <span class="flex h-11 w-11 items-center justify-center rounded-2xl ring-1 bg-accent-50 text-accent-700 ring-accent-100/60 dark:!bg-accent-500/15 dark:!text-accent-400 dark:!ring-white/10">
+              <Icon name="briefcase" size={17} />
+            </span>
+            <span class="text-[10.5px] font-semibold uppercase tabular-nums tracking-widest text-ink-400">02</span>
+          </div>
+          <p class="mt-6 text-[40px] font-semibold leading-none tracking-tight text-ink-900 tabular-nums">128,540</p>
+          <p class="mt-3 text-[13.5px] font-semibold text-ink-800">Curated jobs</p>
+          <p class="mt-1 text-[12px] text-ink-500">1,240 posted this week</p>
+
+          <!-- Weekly posting sparkline -->
+          <div class="mt-auto pt-5">
+            <div class="flex items-end gap-1 h-10">
+              {[6, 8, 5, 9, 12, 11, 14].map((v, i, arr) => (
+                <div class="flex-1 rounded-sm bg-accent-500/70 transition-all group-hover:bg-accent-500 dark:!bg-accent-500/50" style={`height:${(v / Math.max(...arr)) * 100}%`}></div>
+              ))}
+            </div>
+            <p class="mt-2 flex items-center justify-between text-[10px] uppercase tracking-widest text-ink-400">
+              <span>Mon</span><span>Wed</span><span>Fri</span><span>Sun</span>
+            </p>
+          </div>
+        </article>
+
+        <!-- ═══ 03 · Successful hires — 312K ═══ (col-span-3, row 1) -->
+        <article class="group relative flex flex-col rounded-3xl border border-ink-200/70 bg-white p-6 transition-all hover:-translate-y-1 hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.035] lg:col-span-3">
+          <div class="flex items-start justify-between">
+            <span class="flex h-11 w-11 items-center justify-center rounded-2xl ring-1 bg-emerald-50 text-emerald-700 ring-emerald-100/60 dark:!bg-emerald-500/15 dark:!text-emerald-400 dark:!ring-white/10">
+              <Icon name="award" size={17} />
+            </span>
+            <span class="text-[10.5px] font-semibold uppercase tabular-nums tracking-widest text-ink-400">03</span>
+          </div>
+          <p class="mt-6 text-[40px] font-semibold leading-none tracking-tight text-ink-900 tabular-nums">312K</p>
+          <p class="mt-3 text-[13.5px] font-semibold text-ink-800">Successful hires</p>
+          <p class="mt-1 text-[12px] text-ink-500">3.1× industry avg conversion</p>
+
+          <!-- Semi-circle progress showing conv rate -->
+          <div class="mt-auto pt-5">
+            <div class="flex items-center gap-4">
+              <div class="relative h-16 w-16 shrink-0">
+                <svg viewBox="0 0 36 36" class="h-full w-full -rotate-90">
+                  <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" stroke-width="4" class="text-ink-100 dark:!text-white/10" />
+                  <circle cx="18" cy="18" r="15" fill="none" stroke="url(#gradEmerald)" stroke-width="4" stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="30" />
+                  <defs>
+                    <linearGradient id="gradEmerald" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#10b981" />
+                      <stop offset="100%" stop-color="#059669" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <span class="absolute inset-0 flex items-center justify-center text-[13px] font-semibold tabular-nums text-ink-900">68%</span>
+              </div>
+              <div>
+                <p class="text-[11.5px] font-semibold text-ink-800">Interview → offer</p>
+                <p class="mt-0.5 text-[11px] text-ink-500">Industry median: 22%</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- ═══ 04 · Live activity ticker ═══ (col-span-6, row 2) — sits under the two small cards -->
+        <article class="group relative flex overflow-hidden rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-6 transition-all hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10 sm:col-span-2 lg:col-span-6 lg:col-start-7">
+          <div class="flex w-full flex-col gap-5 sm:flex-row sm:items-center">
+            <!-- Left: Live status + label -->
+            <div class="sm:w-52 shrink-0">
+              <div class="flex items-center gap-2 text-brand-700 dark:!text-brand-400">
+                <span class="relative flex h-2 w-2">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                </span>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.22em]">04 · Live activity</p>
+              </div>
+              <p class="mt-3 font-display text-[26px] italic leading-none bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">
+                Right now.
+              </p>
+              <p class="mt-2 text-[12.5px] text-ink-600">Real hires happening on the platform as you read this.</p>
+            </div>
+
+            <!-- Right: rolling activity list -->
+            <ul class="flex-1 space-y-2 min-w-0">
+              {[
+                { name: "Maya O.",   action: "hired at",     target: "Linear",    time: "2 min ago",  avatar: liveHireAvatars.Maya  },
+                { name: "Devon P.",  action: "onboarded at", target: "Notion",    time: "18 min ago", avatar: liveHireAvatars.Devon },
+                { name: "Priya A.",  action: "hired at",     target: "Stripe",    time: "1 hr ago",   avatar: liveHireAvatars.Priya },
+                { name: "Kenji W.",  action: "hired at",     target: "Anthropic", time: "3 hr ago",   avatar: liveHireAvatars.Kenji },
+              ].map((r) => (
+                <li class="flex items-center gap-3 rounded-2xl border border-ink-200/70 bg-white/70 p-2.5 backdrop-blur-sm transition-colors hover:bg-white dark:!border-white/[0.08] dark:!bg-white/[0.04]">
+                  <img src={r.avatar} alt="" class="h-8 w-8 shrink-0 rounded-lg bg-ink-100 ring-1 ring-ink-200 dark:!ring-white/10" />
+                  <p class="min-w-0 flex-1 truncate text-[12.5px] text-ink-800">
+                    <span class="font-semibold text-ink-900">{r.name}</span>
+                    <span class="text-ink-500"> {r.action} </span>
+                    <span class="font-semibold text-brand-700 dark:!text-brand-400">{r.target}</span>
+                  </p>
+                  <span class="shrink-0 text-[10.5px] uppercase tracking-widest text-ink-400 tabular-nums">{r.time}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </article>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═════ STORY — editorial split with pull quote ═════ -->
+  <section id="story" class="section-about-story scroll-mt-24 py-14 sm:py-20 bg-ink-900 text-ink-50 dark:!bg-ink-100">
+    <Container size="xl">
+      <div class="grid gap-12 lg:grid-cols-12 lg:gap-20">
+        <div class="lg:col-span-7">
+          <p class="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-400">
+            <Icon name="play" size={9} />
+            03 · Our story
+          </p>
+          <h2 class="mt-4 text-[32px] font-semibold leading-[1.05] tracking-tight text-white sm:text-[42px] lg:text-[52px]">
+            The industry deserves <span class="font-display italic font-normal text-accent-400">better</span>.
+          </h2>
+          <div class="mt-6 space-y-4 text-[15px] leading-[1.7] text-white/75 sm:mt-8 sm:space-y-5 sm:text-[16.5px] sm:leading-[1.75]">
+            <p>Every job board looks the same because they all optimize for the same thing: filling the feed. More listings, more clicks, more retargeting. Candidates lose because the signal-to-noise ratio collapses. Employers lose because they drown in unqualified applicants.</p>
+            <p>We started Joblo with a simple bet: if you optimize for match quality instead of volume, both sides win. That means saying no to spammy postings, saying no to companies that treat candidates poorly, and saying no to features that pad engagement without adding real value.</p>
+            <p>It's slower to grow this way. It's also more honest. And when we look at our repeat-hire numbers, it's obviously working.</p>
+          </div>
+        </div>
+
+        <aside class="lg:col-span-5">
+          <figure class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] via-white/[0.02] to-white/[0.06] p-6 backdrop-blur sm:p-8">
+            <span class="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-gradient-to-br from-brand-500/40 to-accent-500/30 blur-3xl"></span>
+            <div class="relative">
+              <p class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10.5px] font-semibold uppercase tracking-widest text-white/70">
+                Our promise
+              </p>
+              <blockquote class="mt-5 font-display text-[22px] italic leading-[1.25] text-white sm:text-[28px] lg:text-[32px]">
+                "If we can't confidently recommend a role to someone we love, we don't publish it."
+              </blockquote>
+              <figcaption class="mt-8 flex items-center gap-3">
+                <img src={team[0].avatar} alt={team[0].name} class="h-11 w-11 rounded-xl bg-white/10 ring-1 ring-white/20" />
+                <div>
+                  <p class="text-[13.5px] font-semibold text-white">{team[0].name}</p>
+                  <p class="mt-0.5 text-[12px] text-white/60">{team[0].role}</p>
+                </div>
+              </figcaption>
+            </div>
+          </figure>
+
+          <!-- Mini stat callouts -->
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p class="font-display text-[28px] italic leading-none text-accent-400 tabular-nums">3.1×</p>
+              <p class="mt-2 text-[11.5px] text-white/60">Industry-avg conversion from application to interview.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p class="font-display text-[28px] italic leading-none text-brand-400 tabular-nums">91%</p>
+              <p class="mt-2 text-[11.5px] text-white/60">Median employer response rate — top 10% of all platforms.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═════ VALUES — bento with icon gradients ═════ -->
+  <section class="section-about-values py-16 sm:py-20 lg:py-28">
+    <Container size="xl">
+      <div class="grid gap-6 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-6">
+          <SectionEyebrow number="04" label="How we work" />
+          <h2 class="mt-4 text-[32px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+            Four things we <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">actually mean</span>.
+          </h2>
+        </div>
+        <p class="lg:col-span-5 lg:col-start-8 text-[15.5px] leading-relaxed text-ink-600">
+          Not manifesto stuff. These four principles decide whether we ship a feature, whether we approve a listing, whether we make a hire.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {values.map((v, i) => (
+          <article class="group relative flex flex-col overflow-hidden rounded-3xl border border-ink-200/70 bg-white p-7 transition-all hover:-translate-y-1 hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <!-- Big decorative italic number (top-right, semi-transparent) -->
+            <span
+              aria-hidden="true"
+              class="pointer-events-none absolute -top-3 -right-1 font-display text-[120px] italic leading-none tracking-tight bg-gradient-to-br from-brand-500/20 to-accent-500/10 bg-clip-text text-transparent select-none transition-all duration-500 group-hover:from-brand-500/30 group-hover:to-accent-500/20 dark:!from-brand-500/25 dark:!to-accent-500/15"
+            >
+              {String(i + 1).padStart(2, "0")}
+            </span>
+
+            <div class="relative">
+              <span class={`flex h-12 w-12 items-center justify-center rounded-2xl ring-1 ${toneChip[v.tone]}`}>
+                <Icon name={v.icon as any} size={19} />
+              </span>
+            </div>
+            <h3 class="relative mt-6 text-[18px] font-semibold text-ink-900">{v.title}</h3>
+            <p class="relative mt-2 text-[13.5px] leading-relaxed text-ink-600">{v.body}</p>
+
+            <!-- Subtle brand accent bar (grows on hover) -->
+            <span
+              aria-hidden="true"
+              class="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-brand-500 to-accent-500 transition-transform duration-500 group-hover:scale-x-100"
+            ></span>
+          </article>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═════ TIMELINE — editorial vertical with year rail ═════ -->
+  <section class="section-about-timeline py-16 sm:py-20 lg:py-28 bg-white dark:!bg-ink-100">
+    <Container size="xl">
+      <div class="max-w-3xl">
+        <SectionEyebrow number="05" label="The story so far" />
+        <h2 class="mt-4 text-[32px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+          Six years, <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">one mission</span>.
+        </h2>
+      </div>
+
+      <ol class="relative mt-14 grid gap-10 lg:grid-cols-2 lg:gap-x-20 lg:gap-y-14">
+        <!-- ═══ Improved central rail ═══ -->
+        <!-- Base rail: subtle gradient full length -->
+        <span aria-hidden="true" class="pointer-events-none absolute left-1/2 top-2 bottom-2 hidden w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-ink-200 to-transparent lg:block dark:!via-white/15"></span>
+        <!-- Colored overlay: brand → accent → emerald (matches milestone dots) -->
+        <span aria-hidden="true" class="pointer-events-none absolute left-1/2 top-8 bottom-8 hidden w-[2px] -translate-x-1/2 rounded-full bg-gradient-to-b from-brand-500 via-accent-500 to-emerald-500 opacity-40 lg:block"></span>
+        <!-- Top cap -->
+        <span aria-hidden="true" class="pointer-events-none absolute left-1/2 top-1 hidden h-2 w-2 -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 shadow-[0_0_0_4px_rgba(255,255,255,0.9)] lg:block dark:!shadow-[0_0_0_4px_rgba(30,30,32,0.9)]"></span>
+        <!-- Bottom cap (emerald live pulse) -->
+        <span aria-hidden="true" class="pointer-events-none absolute left-1/2 bottom-1 hidden h-2 w-2 -translate-x-1/2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(255,255,255,0.9),0_0_0_8px_rgba(16,185,129,0.15)] lg:block dark:!shadow-[0_0_0_4px_rgba(30,30,32,0.9),0_0_0_8px_rgba(16,185,129,0.15)]"></span>
+
+        {timeline.map((t, i) => {
+          const isLeft = i % 2 === 0;
+          return (
+            <li class={`relative lg:${isLeft ? "col-start-1 pr-10 text-right" : "col-start-2 pl-10"}`}>
+              <div class="relative rounded-3xl border border-ink-200/70 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg sm:p-7 dark:!border-white/[0.08] dark:!bg-white/[0.04]">
+
+                <!-- ═══ Improved dot + connector on rail ═══ -->
+                <!-- Horizontal connector line from card edge → dot on rail -->
+                <span
+                  aria-hidden="true"
+                  class={`absolute top-10 hidden h-px w-8 lg:block ${isLeft
+                    ? "left-full bg-gradient-to-r from-ink-200 to-transparent dark:!from-white/20"
+                    : "right-full bg-gradient-to-l from-ink-200 to-transparent dark:!from-white/20"}`}
+                ></span>
+                <!-- Dot on rail (bigger, gradient-filled, elegant ring) -->
+                <span
+                  aria-hidden="true"
+                  class={`absolute top-[calc(2.5rem-6px)] z-10 hidden h-3 w-3 rounded-full shadow-[0_0_0_4px_rgba(255,255,255,1)] ring-1 lg:block dark:!shadow-[0_0_0_4px_rgba(30,30,32,1)]
+                    ${t.live
+                      ? "bg-gradient-to-br from-emerald-400 to-emerald-600 ring-emerald-500/40"
+                      : "bg-gradient-to-br from-brand-500 to-accent-500 ring-brand-500/30"}
+                    ${isLeft
+                      ? "-right-[calc(2.5rem+8px)]"
+                      : "-left-[calc(2.5rem+8px)]"}`}
+                >
+                  {t.live && (
+                    <span aria-hidden="true" class="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60"></span>
+                  )}
+                </span>
+
+                <div class={`flex flex-wrap items-center gap-2 ${isLeft ? "lg:justify-end" : ""}`}>
+                  <span class="font-display text-[28px] italic leading-none tabular-nums bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">{t.year}</span>
+                  <Badge variant="outline" size="sm">{t.tag}</Badge>
+                  {t.live && (
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                      Live
+                    </span>
+                  )}
+                </div>
+                <h3 class="mt-4 text-[18px] font-semibold text-ink-900">{t.title}</h3>
+                <p class="mt-2 text-[13.5px] leading-relaxed text-ink-600">{t.body}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </Container>
+  </section>
+
+  <!-- ═════ FOUNDER STORY VIDEO — editorial pull-out ═════ -->
+  <section class="section-about-video py-16 sm:py-20 lg:py-24 bg-white dark:!bg-white/[0.02]">
+    <Container size="xl">
+      <div class="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
+        <div class="lg:col-span-5 lg:order-2">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Founder's cut</p>
+          <h2 class="mt-3 text-[30px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl lg:text-[46px]">
+            The story, <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">told first-hand</span>.
+          </h2>
+          <p class="mt-4 max-w-md text-[15.5px] leading-relaxed text-ink-600 sm:text-[16px]">
+            Four minutes with our founders on why they built Joblo, the incidents that shaped the product, and what they'd never compromise on.
+          </p>
+          <blockquote class="mt-6 border-l-2 border-brand-500/60 pl-4 text-[15px] font-display italic leading-snug text-ink-800 dark:!border-brand-400/60 sm:text-[16.5px]">
+            "We didn't want to build another job board. We wanted to build the platform we wished existed when we were job hunting."
+            <footer class="mt-2 not-italic text-[12px] font-sans font-medium text-ink-500">— Alex Morgan, Co-founder &amp; CEO</footer>
+          </blockquote>
+          <div class="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              data-founder-video-open
+              class="group inline-flex h-12 items-center gap-2 rounded-full bg-ink-900 px-5 text-[14.5px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md"
+            >
+              <span class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-ink-900 transition-transform group-hover:scale-110">
+                <svg width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true">
+                  <path d="M0 0v10l8-5-8-5z"/>
+                </svg>
+              </span>
+              Play 4-minute story
+            </button>
+            <span class="text-[12.5px] text-ink-500 tabular-nums">4:12 · English captions</span>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 lg:order-1">
+          <button
+            type="button"
+            data-founder-video-open
+            class="group relative block w-full overflow-hidden rounded-3xl border border-ink-200/70 bg-ink-100 text-left shadow-2xl shadow-ink-900/10 transition-transform hover:-translate-y-1 dark:!border-white/[0.08] dark:!bg-white/[0.04]"
+            aria-label="Play founder story video"
+          >
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&auto=format&fit=crop&q=75"
+                alt="Founders in the Joblo studio"
+                loading="lazy"
+                class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+              <span class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" aria-hidden="true"></span>
+
+              <span class="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-white/[0.95] px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-ink-900 backdrop-blur dark:!text-[#0c0a09]">
+                Founder's cut
+              </span>
+              <span class="absolute right-5 top-5 rounded-full bg-white/[0.95] px-3 py-1 text-[11px] font-semibold tabular-nums text-ink-900 backdrop-blur dark:!text-[#0c0a09]">4:12</span>
+
+              <span class="absolute inset-0 flex items-center justify-center">
+                <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-white/[0.95] text-ink-900 shadow-2xl backdrop-blur transition-all group-hover:scale-110 dark:!text-[#0c0a09] sm:h-24 sm:w-24">
+                  <span class="absolute inset-0 rounded-full bg-white/40 opacity-0 transition-opacity group-hover:animate-ping group-hover:opacity-75"></span>
+                  <svg width="22" height="26" viewBox="0 0 22 26" fill="currentColor" class="relative ml-1" aria-hidden="true">
+                    <path d="M0 0v26l22-13-22-13z"/>
+                  </svg>
+                </span>
+              </span>
+
+              <div class="absolute inset-x-5 bottom-5">
+                <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-white/80">Chapter one</p>
+                <p class="mt-1 text-[18px] font-semibold text-white sm:text-[22px]">"Why we couldn't stand another job board."</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Founder video modal -->
+  <div
+    id="founder-video-modal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-ink-950/85 p-4 backdrop-blur-sm dark:!bg-[#0c0a09]/90 sm:p-8"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Founder story video"
+  >
+    <div class="relative w-full max-w-5xl">
+      <div class="relative overflow-hidden rounded-2xl bg-black shadow-2xl">
+        <button
+          type="button"
+          data-founder-video-close
+          class="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink-900 shadow-lg transition-transform hover:scale-105 sm:h-11 sm:w-11"
+          aria-label="Close video"
+        >
+          <Icon name="close" size={16} strokeWidth={2} />
+        </button>
+        <div class="relative aspect-video">
+          <iframe
+            id="founder-video-iframe"
+            class="absolute inset-0 h-full w-full"
+            src=""
+            title="Founder story"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const modal = document.getElementById("founder-video-modal");
+      const iframe = document.getElementById("founder-video-iframe");
+      if (!modal || !iframe) return;
+      const openers = document.querySelectorAll("[data-founder-video-open]");
+      const closers = modal.querySelectorAll("[data-founder-video-close]");
+      // Placeholder — swap for your founder video. Currently uses Linda
+      // Raynier's "Tell me about yourself" — a highly-viewed career video.
+      const videoId = "PCWVi5pAa30";
+      const open = () => {
+        iframe.setAttribute("src", "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0");
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.body.style.overflow = "hidden";
+      };
+      const close = () => {
+        iframe.setAttribute("src", "");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        document.body.style.overflow = "";
+      };
+      openers.forEach((b) => b.addEventListener("click", open));
+      closers.forEach((b) => b.addEventListener("click", close));
+      modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.classList.contains("hidden")) close(); });
+    })();
+  </script>
+
+  <!-- ═════ TEAM — rich cards with hover gradient ═════ -->
+  <section id="team" class="section-about-team scroll-mt-24 py-16 sm:py-20 lg:py-28">
+    <Container size="xl">
+      <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+        <div class="max-w-2xl">
+          <SectionEyebrow number="06" label="The team" />
+          <h2 class="mt-4 text-[32px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+            The humans behind <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">the marketplace</span>.
+          </h2>
+          <p class="mt-4 max-w-xl text-[15px] text-ink-600">
+            Eight leaders shown here. The other 26 are just as much the reason this works — they'd rather ship than pose for portraits.
+          </p>
+        </div>
+        <a href="#join" class="group inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 py-2.5 text-[13px] font-medium text-ink-800 transition-colors hover:border-ink-400 hover:bg-ink-50 dark:!border-white/10 dark:!bg-white/[0.04]">
+          We're hiring
+          <Icon name="arrowRight" size={13} class="transition-transform group-hover:translate-x-0.5" />
+        </a>
+      </div>
+
+      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {team.map((m) => (
+          <a
+            href={`/team/${m.slug}`}
+            class="group relative flex flex-col overflow-hidden rounded-3xl border border-ink-200/70 bg-white transition-all hover:-translate-y-1 hover:border-ink-300 hover:shadow-lg dark:!border-white/[0.08] dark:!bg-white/[0.035]"
+          >
+            <!-- Gradient portrait area -->
+            <div class={`relative aspect-square overflow-hidden bg-gradient-to-br ${m.gradient}`}>
+              <div class="absolute inset-0 bg-grid opacity-25 mix-blend-overlay"></div>
+              <img
+                src={m.avatar}
+                alt={m.name}
+                class="relative z-10 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+              />
+              <!-- Hover arrow badge -->
+              <span class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-ink-900 shadow-sm opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 backdrop-blur">
+                <Icon name="arrowUpRight" size={12} />
+              </span>
+            </div>
+
+            <!-- Info -->
+            <div class="p-5">
+              <p class="text-[15px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{m.name}</p>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">{m.role}</p>
+              <div class="mt-3 flex flex-wrap items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-0.5 text-[10.5px] font-medium text-ink-700 dark:!bg-white/[0.06] dark:!text-ink-800">
+                  <Icon name="mapPin" size={9} />
+                  {m.location}
+                </span>
+                <span class="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[10.5px] font-medium text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400">
+                  {m.from}
+                </span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═════ OFFICES — 4 cities as gradient cards ═════ -->
+  <section class="section-about-offices py-16 sm:py-20 lg:py-28 bg-gradient-to-b from-white to-ink-50/70 dark:!from-transparent dark:!to-white/[0.02]">
+    <Container size="xl">
+      <div class="max-w-3xl">
+        <SectionEyebrow number="07" label="Where we work" />
+        <h2 class="mt-4 text-[32px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+          Four cities. <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">One team.</span>
+        </h2>
+        <p class="mt-4 text-[15px] text-ink-600">
+          Hybrid where it helps. Remote-first everywhere else. Every timezone's covered.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {offices.map((o) => (
+          <a href={o.href} class="group relative isolate flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-3xl p-6 text-white shadow-lg shadow-ink-900/10 transition-all hover:-translate-y-1 hover:shadow-2xl">
+            <!-- Cinematic city photo (fills card, subtle zoom on hover) -->
+            <img
+              src={o.image}
+              alt={o.alt}
+              loading="lazy"
+              class="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+            />
+            <!-- Dark bottom gradient for text legibility -->
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10"></div>
+            <!-- Top soft dark for badges -->
+            <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/40 to-transparent"></div>
+            <!-- Subtle warm color wash — ties to brand -->
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-900/10 to-accent-900/10 mix-blend-multiply"></div>
+
+            <!-- Top: badges -->
+            <span class="absolute left-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-semibold text-ink-900 shadow-sm backdrop-blur">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+              {o.role}
+            </span>
+            <span class="absolute right-5 top-5 z-10 rounded-full bg-white/20 px-2.5 py-1 text-[10.5px] font-semibold text-white backdrop-blur ring-1 ring-white/30">
+              {o.tz}
+            </span>
+
+            <!-- Bottom: city name + meta -->
+            <div class="relative z-10">
+              <p class="font-display text-[34px] italic leading-[1.1] tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] sm:text-[38px] lg:text-[46px]">{o.city}</p>
+              <p class="mt-1 text-[13px] font-medium text-white/90">{o.country}</p>
+              <div class="mt-5 flex items-center justify-between border-t border-white/25 pt-4">
+                <p class="text-[10.5px] font-bold uppercase tracking-widest text-white/80">Teammates</p>
+                <p class="text-[22px] font-semibold text-white tabular-nums drop-shadow-[0_1px_8px_rgba(0,0,0,0.4)]">{o.people}</p>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═════ JOIN US — open roles inside Joblo ═════ -->
+  <section id="join" class="section-about-join scroll-mt-24 pb-16 sm:pb-20 lg:pb-28 bg-ink-50/70 dark:!bg-white/[0.02]">
+    <Container size="xl">
+      <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
+        <div class="lg:col-span-5">
+          <SectionEyebrow number="08" label="Come with us" />
+          <h2 class="mt-4 text-[30px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+            We're hiring <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">3 more roles</span> this quarter.
+          </h2>
+          <p class="mt-4 max-w-md text-[15px] text-ink-600">
+            Small team, high standards. Every hire has autonomy from day one and equity that matters. Fully remote or hybrid at any of our four offices.
+          </p>
+          <ul class="mt-8 space-y-2.5">
+            {["Competitive salary + meaningful equity","Fully remote or hybrid HQ","5 weeks PTO + parental leave","$3K home office setup","Annual team offsite"].map((b) => (
+              <li class="flex items-start gap-2.5 text-[14px] text-ink-700">
+                <span class="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400">
+                  <Icon name="check" size={10} strokeWidth={2.5} />
+                </span>
+                {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="lg:col-span-7">
+          <div class="rounded-3xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <div class="mb-3 flex items-center justify-between px-2 pt-1">
+              <p class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Open roles at Joblo</p>
+              <span class="text-[11.5px] text-ink-400 tabular-nums">{openRoles.length} live</span>
+            </div>
+            <ul class="space-y-2">
+              {openRoles.map((r) => (
+                <li>
+                  <a href="/jobs" class="group flex items-center gap-4 rounded-2xl border border-ink-200/70 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.02]">
+                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-[13px] font-bold text-ink-50 dark:!bg-brand-500 dark:text-white">J</span>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-[15px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{r.title}</p>
+                      <p class="mt-0.5 text-[12.5px] text-ink-500">{r.team} · {r.location}</p>
+                    </div>
+                    <span class="hidden sm:inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                      Live
+                    </span>
+                    <Icon name="arrowRight" size={14} class="text-ink-400 transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <a href="/jobs" class="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-2xl bg-ink-50/70 py-3 text-[12.5px] font-medium text-ink-700 hover:bg-ink-100 dark:!bg-white/[0.03] dark:hover:!bg-white/[0.06]">
+              See all open roles
+              <Icon name="arrowRight" size={11} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═════ CTA CLOSER — dark gradient ═════ -->
+  <section class="section-about-cta pb-16 sm:pb-24 lg:pb-32">
+    <Container size="xl">
+      <div class="relative overflow-hidden rounded-3xl bg-ink-900 p-8 text-center text-ink-50 sm:p-10 lg:p-16">
+        <div class="pointer-events-none absolute -top-32 left-1/2 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-500/40 via-accent-500/30 to-transparent blur-3xl"></div>
+        <div class="pointer-events-none absolute inset-0 bg-grid opacity-15 mix-blend-overlay"></div>
+        <div class="relative">
+          <p class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-white/70">
+            Whether you're hiring or looking
+          </p>
+          <h2 class="mt-5 text-[30px] font-semibold leading-[1.05] tracking-tight sm:text-4xl lg:text-[52px]">
+            Start where it makes <span class="font-display italic font-normal text-accent-400">sense</span>.
+          </h2>
+          <p class="mx-auto mt-4 max-w-xl text-[15.5px] text-ink-300">Both sides are free to try. Only good matches make it through.</p>
+          <div class="mt-8 flex flex-wrap justify-center gap-3">
+            <a href="/jobs" class="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-6 text-[14.5px] font-semibold text-ink-900 shadow-sm transition-all hover:shadow-md">
+              Browse jobs
+              <Icon name="arrowRight" size={15} class="transition-transform group-hover:translate-x-0.5" />
+            </a>
+            <a href="/post-a-job" class="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 text-[14.5px] font-medium text-white transition-colors hover:bg-white/10">
+              Post a role
+            </a>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>

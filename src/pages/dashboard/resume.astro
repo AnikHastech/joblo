@@ -1,0 +1,165 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import { currentCandidate, experience, education } from "@data/dashboard";
+
+const templates = [
+  { id: "modern",   label: "Modern",   description: "Clean, ATS-friendly, 1 page.",          featured: true  },
+  { id: "editorial",label: "Editorial",description: "Serif headings, magazine layout.",      featured: false },
+  { id: "compact",  label: "Compact",  description: "Dense two-column layout.",              featured: false },
+  { id: "classic",  label: "Classic",  description: "Traditional single-column.",             featured: false },
+];
+
+const sections = [
+  { key: "summary",    label: "Professional summary", included: true  },
+  { key: "experience", label: "Work experience",      included: true  },
+  { key: "education",  label: "Education",            included: true  },
+  { key: "skills",     label: "Skills",               included: true  },
+  { key: "languages",  label: "Languages",            included: true  },
+  { key: "projects",   label: "Selected projects",    included: false },
+  { key: "awards",     label: "Awards & recognition", included: false },
+  { key: "certs",      label: "Certifications",       included: false },
+];
+---
+<DashboardLayout
+  title="Resume"
+  subtitle="Build and export your resume. Auto-syncs from your profile."
+  active="resume"
+>
+  <div class="grid gap-6 lg:grid-cols-12">
+    <!-- Left: settings -->
+    <div class="lg:col-span-4 space-y-5">
+      <!-- Template picker -->
+      <section class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Template</p>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          {templates.map((t) => (
+            <label class="relative cursor-pointer">
+              <input type="radio" name="template" value={t.id} checked={t.featured} class="peer sr-only" />
+              <div class="rounded-2xl border border-ink-200 bg-white p-3 transition-all peer-checked:border-brand-500 peer-checked:ring-2 peer-checked:ring-brand-200 dark:!border-white/10 dark:!bg-white/[0.03] dark:peer-checked:!ring-brand-500/40">
+                <div class="aspect-[4/5] rounded-lg bg-gradient-to-br from-ink-100 to-white ring-1 ring-inset ring-ink-200 dark:!from-white/[0.06] dark:!to-white/[0.02] dark:!ring-white/10">
+                  <div class="p-2.5 space-y-1">
+                    <div class="h-1.5 w-2/3 rounded bg-ink-400"></div>
+                    <div class="h-0.5 w-1/3 rounded bg-ink-300"></div>
+                    <div class="mt-2 space-y-0.5">
+                      <div class="h-0.5 w-full rounded bg-ink-200"></div>
+                      <div class="h-0.5 w-full rounded bg-ink-200"></div>
+                      <div class="h-0.5 w-3/4 rounded bg-ink-200"></div>
+                    </div>
+                  </div>
+                </div>
+                <p class="mt-2 text-[13px] font-semibold text-ink-900">{t.label}</p>
+                <p class="text-[11px] text-ink-500">{t.description}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <!-- Sections -->
+      <section class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Sections</p>
+        <ul class="mt-4 space-y-2">
+          {sections.map((s) => (
+            <li>
+              <label class="flex items-center justify-between gap-3 rounded-xl p-2 hover:bg-ink-50 dark:hover:!bg-white/[0.04]">
+                <span class="text-[13px] text-ink-800">{s.label}</span>
+                <input type="checkbox" checked={s.included} class="peer sr-only" />
+                <span class="relative h-5 w-9 rounded-full bg-ink-200 transition-colors peer-checked:bg-brand-600 dark:!bg-white/10">
+                  <span class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform peer-checked:translate-x-4"></span>
+                </span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Export -->
+      <section class="rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-700 dark:text-brand-400">Export</p>
+        <p class="mt-2 text-[13px] text-ink-700">Download or share your resume in one tap.</p>
+        <div class="mt-4 flex flex-col gap-2">
+          <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13.5px] font-semibold text-ink-50 shadow-sm hover:bg-brand-600">
+            <Icon name="arrowUp" size={13} class="rotate-180" />
+            Download PDF
+          </button>
+          <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+            <Icon name="send" size={13} />
+            Get shareable link
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right: live preview -->
+    <div class="lg:col-span-8">
+      <div class="rounded-3xl border border-ink-200/70 bg-ink-100 p-4 sm:p-6 dark:!border-white/[0.08] dark:!bg-white/[0.04]">
+        <div class="mx-auto max-w-[820px] rounded-2xl bg-white p-8 shadow-xl ring-1 ring-ink-200 sm:p-12 dark:!bg-ink-50 dark:!ring-white/10">
+          <!-- Resume preview -->
+          <header class="border-b border-ink-200 pb-6 dark:!border-white/10">
+            <h1 class="text-[32px] font-semibold tracking-tight text-ink-900">{currentCandidate.name}</h1>
+            <p class="mt-1 text-[15px] text-ink-700">{currentCandidate.role}</p>
+            <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11.5px] text-ink-500">
+              <span>{currentCandidate.email}</span>
+              <span>·</span>
+              <span>{currentCandidate.location}</span>
+              <span>·</span>
+              <span>{currentCandidate.links.website.replace(/^https?:\/\//, "")}</span>
+              <span>·</span>
+              <span>{currentCandidate.links.linkedin.replace(/^https?:\/\//, "")}</span>
+            </div>
+          </header>
+
+          <section class="mt-6">
+            <h2 class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Summary</h2>
+            <p class="mt-2 text-[13.5px] leading-[1.7] text-ink-800">{currentCandidate.bio}</p>
+          </section>
+
+          <section class="mt-6">
+            <h2 class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Experience</h2>
+            <ul class="mt-3 space-y-4">
+              {experience.map((e) => (
+                <li>
+                  <div class="flex flex-wrap items-baseline justify-between gap-2">
+                    <p class="text-[14px] font-semibold text-ink-900">{e.role} · <span class="text-ink-700 font-normal">{e.company}</span></p>
+                    <p class="text-[11.5px] tabular-nums text-ink-500">{e.start} — {e.end}</p>
+                  </div>
+                  <p class="mt-0.5 text-[11.5px] text-ink-500">{e.location}</p>
+                  <p class="mt-1.5 text-[12.5px] leading-relaxed text-ink-700">{e.summary}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section class="mt-6">
+            <h2 class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Education</h2>
+            <ul class="mt-3 space-y-3">
+              {education.map((e) => (
+                <li class="flex flex-wrap items-baseline justify-between gap-2">
+                  <div>
+                    <p class="text-[13.5px] font-semibold text-ink-900">{e.school}</p>
+                    <p class="mt-0.5 text-[12px] text-ink-700">{e.degree}</p>
+                  </div>
+                  <p class="text-[11.5px] tabular-nums text-ink-500">{e.start} — {e.end}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section class="mt-6 grid gap-6 sm:grid-cols-2">
+            <div>
+              <h2 class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Skills</h2>
+              <p class="mt-2 text-[12.5px] leading-relaxed text-ink-700">{currentCandidate.skills.join(" · ")}</p>
+            </div>
+            <div>
+              <h2 class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Languages</h2>
+              <ul class="mt-2 space-y-0.5 text-[12.5px] text-ink-700">
+                {currentCandidate.languages.map((l) => <li>{l}</li>)}
+              </ul>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

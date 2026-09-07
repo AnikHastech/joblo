@@ -1,0 +1,44 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Hero              from "@components/sections/Hero.astro";
+import TrustedCompanies  from "@components/sections/TrustedCompanies.astro";
+import Categories        from "@components/sections/Categories.astro";
+import FeaturedJobs      from "@components/sections/FeaturedJobs.astro";
+import HowItWorks        from "@components/sections/HowItWorks.astro";
+import VideoDemo         from "@components/sections/VideoDemo.astro";
+import Testimonials      from "@components/sections/Testimonials.astro";
+import TopCompanies      from "@components/sections/TopCompanies.astro";
+import FeaturedCandidates from "@components/sections/FeaturedCandidates.astro";
+import JobsByLocation    from "@components/sections/JobsByLocation.astro";
+import RemoteJobs        from "@components/sections/RemoteJobs.astro";
+import MarketPulse       from "@components/sections/MarketPulse.astro";
+import Insights          from "@components/sections/Insights.astro";
+import CandidateCTA      from "@components/sections/CandidateCTA.astro";
+import EmployerCTA       from "@components/sections/EmployerCTA.astro";
+import FAQ               from "@components/sections/FAQ.astro";
+import { organizationSchema, websiteSchema } from "@lib/schema";
+
+const schema = [organizationSchema(), websiteSchema()];
+---
+<BaseLayout
+  title="Joblo — Where careers begin. The modern job marketplace."
+  description="Joblo connects exceptional talent with the world's most ambitious teams. Browse 128,000+ curated roles from verified companies hiring now."
+  schema={schema}
+>
+  <Hero />
+  <TrustedCompanies />
+  <Categories />
+  <FeaturedJobs />
+  <HowItWorks />
+  <VideoDemo />
+  <Testimonials />
+  <TopCompanies />
+  <FeaturedCandidates />
+  <JobsByLocation />
+  <RemoteJobs />
+  <MarketPulse />
+  <Insights />
+  <CandidateCTA />
+  <EmployerCTA />
+  <FAQ />
+</BaseLayout>

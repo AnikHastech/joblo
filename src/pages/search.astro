@@ -1,0 +1,300 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import JobCard from "@components/jobs/JobCard.astro";
+import CompanyCard from "@components/companies/CompanyCard.astro";
+import CategoryCard from "@components/cards/CategoryCard.astro";
+import { jobs } from "@data/jobs";
+import { companies } from "@data/companies";
+import { candidates } from "@data/candidates";
+import { categories } from "@data/categories";
+import { blogPosts } from "@data/blog";
+import { site } from "@data/site";
+---
+<BaseLayout
+  title={`Search · ${site.name}`}
+  description="Search across every job, company, category, candidate, and article on Joblo."
+>
+  <section class="section-search relative isolate pt-14 pb-8 sm:pt-20">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-30 mask-radial"></div>
+      <div class="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-200/40 via-accent-200/30 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="font-medium text-ink-800">Search</span>
+      </nav>
+
+      <div class="mt-6 max-w-3xl">
+        <SectionEyebrow number="01" label="Universal search" />
+        <h1 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+          Find <span id="s-echo" class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">anything</span> on Joblo.
+        </h1>
+        <p class="mt-3 max-w-xl text-[15px] text-ink-600">
+          Searches across <span class="font-semibold text-ink-900 tabular-nums">{jobs.length}</span> jobs,
+          <span class="font-semibold text-ink-900 tabular-nums">{companies.length}</span> companies,
+          <span class="font-semibold text-ink-900 tabular-nums">{candidates.length}</span> candidates,
+          <span class="font-semibold text-ink-900 tabular-nums">{categories.length}</span> categories, and
+          <span class="font-semibold text-ink-900 tabular-nums">{blogPosts.length}</span> articles.
+        </p>
+      </div>
+
+      <!-- Search box -->
+      <form id="s-form" action="/search" method="get" class="mt-8 max-w-2xl">
+        <label class="relative block">
+          <span class="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-ink-400"><Icon name="search" size={17} /></span>
+          <input
+            id="s-input"
+            name="q"
+            type="search"
+            placeholder="Try 'designer', 'remote', 'stripe', 'salary'…"
+            class="h-14 w-full rounded-full border border-ink-200 bg-white pl-13 pr-32 text-[15px] text-ink-900 placeholder:text-ink-400 shadow-sm focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"
+            autofocus
+          />
+          <button type="submit" class="absolute right-1.5 top-1.5 inline-flex h-11 items-center gap-1.5 rounded-full bg-ink-900 px-5 text-[13.5px] font-semibold text-ink-50 hover:bg-brand-600">
+            Search <Icon name="arrowRight" size={12} />
+          </button>
+        </label>
+      </form>
+    </Container>
+  </section>
+
+  <!-- Result tabs + summary -->
+  <section class="pt-2 pb-6">
+    <Container size="xl">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <p id="s-summary" class="text-[13.5px] text-ink-500">Start typing to search.</p>
+        <div class="inline-flex flex-wrap gap-1 rounded-full border border-ink-200 bg-white p-0.5 dark:!border-white/10 dark:!bg-white/[0.04]" role="group">
+          <button type="button" data-scope="all"        data-active="true"  class="s-scope rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">All</button>
+          <button type="button" data-scope="jobs"       data-active="false" class="s-scope rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Jobs</button>
+          <button type="button" data-scope="companies"  data-active="false" class="s-scope rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Companies</button>
+          <button type="button" data-scope="candidates" data-active="false" class="s-scope rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Candidates</button>
+          <button type="button" data-scope="categories" data-active="false" class="s-scope rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Categories</button>
+          <button type="button" data-scope="blog"       data-active="false" class="s-scope rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Articles</button>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Results (all pre-rendered, JS toggles visibility) -->
+  <section class="pb-24 sm:pb-32">
+    <Container size="xl">
+
+      <!-- JOBS -->
+      <div class="s-group" data-group="jobs">
+        <div class="mb-4 flex items-baseline justify-between gap-3">
+          <h2 class="text-[18px] font-semibold tracking-tight text-ink-900">Jobs <span class="s-count text-[13px] font-normal text-ink-500 tabular-nums" data-of={jobs.length}>({jobs.length})</span></h2>
+          <a href="/jobs" class="text-[12.5px] font-medium text-brand-700 hover:underline">All jobs →</a>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {jobs.map((j) => (
+            <div
+              class="s-item"
+              data-hay={`${j.title} ${j.tags.join(" ")} ${j.location} ${j.experience} ${j.type} ${j.categorySlug}`.toLowerCase()}
+            >
+              <JobCard job={j} />
+            </div>
+          ))}
+        </div>
+        <div class="s-empty mt-4 hidden">
+          <EmptyState compact icon="briefcase" title="No matching jobs" body="Try a shorter or different keyword." />
+        </div>
+      </div>
+
+      <!-- COMPANIES -->
+      <div class="s-group mt-14" data-group="companies">
+        <div class="mb-4 flex items-baseline justify-between gap-3">
+          <h2 class="text-[18px] font-semibold tracking-tight text-ink-900">Companies <span class="s-count text-[13px] font-normal text-ink-500 tabular-nums" data-of={companies.length}>({companies.length})</span></h2>
+          <a href="/companies" class="text-[12.5px] font-medium text-brand-700 hover:underline">All companies →</a>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {companies.map((c) => (
+            <div
+              class="s-item"
+              data-hay={`${c.name} ${c.industry} ${c.location} ${c.size}`.toLowerCase()}
+            >
+              <CompanyCard company={c} />
+            </div>
+          ))}
+        </div>
+        <div class="s-empty mt-4 hidden">
+          <EmptyState compact icon="building" title="No matching companies" body="Try a company name, industry, or city." />
+        </div>
+      </div>
+
+      <!-- CANDIDATES -->
+      <div class="s-group mt-14" data-group="candidates">
+        <div class="mb-4 flex items-baseline justify-between gap-3">
+          <h2 class="text-[18px] font-semibold tracking-tight text-ink-900">Candidates <span class="s-count text-[13px] font-normal text-ink-500 tabular-nums" data-of={candidates.length}>({candidates.length})</span></h2>
+          <a href="/candidates" class="text-[12.5px] font-medium text-brand-700 hover:underline">All candidates →</a>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {candidates.map((c) => (
+            <a
+              href={`/candidates/${c.slug}`}
+              class="s-item group flex items-center gap-4 rounded-2xl border border-ink-200/70 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.035]"
+              data-hay={`${c.name} ${c.role} ${c.location} ${c.skills.join(" ")}`.toLowerCase()}
+            >
+              <img src={c.avatar} alt={c.name} class="h-14 w-14 shrink-0 rounded-2xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+              <div class="min-w-0 flex-1">
+                <p class="line-clamp-1 text-[14.5px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{c.name}</p>
+                <p class="mt-0.5 line-clamp-1 text-[12.5px] text-ink-500">{c.role}</p>
+                <div class="mt-2 flex flex-wrap gap-1">
+                  {c.skills.slice(0, 3).map((s) => (
+                    <span class="rounded-full border border-ink-200 bg-white px-2 py-0.5 text-[10.5px] text-ink-700 dark:!border-white/10 dark:!bg-white/[0.03]">{s}</span>
+                  ))}
+                </div>
+              </div>
+              <Icon name="arrowUpRight" size={13} class="text-ink-400 shrink-0 transition-transform group-hover:translate-x-0.5" />
+            </a>
+          ))}
+        </div>
+        <div class="s-empty mt-4 hidden">
+          <EmptyState compact icon="users" title="No matching candidates" body="Try a skill or role." />
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="s-group mt-14" data-group="categories">
+        <div class="mb-4 flex items-baseline justify-between gap-3">
+          <h2 class="text-[18px] font-semibold tracking-tight text-ink-900">Categories <span class="s-count text-[13px] font-normal text-ink-500 tabular-nums" data-of={categories.length}>({categories.length})</span></h2>
+          <a href="/categories" class="text-[12.5px] font-medium text-brand-700 hover:underline">All categories →</a>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {categories.map((c) => (
+            <div class="s-item" data-hay={`${c.name} ${c.slug}`.toLowerCase()}>
+              <CategoryCard category={c} />
+            </div>
+          ))}
+        </div>
+        <div class="s-empty mt-4 hidden">
+          <EmptyState compact icon="grid" title="No matching categories" />
+        </div>
+      </div>
+
+      <!-- BLOG POSTS -->
+      <div class="s-group mt-14" data-group="blog">
+        <div class="mb-4 flex items-baseline justify-between gap-3">
+          <h2 class="text-[18px] font-semibold tracking-tight text-ink-900">Articles <span class="s-count text-[13px] font-normal text-ink-500 tabular-nums" data-of={blogPosts.length}>({blogPosts.length})</span></h2>
+          <a href="/blog" class="text-[12.5px] font-medium text-brand-700 hover:underline">All articles →</a>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {blogPosts.map((p) => (
+            <a
+              href={`/blog/${p.slug}`}
+              class="s-item group flex flex-col overflow-hidden rounded-2xl border border-ink-200/70 bg-white transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg dark:!border-white/[0.08] dark:!bg-white/[0.035]"
+              data-hay={`${p.title} ${p.excerpt} ${p.category} ${p.tags.join(" ")} ${p.author}`.toLowerCase()}
+            >
+              <div class="relative aspect-[16/10] overflow-hidden">
+                <img src={p.coverUrl} alt="" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" />
+              </div>
+              <div class="flex flex-1 flex-col p-5">
+                <div class="flex items-center gap-2 text-[11.5px] text-ink-500">
+                  <span class="rounded-full bg-brand-50 px-2 py-0.5 text-[10.5px] font-semibold text-brand-700 dark:!bg-brand-500/15 dark:text-brand-400">{p.category}</span>
+                  <span>·</span>
+                  <span>{p.readMinutes} min</span>
+                </div>
+                <h3 class="mt-2 line-clamp-2 text-[15px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{p.title}</h3>
+              </div>
+            </a>
+          ))}
+        </div>
+        <div class="s-empty mt-4 hidden">
+          <EmptyState compact icon="quote" title="No matching articles" />
+        </div>
+      </div>
+
+      <!-- Global empty -->
+      <div id="s-nothing" hidden class="mt-8">
+        <EmptyState
+          icon="search"
+          title="No results across the whole marketplace"
+          body="Try a shorter keyword, check your spelling, or browse from the sections above."
+          ctaLabel="Browse all jobs"
+          ctaHref="/jobs"
+        />
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
+
+<script>
+  const input   = document.getElementById("s-input") as HTMLInputElement | null;
+  const echo    = document.getElementById("s-echo");
+  const summary = document.getElementById("s-summary");
+  const nothing = document.getElementById("s-nothing");
+  const groups  = document.querySelectorAll<HTMLElement>(".s-group");
+  const scopeBtns = document.querySelectorAll<HTMLButtonElement>(".s-scope");
+  let scope = "all";
+
+  const getQ = () => new URLSearchParams(window.location.search).get("q") ?? "";
+
+  const apply = () => {
+    const q = (input?.value ?? "").trim().toLowerCase();
+    if (echo) echo.textContent = q ? `"${q.slice(0, 40)}"` : "anything";
+    let totalMatched = 0;
+
+    groups.forEach((g) => {
+      const groupKey = g.dataset.group;
+      const items = g.querySelectorAll<HTMLElement>(".s-item");
+      const empty = g.querySelector<HTMLElement>(".s-empty");
+      const count = g.querySelector<HTMLElement>(".s-count");
+      const of = Number(count?.dataset.of ?? items.length);
+
+      // Scope visibility
+      const scopeVisible = scope === "all" || scope === groupKey;
+      g.hidden = !scopeVisible;
+      if (!scopeVisible) return;
+
+      let matched = 0;
+      items.forEach((it) => {
+        const hay = it.dataset.hay ?? "";
+        const show = !q || hay.includes(q);
+        it.hidden = !show;
+        if (show) matched++;
+      });
+
+      if (count) count.textContent = q ? `(${matched} of ${of})` : `(${of})`;
+      if (empty) empty.classList.toggle("hidden", matched > 0);
+      totalMatched += matched;
+    });
+
+    if (summary) {
+      if (!q) summary.textContent = "Showing everything. Type to filter.";
+      else summary.textContent = totalMatched === 0
+        ? `No results for "${q}"`
+        : `${totalMatched} result${totalMatched === 1 ? "" : "s"} for "${q}"`;
+    }
+    if (nothing) nothing.hidden = totalMatched > 0 || !q;
+  };
+
+  // Init from URL
+  if (input) {
+    input.value = getQ();
+    apply();
+  }
+  // Live filter (fast, since everything is DOM)
+  let t: number | undefined;
+  input?.addEventListener("input", () => {
+    window.clearTimeout(t);
+    t = window.setTimeout(apply, 60);
+  });
+  scopeBtns.forEach((b) => b.addEventListener("click", () => {
+    scopeBtns.forEach((x) => (x.dataset.active = String(x === b)));
+    scope = b.dataset.scope ?? "all";
+    apply();
+  }));
+  // Update URL on submit without full reload
+  document.getElementById("s-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const q = input?.value ?? "";
+    history.replaceState({}, "", q ? `?q=${encodeURIComponent(q)}` : window.location.pathname);
+    apply();
+  });
+</script>

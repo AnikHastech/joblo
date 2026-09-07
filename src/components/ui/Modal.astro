@@ -1,0 +1,136 @@
+---
+import Icon from "@components/ui/Icon.astro";
+
+/**
+ * Reusable modal. Uses <dialog> so keyboard/focus/ESC just work.
+ * Trigger via a button with `data-modal-open="<id>"`.
+ *
+ * Slots:
+ *   - default: body
+ *   - footer:  right-aligned action row
+ */
+interface Props {
+  id: string;
+  title: string;
+  description?: string;
+  size?: "sm" | "md" | "lg" | "xl";
+  icon?: string;
+  tone?: "brand" | "success" | "warning" | "danger" | "info";
+  dismissable?: boolean;   // shows close button (default true)
+  class?: string;
+}
+const {
+  id, title, description,
+  size = "md", icon, tone,
+  dismissable = true, class: className = "",
+} = Astro.props;
+
+const widths = {
+  sm: "max-w-sm",
+  md: "max-w-lg",
+  lg: "max-w-2xl",
+  xl: "max-w-4xl",
+};
+
+const tones = {
+  brand:   "bg-brand-50 text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400",
+  success: "bg-emerald-50 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400",
+  warning: "bg-amber-50 text-amber-700 dark:!bg-amber-500/15 dark:!text-amber-400",
+  danger:  "bg-rose-50 text-rose-700 dark:!bg-rose-500/15 dark:!text-rose-400",
+  info:    "bg-sky-50 text-sky-700 dark:!bg-sky-500/15 dark:!text-sky-400",
+};
+---
+<dialog
+  id={id}
+  class={`joblo-modal m-auto w-[calc(100vw-2rem)] ${widths[size]} rounded-3xl border border-ink-200/70 bg-white p-0 shadow-2xl shadow-ink-900/20 backdrop:bg-ink-900/40 backdrop:backdrop-blur-sm open:animate-in dark:!border-white/10 dark:!bg-ink-100 ${className}`}
+  aria-labelledby={`${id}-title`}
+  aria-describedby={description ? `${id}-desc` : undefined}
+>
+  <form method="dialog" class="flex flex-col">
+    <!-- Header -->
+    <header class="flex items-start justify-between gap-4 px-6 pt-6">
+      <div class="flex items-start gap-4 min-w-0 flex-1">
+        {icon && tone && (
+          <span class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tones[tone]}`}>
+            <Icon name={icon as any} size={17} />
+          </span>
+        )}
+        <div class="min-w-0 flex-1">
+          <h2 id={`${id}-title`} class="text-[18px] font-semibold tracking-tight text-ink-900 sm:text-[20px]">{title}</h2>
+          {description && <p id={`${id}-desc`} class="mt-1.5 text-[13.5px] leading-relaxed text-ink-600">{description}</p>}
+        </div>
+      </div>
+      {dismissable && (
+        <button
+          type="submit"
+          value="cancel"
+          formnovalidate
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 dark:hover:!bg-white/[0.06]"
+          aria-label="Close modal"
+        >
+          <Icon name="close" size={14} />
+        </button>
+      )}
+    </header>
+
+    <!-- Body -->
+    <div class="px-6 py-5">
+      <slot />
+    </div>
+
+    <!-- Footer -->
+    <footer class="flex flex-wrap items-center justify-end gap-2 border-t border-ink-100 bg-ink-50/50 px-6 py-4 dark:!border-white/[0.06] dark:!bg-white/[0.02]">
+      <slot name="footer">
+        {dismissable && (
+          <button
+            type="submit"
+            value="cancel"
+            class="inline-flex h-10 items-center rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]"
+          >
+            Close
+          </button>
+        )}
+      </slot>
+    </footer>
+  </form>
+</dialog>
+
+<style>
+  /* Enter animation */
+  @keyframes joblo-modal-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+  dialog[open].joblo-modal { animation: joblo-modal-in 180ms cubic-bezier(0.16, 1, 0.3, 1); }
+  dialog::backdrop { animation: joblo-modal-in 200ms ease; }
+</style>
+
+<script>
+  // Any button with data-modal-open="<id>" opens the matching <dialog>.
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const opener = target.closest<HTMLElement>("[data-modal-open]");
+    if (opener) {
+      e.preventDefault();
+      const id = opener.dataset.modalOpen!;
+      const dlg = document.getElementById(id) as HTMLDialogElement | null;
+      dlg?.showModal();
+      return;
+    }
+    // click outside closes
+    const closer = target.closest<HTMLElement>("[data-modal-close]");
+    if (closer) {
+      const dlg = closer.closest("dialog") as HTMLDialogElement | null;
+      dlg?.close();
+    }
+  });
+  // Click on backdrop (dialog itself, not children) closes
+  document.querySelectorAll<HTMLDialogElement>(".joblo-modal").forEach((dlg) => {
+    dlg.addEventListener("click", (ev) => {
+      const rect = dlg.getBoundingClientRect();
+      const inDialog = rect.top <= ev.clientY && ev.clientY <= rect.top + rect.height
+                    && rect.left <= ev.clientX && ev.clientX <= rect.left + rect.width;
+      if (!inDialog) dlg.close();
+    });
+  });
+</script>

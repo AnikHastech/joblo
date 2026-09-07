@@ -1,0 +1,90 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import JobDetailsHeader from "@components/jobs/JobDetailsHeader.astro";
+import JobDetailsBody from "@components/jobs/JobDetailsBody.astro";
+import JobDetailsSidebar from "@components/jobs/JobDetailsSidebar.astro";
+import RelatedJobs from "@components/jobs/RelatedJobs.astro";
+import { jobs } from "@data/jobs";
+import { getCompany } from "@data/companies";
+import { getJobContent } from "@data/jobContent";
+import { site } from "@data/site";
+import { jobPostingSchema, breadcrumbSchema } from "@lib/schema";
+
+export function getStaticPaths() {
+  return jobs.map((job) => ({ params: { slug: job.slug }, props: { job } }));
+}
+
+const { job } = Astro.props;
+const company = getCompany(job.companyId);
+const content = getJobContent(job);
+
+const related = jobs
+  .filter((j) => j.slug !== job.slug && j.categorySlug === job.categorySlug)
+  .sort((a, b) => (a.companyId === job.companyId ? 1 : -1))
+  .slice(0, 3);
+
+const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(0)}k` : `${n}`);
+const sym = job.currency === "USD" ? "$" : job.currency === "EUR" ? "€" : `${job.currency} `;
+const salary = `${sym}${fmt(job.salaryMin)}–${fmt(job.salaryMax)}`;
+
+const seoDescription = [content.overview, content.aboutRole].join(" ").slice(0, 500);
+const schema = [
+  jobPostingSchema(job, company, seoDescription),
+  breadcrumbSchema([
+    { name: "Home",     url: "/" },
+    { name: "Jobs",     url: "/jobs" },
+    { name: job.categorySlug, url: `/jobs?category=${job.categorySlug}` },
+    { name: job.title,  url: `/jobs/${job.slug}` },
+  ]),
+];
+---
+<BaseLayout
+  title={`${job.title} at ${company.name} · ${site.name}`}
+  description={`${company.name} is hiring a ${job.title} (${job.type}, ${job.experience}) — ${salary}/yr. ${job.remote ? "Remote-friendly." : job.location + "."}`}
+  schema={schema}
+>
+  <section class="section-job-detail relative isolate pt-12 pb-24 sm:pt-16 sm:pb-32">
+    <!-- Ambient background (clipped in its own wrapper so section doesn't need overflow-hidden — sticky needs no clipping ancestor) -->
+    <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[640px] overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-30 mask-radial"></div>
+      <div class="absolute -top-40 right-0 h-[520px] w-[820px] rounded-full bg-gradient-to-bl from-brand-200/40 via-accent-200/25 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+
+    <Container size="xl">
+      <!-- Breadcrumb -->
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <a href="/jobs" class="hover:text-ink-900 transition-colors">Jobs</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <a href={`/jobs?category=${job.categorySlug}`} class="capitalize hover:text-ink-900 transition-colors">{job.categorySlug}</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="line-clamp-1 font-medium text-ink-800">{job.title}</span>
+      </nav>
+
+      <!-- Two-column layout: everything left / sticky sidebar right -->
+      <div class="mt-8 grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
+        <!-- LEFT: header + body -->
+        <div class="lg:col-span-8">
+          <SectionEyebrow number="01" label="Open role" />
+          <div class="mt-5">
+            <JobDetailsHeader job={job} company={company} />
+          </div>
+          <div class="mt-14">
+            <JobDetailsBody job={job} content={content} />
+          </div>
+        </div>
+
+        <!-- RIGHT: sticky sidebar (Apply CTA + company + facts + insight + share) -->
+        <div class="lg:sticky lg:top-24 lg:col-span-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-2 lg:[scrollbar-width:thin]">
+          <JobDetailsSidebar job={job} company={company} />
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <RelatedJobs jobs={related} />
+</BaseLayout>

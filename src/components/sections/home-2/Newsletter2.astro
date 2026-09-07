@@ -1,0 +1,40 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+---
+<section class="section-newsletter-2 relative isolate overflow-hidden py-16 sm:py-20 bg-gradient-to-b from-white via-brand-50/40 to-accent-50/40 dark:!from-ink-100 dark:!via-brand-950/25 dark:!to-accent-900/20">
+  <div class="pointer-events-none absolute -left-32 top-0 h-[350px] w-[350px] rounded-full bg-brand-200/40 blur-3xl dark:!bg-brand-500/15"></div>
+  <div class="pointer-events-none absolute -right-32 bottom-0 h-[350px] w-[350px] rounded-full bg-accent-200/40 blur-3xl dark:!bg-accent-500/15"></div>
+  <Container size="xl">
+    <div class="mx-auto flex max-w-6xl flex-col items-center gap-6 text-center">
+      <SectionEyebrow number={14} label="Weekly digest" class="justify-center" />
+      <h2 class="text-3xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl">
+        Get the 10 <span class="font-display italic font-normal text-brand-600">best roles</span> of the week.
+      </h2>
+      <p class="max-w-xl text-[15.5px] text-ink-600">
+        Hand-picked opportunities matched to your saved filters. 84,000+ pros already subscribed.
+      </p>
+
+      <form onsubmit="event.preventDefault();" class="mt-4 flex w-full max-w-lg flex-col gap-2 sm:flex-row">
+        <div class="relative flex-1">
+          <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-400">
+            <Icon name="send" size={16} />
+          </span>
+          <input
+            type="email"
+            required
+            placeholder="you@company.com"
+            class="h-13 w-full rounded-full border border-ink-200 bg-white pl-11 pr-4 text-[14.5px] text-ink-900 placeholder:text-ink-400 focus:border-ink-900 focus:outline-none dark:border-white/10 dark:!bg-white/[0.04]"
+          />
+        </div>
+        <button type="submit" class="group inline-flex h-13 shrink-0 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-600 to-accent-500 px-6 text-[14.5px] font-semibold text-white transition-all hover:shadow-[0_10px_30px_-8px_rgb(74_63_230/0.5)]">
+          Subscribe
+          <Icon name="arrowRight" size={14} strokeWidth={2} class="transition-transform group-hover:translate-x-0.5" />
+        </button>
+      </form>
+
+      <p class="text-[12px] text-ink-500">No spam. Unsubscribe with one click.</p>
+    </div>
+  </Container>
+</section>

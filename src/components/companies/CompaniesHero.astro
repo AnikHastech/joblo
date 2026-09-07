@@ -1,0 +1,92 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { site } from "@data/site";
+import { companies } from "@data/companies";
+
+const verifiedCount = companies.filter((c) => c.verified).length;
+const hiring = companies.filter((c) => (c.openings ?? 0) > 0).length;
+const industryCount = new Set(companies.map((c) => c.industry)).size;
+
+const trending = ["AI Research", "Fintech", "Developer Tools", "Design", "Infrastructure"];
+---
+<section class="companies-hero relative isolate pt-14 pb-16 sm:pt-20 sm:pb-20">
+  <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <div class="absolute inset-0 bg-grid opacity-40 mask-radial"></div>
+    <div class="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-br from-accent-200/40 via-brand-200/30 to-transparent blur-3xl dark:!from-accent-500/15 dark:!via-brand-500/10"></div>
+  </div>
+
+  <Container size="xl">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+      <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+      <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+      <span class="font-medium text-ink-800">Companies</span>
+    </nav>
+
+    <div class="mt-6 grid gap-8 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-8">
+        <SectionEyebrow number="01" label="Company directory" />
+        <h1 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl lg:text-[56px]">
+          Teams worth <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">joining</span>.
+        </h1>
+        <p class="mt-4 max-w-xl text-[16px] leading-relaxed text-ink-600">
+          Browse {site.stats.companies} verified companies hiring right now — filter by industry, size, and location. Every profile is human-reviewed.
+        </p>
+      </div>
+
+      <!-- Stats trio -->
+      <div class="lg:col-span-4">
+        <dl class="grid grid-cols-3 divide-x divide-ink-200 rounded-2xl border border-ink-200/70 bg-white/70 p-4 backdrop-blur dark:!divide-white/10 dark:!border-white/10 dark:!bg-white/[0.04]">
+          <div class="px-3 text-center">
+            <dt class="text-[10.5px] font-semibold uppercase tracking-widest text-ink-500">Verified</dt>
+            <dd class="mt-1 text-[22px] font-semibold text-ink-900 tabular-nums">{verifiedCount}</dd>
+          </div>
+          <div class="px-3 text-center">
+            <dt class="text-[10.5px] font-semibold uppercase tracking-widest text-ink-500">Hiring now</dt>
+            <dd class="mt-1 text-[22px] font-semibold text-ink-900 tabular-nums">{hiring}</dd>
+          </div>
+          <div class="px-3 text-center">
+            <dt class="text-[10.5px] font-semibold uppercase tracking-widest text-ink-500">Industries</dt>
+            <dd class="mt-1 text-[22px] font-semibold text-ink-900 tabular-nums">{industryCount}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Search + trending -->
+    <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div class="relative flex-1">
+        <span class="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-ink-400">
+          <Icon name="search" size={18} />
+        </span>
+        <input
+          id="companies-search"
+          type="search"
+          placeholder="Search companies by name, industry, or location…"
+          class="h-14 w-full rounded-full border border-ink-200 bg-white pl-14 pr-6 text-[14.5px] text-ink-900 placeholder:text-ink-400 shadow-sm transition-colors focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"
+        />
+      </div>
+      <a
+        href="/post-a-job"
+        class="group inline-flex h-14 items-center justify-center gap-1.5 rounded-full bg-ink-900 px-6 text-[14px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md"
+      >
+        List your company
+        <Icon name="arrowRight" size={15} class="transition-transform group-hover:translate-x-0.5" />
+      </a>
+    </div>
+
+    <div class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <span class="text-[12.5px] uppercase tracking-widest text-ink-500">Trending industries</span>
+      {trending.map((t) => (
+        <a
+          href={`/companies?industry=${encodeURIComponent(t.toLowerCase())}`}
+          class="rounded-full border border-ink-200 bg-white/70 px-3 py-1 text-[13px] text-ink-700 backdrop-blur transition-colors hover:border-ink-900 hover:bg-ink-900 hover:text-ink-50 dark:!border-white/10 dark:!bg-white/[0.04] dark:text-ink-800 dark:hover:!bg-white/[0.1]"
+        >
+          {t}
+        </a>
+      ))}
+    </div>
+  </Container>
+</section>

@@ -1,0 +1,21 @@
+---
+interface Props {
+  variant?: "dark" | "light";
+  class?: string;
+}
+const { variant = "dark", class: className = "" } = Astro.props;
+const text = variant === "light" ? "text-ink-50" : "text-ink-900";
+---
+<a href="/" class={`inline-flex items-center gap-2 group ${className}`} aria-label="Joblo — home">
+  <span class="relative flex h-8 w-8 items-center justify-center">
+    <svg viewBox="0 0 32 32" class="h-8 w-8" aria-hidden="true">
+      <rect x="1" y="1" width="30" height="30" rx="10" fill="currentColor" class={text}/>
+      <path d="M11 10v8.5a3.5 3.5 0 003.5 3.5h.5V12h5V10H11z" fill="currentColor" class={variant === "light" ? "text-ink-900" : "text-ink-50"}/>
+    </svg>
+    <span class="absolute -right-0.5 -top-0.5 flex h-2 w-2" aria-label="online">
+      <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+      <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-ink-50 dark:!ring-white"></span>
+    </span>
+  </span>
+  <span class={`text-[19px] font-semibold tracking-tight ${text}`}>Joblo</span>
+</a>

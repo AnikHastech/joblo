@@ -1,0 +1,58 @@
+---
+import Container from "@components/ui/Container.astro";
+import SearchBar from "@components/jobs/SearchBar.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { site } from "@data/site";
+
+const trending = ["Product Designer", "AI/ML", "Frontend", "Growth Lead", "Rust", "iOS"];
+---
+<section class="jobs-hero relative isolate overflow-hidden pt-14 pb-16 sm:pt-20 sm:pb-20">
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-40 mask-radial"></div>
+  <div class="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-200/40 via-accent-200/30 to-transparent blur-3xl dark:!from-brand-500/20 dark:!via-accent-500/15"></div>
+
+  <Container size="xl">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+      <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+      <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+      <span class="font-medium text-ink-800">Find work</span>
+    </nav>
+
+    <div class="mt-6 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
+      <div class="max-w-3xl">
+        <SectionEyebrow number={1} label="Jobs board" />
+        <h1 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+          Every open role, <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">one place</span>.
+        </h1>
+        <p class="mt-4 max-w-xl text-[16px] leading-relaxed text-ink-600">
+          Browse {site.stats.jobs} curated positions from {site.stats.companies} verified companies. Filter by anything — apply in one click.
+        </p>
+      </div>
+
+      <!-- Live indicator -->
+      <div class="flex items-center gap-2 rounded-full border border-ink-200 bg-white/70 px-3 py-1.5 backdrop-blur dark:border-white/10 dark:!bg-white/[0.04]">
+        <span class="relative flex h-1.5 w-1.5">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+        </span>
+        <span class="text-[11.5px] font-semibold uppercase tracking-widest text-ink-700">Updated · just now</span>
+      </div>
+    </div>
+
+    <!-- Search bar -->
+    <div class="mt-10">
+      <SearchBar />
+    </div>
+
+    <!-- Trending pills -->
+    <div class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <span class="text-[12.5px] uppercase tracking-widest text-ink-500">Trending</span>
+      {trending.map((t) => (
+        <a href={`/jobs?q=${encodeURIComponent(t)}`} class="rounded-full border border-ink-200 bg-white/70 px-3 py-1 text-[13px] text-ink-700 backdrop-blur transition-colors hover:border-ink-900 hover:bg-ink-900 hover:text-ink-50 dark:border-white/10 dark:!bg-white/[0.04] dark:text-ink-800 dark:hover:!bg-white/[0.1]">
+          {t}
+        </a>
+      ))}
+    </div>
+  </Container>
+</section>

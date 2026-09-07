@@ -1,0 +1,121 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import Icon from "@components/ui/Icon.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import { jobs } from "@data/jobs";
+import { site } from "@data/site";
+
+// A tiny selection of live things to help the visitor get un-stuck
+const trending = jobs.slice(0, 3);
+const quickLinks = [
+  { label: "Browse all jobs",       href: "/jobs",       icon: "briefcase", tone: "bg-accent-50 text-accent-700 dark:!bg-accent-500/15 dark:!text-accent-400" },
+  { label: "Explore companies",     href: "/companies",  icon: "building",  tone: "bg-brand-50 text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400" },
+  { label: "Categories directory",  href: "/categories", icon: "grid",      tone: "bg-violet-50 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400" },
+  { label: "Insights & guides",     href: "/blog",       icon: "quote",     tone: "bg-emerald-50 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400" },
+  { label: "Talk to us",            href: "/contact",    icon: "send",      tone: "bg-sky-50 text-sky-700 dark:!bg-sky-500/15 dark:!text-sky-400" },
+];
+---
+<BaseLayout
+  title={`Page not found · ${site.name}`}
+  description="This URL doesn't exist — but a few thousand active roles do. Let us help you find your way."
+>
+  <section class="relative isolate flex min-h-[calc(100vh-4.5rem)] items-center py-16 sm:py-24">
+    <!-- Ambient background -->
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-30 mask-radial"></div>
+      <div class="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-200/40 via-accent-200/30 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+
+    <Container size="xl">
+      <div class="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
+        <!-- Left: title -->
+        <div class="lg:col-span-7">
+          <SectionEyebrow number="404" label="Not found" />
+          <h1 class="mt-5 text-[64px] font-semibold leading-[0.95] tracking-tight text-ink-900 sm:text-[96px] lg:text-[128px]">
+            Off the <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">map</span>.
+          </h1>
+          <p class="mt-6 max-w-xl text-[17px] leading-relaxed text-ink-600">
+            This URL doesn't lead anywhere on Joblo. It might have moved, or the link that got you here was a little older than we'd like to admit. Either way — we can help.
+          </p>
+
+          <!-- Search -->
+          <form action="/search" method="get" class="mt-8 max-w-lg">
+            <label class="relative block">
+              <span class="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-ink-400"><Icon name="search" size={17} /></span>
+              <input
+                type="search"
+                name="q"
+                placeholder="Search for a role, company, or category…"
+                class="h-14 w-full rounded-full border border-ink-200 bg-white pl-13 pr-32 text-[15px] text-ink-900 placeholder:text-ink-400 shadow-sm focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"
+                autofocus
+              />
+              <button type="submit" class="absolute right-1.5 top-1.5 inline-flex h-11 items-center gap-1.5 rounded-full bg-ink-900 px-5 text-[13.5px] font-semibold text-ink-50 hover:bg-brand-600">
+                Search <Icon name="arrowRight" size={12} />
+              </button>
+            </label>
+          </form>
+
+          <!-- Quick links -->
+          <div class="mt-8">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Popular starting points</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              {quickLinks.map((l) => (
+                <a
+                  href={l.href}
+                  class="group inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white/70 py-2 pl-1.5 pr-4 text-[13px] font-medium text-ink-800 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-ink-400 hover:shadow-sm dark:!border-white/10 dark:!bg-white/[0.04]"
+                >
+                  <span class={`flex h-7 w-7 items-center justify-center rounded-full ${l.tone}`}>
+                    <Icon name={l.icon as any} size={12} />
+                  </span>
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: helpful cards -->
+        <aside class="lg:col-span-5 space-y-4">
+          <div class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <div class="flex items-center gap-2 text-brand-700 dark:text-brand-400">
+              <Icon name="livePulse" size={13} />
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em]">Trending right now</p>
+            </div>
+            <ul class="mt-4 space-y-3">
+              {trending.map((j) => (
+                <li>
+                  <a href={`/jobs/${j.slug}`} class="group flex items-center gap-3 rounded-2xl border border-ink-200/70 bg-white p-3 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.02]">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white" style={`background:${["#5b58f5","#000","#635bff"][trending.indexOf(j)]}`}>{j.title[0]}</span>
+                    <div class="min-w-0 flex-1">
+                      <p class="line-clamp-1 text-[13.5px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{j.title}</p>
+                      <p class="mt-0.5 text-[11.5px] text-ink-500">{j.location}</p>
+                    </div>
+                    <Icon name="arrowUpRight" size={12} class="text-ink-400 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="flex items-center gap-3 rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-5 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/70 text-brand-700 dark:!bg-white/[0.08] dark:!text-brand-400">
+              <Icon name="sparkles" size={16} />
+            </span>
+            <div class="flex-1">
+              <p class="text-[13.5px] font-semibold text-ink-900">Still lost?</p>
+              <p class="mt-0.5 text-[12.5px] text-ink-600"><a href="/contact" class="text-brand-700 hover:underline">Ping our team</a> — real reply within 4 hours.</p>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <a href="/" class="inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-500 hover:text-ink-900 transition-colors">
+              <Icon name="arrowRight" size={11} class="rotate-180" />
+              Back to home
+            </a>
+          </div>
+        </aside>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>

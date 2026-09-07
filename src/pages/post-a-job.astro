@@ -1,0 +1,518 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import Badge from "@components/ui/Badge.astro";
+import BrandLogo from "@components/common/BrandLogo.astro";
+import { categories } from "@data/categories";
+import { companies } from "@data/companies";
+import { pricingPlans } from "@data/pricing";
+import { site } from "@data/site";
+
+const trustLogos = companies.filter((c) => c.featured).slice(0, 6);
+
+const valueProps = [
+  { icon: "users",     tone: "brand",   title: `${site.stats.candidates} active candidates`, body: "Your role reaches a curated pool of engineers, designers, PMs, and operators actively looking." },
+  { icon: "sparkles",  tone: "violet",  title: "AI-matched shortlists",                       body: "We surface your best-fit applicants first — sorted by skills, experience, and intent signals." },
+  { icon: "bolt",      tone: "warning", title: "Live within 5 minutes",                       body: "Post now, indexed instantly. Median first application arrives in under 3 hours." },
+  { icon: "shield",    tone: "success", title: "Curated, spam-free applicants",              body: "Every candidate is human-reviewed. No CVs from irrelevant roles or timezones." },
+];
+
+const steps = [
+  { n: "01", title: "Basics",       body: "Job title, category, employment type." },
+  { n: "02", title: "Details",      body: "Location, salary range, seniority." },
+  { n: "03", title: "Description",  body: "Overview, responsibilities, requirements, benefits." },
+  { n: "04", title: "How to apply", body: "Joblo ATS, external URL, or email." },
+  { n: "05", title: "Preview",      body: "Review before going live." },
+];
+
+const faqs = [
+  { q: "How much does it cost?",             a: "Your first posting is free forever on the Starter plan. Growth ($119/mo billed annually) unlocks 10 active postings and featured placement. Scale is for high-volume orgs." },
+  { q: "How long does the posting stay live?", a: "Starter listings are visible for 30 days. Growth extends this to 60 days. Scale offers unlimited duration and priority placement." },
+  { q: "Can I edit or close a job after posting?", a: "Yes — from Manage jobs in your employer dashboard. Changes go live within a minute." },
+  { q: "What happens after I publish?",         a: "Your role is indexed instantly, distributed via job alerts to matching candidates, and included in relevant category and company pages." },
+];
+
+const testimonial = {
+  quote: "\"We've hired seven senior engineers through Joblo this year. The candidate quality is in a different league from anywhere else we've tried.\"",
+  author: "Rafael Chen",
+  role: "Head of Engineering",
+  company: "Vercel",
+  avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Rafael-Post&backgroundColor=c0aede",
+};
+
+const toneChip: Record<string, string> = {
+  brand:   "bg-brand-50 text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400",
+  violet:  "bg-violet-50 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400",
+  warning: "bg-amber-50 text-amber-700 dark:!bg-amber-500/15 dark:!text-amber-400",
+  success: "bg-emerald-50 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400",
+};
+---
+<BaseLayout
+  title={`Post a job · ${site.name}`}
+  description={`Reach ${site.stats.candidates} curated candidates in minutes. Post your first role free — no credit card, no commitments.`}
+>
+  <!-- Hero -->
+  <section class="section-post-hero relative isolate pt-14 pb-14 sm:pt-24 sm:pb-20">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-30 mask-radial"></div>
+      <div class="absolute -top-40 right-0 h-[560px] w-[900px] rounded-full bg-gradient-to-bl from-brand-200/40 via-accent-200/30 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <a href="/employer" class="hover:text-ink-900 transition-colors">For employers</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="font-medium text-ink-800">Post a job</span>
+      </nav>
+
+      <div class="mt-8 grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
+        <div class="lg:col-span-7">
+          <SectionEyebrow number="01" label="Post a job" />
+          <h1 class="mt-5 text-[42px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-[56px] lg:text-[64px]">
+            Hire the <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">right</span> people.
+            <br class="hidden sm:block" />In minutes.
+          </h1>
+          <p class="mt-5 max-w-xl text-[17px] leading-relaxed text-ink-600">
+            Publish your role to a curated pool of <span class="font-semibold text-ink-900 tabular-nums">{site.stats.candidates}</span> active candidates. Your first posting is free — forever.
+          </p>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="#post-form" class="group inline-flex h-13 items-center gap-2 rounded-full bg-ink-900 px-6 text-[14.5px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md">
+              Start posting free
+              <Icon name="arrowRight" size={14} class="transition-transform group-hover:translate-x-0.5" />
+            </a>
+            <a href="/pricing" class="inline-flex h-13 items-center gap-2 rounded-full border border-ink-200 bg-white px-6 text-[14px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+              See pricing
+            </a>
+          </div>
+
+          <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-ink-600">
+            {[
+              "No credit card required",
+              "Live in 5 minutes",
+              "Cancel any time",
+            ].map((f) => (
+              <li class="inline-flex items-center gap-1.5">
+                <span class="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400">
+                  <Icon name="check" size={10} strokeWidth={2.5} />
+                </span>
+                {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Right: stats card -->
+        <aside class="lg:col-span-5">
+          <div class="rounded-3xl border border-ink-200/70 bg-white/80 p-6 backdrop-blur-md shadow-sm sm:p-8 dark:!border-white/10 dark:!bg-white/[0.04]">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Median performance</p>
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+            </div>
+            <dl class="mt-6 space-y-5">
+              <div>
+                <dt class="text-[12.5px] text-ink-500">First application</dt>
+                <dd class="mt-1 font-display text-[36px] italic leading-none bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">Under 3 hours</dd>
+              </div>
+              <div>
+                <dt class="text-[12.5px] text-ink-500">Qualified applicants (14 days)</dt>
+                <dd class="mt-1 text-[26px] font-semibold text-ink-900 tabular-nums">42</dd>
+              </div>
+              <div>
+                <dt class="text-[12.5px] text-ink-500">Time to hire</dt>
+                <dd class="mt-1 text-[26px] font-semibold text-ink-900 tabular-nums">23 days</dd>
+              </div>
+              <div>
+                <dt class="text-[12.5px] text-ink-500">Candidate response rate</dt>
+                <dd class="mt-1 text-[26px] font-semibold text-ink-900 tabular-nums">91%</dd>
+              </div>
+            </dl>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Trust bar -->
+      <div class="mt-16 border-t border-ink-200 pt-8 dark:!border-white/10">
+        <p class="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Trusted by hiring teams at</p>
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+          {trustLogos.map((c) => (
+            <div class="flex items-center gap-2 opacity-70 grayscale transition-all hover:opacity-100 hover:grayscale-0">
+              <BrandLogo slug={c.slug} size="xs" fallbackColor={c.brandColor} fallbackLetter={c.logo} />
+              <span class="text-[14px] font-semibold text-ink-800">{c.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Why post here -->
+  <section class="section-post-why py-16 sm:py-20">
+    <Container size="xl">
+      <div class="max-w-3xl">
+        <SectionEyebrow number="02" label="Why post here" />
+        <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-[42px]">
+          The marketplace built for <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">signal, not volume</span>.
+        </h2>
+        <p class="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-600">
+          Every candidate is human-reviewed before they can apply. Every application is scored. Every posting reaches the right people first — not everyone.
+        </p>
+      </div>
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {valueProps.map((v, i) => (
+          <article class="group rounded-3xl border border-ink-200/70 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <div class="flex items-center justify-between">
+              <span class={`flex h-11 w-11 items-center justify-center rounded-xl ${toneChip[v.tone]}`}>
+                <Icon name={v.icon as any} size={18} />
+              </span>
+              <span class="text-[10.5px] font-semibold tabular-nums text-ink-400">{String(i + 1).padStart(2, "0")}</span>
+            </div>
+            <h3 class="mt-4 text-[16px] font-semibold text-ink-900">{v.title}</h3>
+            <p class="mt-2 text-[13.5px] leading-relaxed text-ink-600">{v.body}</p>
+          </article>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- 5-step visualization -->
+  <section class="py-8 sm:py-16">
+    <Container size="xl">
+      <div class="max-w-3xl">
+        <SectionEyebrow number="03" label="What to expect" />
+        <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-4xl">
+          Five short steps. <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">~4 minutes total.</span>
+        </h2>
+      </div>
+      <ol class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {steps.map((s, i) => (
+          <li class="group relative flex flex-col rounded-2xl border border-ink-200/70 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-bold uppercase tracking-widest text-brand-700 dark:text-brand-400">{s.n}</p>
+            <p class="mt-2 text-[15px] font-semibold text-ink-900">{s.title}</p>
+            <p class="mt-1.5 text-[12.5px] leading-relaxed text-ink-500">{s.body}</p>
+            {i < steps.length - 1 && (
+              <span aria-hidden="true" class="absolute -right-1.5 top-1/2 hidden -translate-y-1/2 text-ink-300 lg:block">
+                <Icon name="arrowRight" size={14} />
+              </span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </Container>
+  </section>
+
+  <!-- FORM — actual posting -->
+  <section id="post-form" class="section-post-form scroll-mt-24 py-16 sm:py-20">
+    <Container size="xl">
+      <div class="grid gap-8 lg:grid-cols-12 lg:gap-12">
+        <!-- Sticky pitch column -->
+        <aside class="lg:col-span-4 space-y-5 lg:sticky lg:top-28 lg:h-fit">
+          <div class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <SectionEyebrow number="04" label="Fill it in" />
+            <h2 class="mt-3 text-2xl font-semibold leading-[1.1] tracking-tight text-ink-900">
+              Start with the basics.
+            </h2>
+            <p class="mt-3 text-[13.5px] leading-relaxed text-ink-600">
+              You can save and come back any time. Nothing goes live until you hit publish.
+            </p>
+          </div>
+
+          <!-- Testimonial -->
+          <figure class="rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+            <blockquote class="font-display text-[18px] italic leading-snug text-ink-900">
+              {testimonial.quote}
+            </blockquote>
+            <figcaption class="mt-5 flex items-center gap-3 text-[12.5px]">
+              <img src={testimonial.avatar} alt={testimonial.author} class="h-10 w-10 rounded-xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+              <div>
+                <p class="font-semibold text-ink-900">{testimonial.author}</p>
+                <p class="mt-0.5 text-ink-500">{testimonial.role} · {testimonial.company}</p>
+              </div>
+            </figcaption>
+          </figure>
+
+          <!-- Pricing snippet -->
+          <div class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Plans</p>
+            <div class="mt-4 space-y-3">
+              {pricingPlans.map((p) => (
+                <div class={`rounded-2xl border p-3.5 ${p.highlight ? "border-ink-900 bg-ink-900 text-ink-50" : "border-ink-200 dark:!border-white/10"}`}>
+                  <div class="flex items-baseline justify-between">
+                    <p class={`text-[13.5px] font-semibold ${p.highlight ? "text-white" : "text-ink-900"}`}>{p.name}</p>
+                    <p class={`font-semibold tabular-nums ${p.highlight ? "text-white" : "text-ink-900"}`}>
+                      {p.monthly === 0 ? "Free" : `$${p.yearly}`}
+                      {p.monthly > 0 && <span class={`text-[10.5px] font-normal ${p.highlight ? "text-ink-400" : "text-ink-500"}`}> /mo</span>}
+                    </p>
+                  </div>
+                  <p class={`mt-0.5 text-[11.5px] ${p.highlight ? "text-ink-300" : "text-ink-500"}`}>{p.tagline}</p>
+                </div>
+              ))}
+            </div>
+            <a href="/pricing" class="mt-4 inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-700 hover:underline">
+              Compare full plans <Icon name="arrowRight" size={11} />
+            </a>
+          </div>
+        </aside>
+
+        <!-- Form -->
+        <form class="lg:col-span-8 space-y-5">
+          <!-- Basics -->
+          <section class="rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">01 · Basics</p>
+            <h3 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">The role</h3>
+            <div class="mt-6 space-y-5">
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Job title <span class="text-rose-500">*</span></span>
+                <input type="text" required placeholder="e.g. Senior Product Designer" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+              </label>
+              <div class="grid gap-5 sm:grid-cols-2">
+                <label class="block">
+                  <span class="text-[12.5px] font-medium text-ink-700">Category</span>
+                  <select class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">
+                    {categories.map((c) => <option value={c.slug}>{c.name}</option>)}
+                  </select>
+                </label>
+                <label class="block">
+                  <span class="text-[12.5px] font-medium text-ink-700">Employment type</span>
+                  <select class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">
+                    {["Full-time","Part-time","Contract","Freelance","Internship"].map((t) => <option>{t}</option>)}
+                  </select>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <!-- Company -->
+          <section class="rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">02 · Your company</p>
+            <h3 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Who's hiring</h3>
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Company name <span class="text-rose-500">*</span></span>
+                <input type="text" required placeholder="Acme Inc." class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Website</span>
+                <input type="url" placeholder="https://acme.com" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Work email <span class="text-rose-500">*</span></span>
+                <input type="email" required placeholder="you@acme.com" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Company size</span>
+                <select class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">
+                  {["1-10","11-50","51-200","201-500","501-1000","1001-5000","5000+"].map((s) => <option>{s}</option>)}
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <!-- Details -->
+          <section class="rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">03 · Details</p>
+            <h3 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Where & how much</h3>
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Experience level</span>
+                <select class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">
+                  {["Entry","Mid","Senior","Lead","Executive"].map((l) => <option>{l}</option>)}
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Location</span>
+                <input type="text" placeholder="e.g. San Francisco, CA" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+              </label>
+              <label class="sm:col-span-2 flex items-start gap-3 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 dark:!border-brand-500/30 dark:!bg-brand-500/10">
+                <input type="checkbox" checked class="mt-1 h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+                <div>
+                  <p class="text-[13.5px] font-semibold text-ink-900">Remote-friendly</p>
+                  <p class="mt-0.5 text-[12px] text-ink-600">Roles marked remote-friendly get 3× more qualified applicants on average.</p>
+                </div>
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Salary min (yearly)</span>
+                <div class="mt-1.5 flex h-11 w-full rounded-xl border border-ink-200 bg-white focus-within:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+                  <span class="flex items-center pl-3.5 text-[13px] text-ink-500">$</span>
+                  <input type="number" placeholder="160000" class="flex-1 border-0 bg-transparent px-2 text-[14px] text-ink-900 focus:outline-none" />
+                  <select class="mr-1 h-full rounded-xl border-0 bg-transparent px-2 text-[12px] text-ink-500 focus:outline-none">
+                    <option>USD</option><option>EUR</option><option>GBP</option><option>CAD</option>
+                  </select>
+                </div>
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Salary max (yearly)</span>
+                <div class="mt-1.5 flex h-11 w-full rounded-xl border border-ink-200 bg-white focus-within:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+                  <span class="flex items-center pl-3.5 text-[13px] text-ink-500">$</span>
+                  <input type="number" placeholder="210000" class="flex-1 border-0 bg-transparent px-2 text-[14px] text-ink-900 focus:outline-none" />
+                </div>
+              </label>
+            </div>
+          </section>
+
+          <!-- Description -->
+          <section class="rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">04 · Description</p>
+            <h3 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">The story</h3>
+            <div class="mt-6 space-y-5">
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Overview <span class="text-rose-500">*</span></span>
+                <textarea rows="4" required placeholder="What's the mission of this role? Who will they work with?" class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Responsibilities</span>
+                <textarea rows="5" placeholder={"• Own the design of major surfaces from concept to shipped\n• Partner with PMs and engineers"} class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Requirements</span>
+                <textarea rows="5" placeholder={"• 5+ years of experience\n• Strong portfolio\n• Systems thinking"} class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+              </label>
+              <label class="block">
+                <span class="text-[12.5px] font-medium text-ink-700">Benefits</span>
+                <textarea rows="3" placeholder={"• Competitive salary + equity\n• Fully remote or hybrid HQ\n• $2K/yr learning stipend"} class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+              </label>
+            </div>
+          </section>
+
+          <!-- Apply method -->
+          <section class="rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">05 · How to apply</p>
+            <h3 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Application method</h3>
+            <div class="mt-6 grid gap-3">
+              <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 has-[input:checked]:border-brand-500 has-[input:checked]:bg-brand-50/40 dark:!border-white/10 dark:has-[input:checked]:!bg-brand-500/10">
+                <input type="radio" name="apply" checked class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+                <div>
+                  <p class="text-[13.5px] font-semibold text-ink-900">Apply through Joblo</p>
+                  <p class="mt-0.5 text-[12.5px] text-ink-500">Candidates submit via our ATS. Recommended for best conversion.</p>
+                </div>
+              </label>
+              <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+                <input type="radio" name="apply" class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+                <div>
+                  <p class="text-[13.5px] font-semibold text-ink-900">External URL</p>
+                  <p class="mt-0.5 text-[12.5px] text-ink-500">Redirect candidates to your own careers site.</p>
+                </div>
+              </label>
+              <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+                <input type="radio" name="apply" class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+                <div>
+                  <p class="text-[13.5px] font-semibold text-ink-900">Email application</p>
+                  <p class="mt-0.5 text-[12.5px] text-ink-500">Candidates email a specified address directly.</p>
+                </div>
+              </label>
+            </div>
+            <label class="mt-5 block">
+              <span class="text-[12.5px] font-medium text-ink-700">Application deadline (optional)</span>
+              <input type="date" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+            </label>
+          </section>
+
+          <!-- 06 Boost visibility -->
+          <section class="rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">06 · Boost visibility (optional)</p>
+            <h3 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Reach more of the right people</h3>
+            <div class="mt-6 grid gap-3">
+              <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 has-[input:checked]:border-brand-500 has-[input:checked]:bg-brand-50/40 dark:!border-white/10 dark:has-[input:checked]:!bg-brand-500/10">
+                <input type="checkbox" class="mt-1 h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+                <div class="flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <p class="text-[13.5px] font-semibold text-ink-900">Feature this posting</p>
+                    <span class="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-700 dark:!bg-accent-500/15 dark:!text-accent-400">+$79</span>
+                  </div>
+                  <p class="mt-0.5 text-[12.5px] text-ink-500">Featured placement on the homepage + category pages + job feed. Averages 4× more qualified applicants.</p>
+                </div>
+              </label>
+              <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+                <input type="checkbox" class="mt-1 h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+                <div class="flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <p class="text-[13.5px] font-semibold text-ink-900">Send to matching alerts instantly</p>
+                    <span class="rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400">Included</span>
+                  </div>
+                  <p class="mt-0.5 text-[12.5px] text-ink-500">Candidates with a matching job alert get notified within 5 minutes.</p>
+                </div>
+              </label>
+            </div>
+          </section>
+
+          <!-- 07 Preview & publish -->
+          <section class="rounded-3xl border border-brand-200 bg-brand-50/40 p-6 sm:p-8 dark:!border-brand-500/30 dark:!bg-brand-500/10">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-400">07 · Preview & publish</p>
+            <h3 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Ready to go live?</h3>
+            <p class="mt-3 text-[13.5px] text-ink-600">Free · no credit card · edit any time from your dashboard. Live within 5 minutes of publishing.</p>
+            <div class="mt-5 flex flex-wrap items-center gap-2">
+              <button type="button" class="inline-flex h-11 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-5 text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+                Preview posting
+              </button>
+              <button type="button" class="inline-flex h-11 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-5 text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+                Save as draft
+              </button>
+              <button type="submit" class="group inline-flex h-11 items-center gap-2 rounded-full bg-ink-900 px-5 text-[13.5px] font-semibold text-ink-50 shadow-sm hover:bg-brand-600">
+                Publish job
+                <Icon name="arrowRight" size={13} class="transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </div>
+          </section>
+        </form>
+      </div>
+    </Container>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-16 sm:py-20">
+    <Container size="xl">
+      <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
+        <div class="lg:col-span-5">
+          <SectionEyebrow number="05" label="FAQ" />
+          <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-4xl">
+            Common <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">questions</span>
+          </h2>
+          <p class="mt-4 text-[14.5px] text-ink-600">
+            Anything else? <a href="/contact" class="font-semibold text-brand-700 hover:underline">Reach out</a> — real person replies within 4 hours.
+          </p>
+        </div>
+        <div class="lg:col-span-7">
+          <div class="space-y-3">
+            {faqs.map((f) => (
+              <details class="group rounded-2xl border border-ink-200/70 bg-white p-5 transition-colors open:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+                <summary class="flex cursor-pointer items-center justify-between gap-4 list-none">
+                  <span class="text-[14.5px] font-semibold text-ink-900">{f.q}</span>
+                  <span class="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-ink-700 transition-transform group-open:rotate-45 dark:!bg-white/[0.06]">
+                    <Icon name="plus" size={12} strokeWidth={2.2} />
+                  </span>
+                </summary>
+                <p class="mt-3 text-[14px] leading-relaxed text-ink-600">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- CTA -->
+  <section class="pb-24 sm:pb-32">
+    <Container size="xl">
+      <div class="relative overflow-hidden rounded-3xl bg-ink-900 p-10 text-center text-ink-50 sm:p-16">
+        <div class="pointer-events-none absolute -top-32 left-1/2 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-500/40 via-accent-500/30 to-transparent blur-3xl"></div>
+        <div class="relative">
+          <h2 class="text-3xl font-semibold leading-[1.1] tracking-tight sm:text-[42px]">
+            Post your first job <span class="font-display italic font-normal text-accent-400">free.</span>
+          </h2>
+          <p class="mx-auto mt-3 max-w-xl text-[15px] text-ink-300">No credit card. Live in 5 minutes. Cancel any time.</p>
+          <div class="mt-7 flex flex-wrap justify-center gap-3">
+            <a href="#post-form" class="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-accent-500 px-6 text-[14.5px] font-semibold text-white shadow-sm hover:bg-accent-600">Start posting<Icon name="arrowRight" size={15} /></a>
+            <a href="/contact" class="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 text-[14.5px] font-medium text-white hover:bg-white/10">Talk to sales</a>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>

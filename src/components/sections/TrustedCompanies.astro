@@ -1,0 +1,27 @@
+---
+import Container from "@components/ui/Container.astro";
+import BrandLogo from "@components/common/BrandLogo.astro";
+import { companies } from "@data/companies";
+const row = [...companies, ...companies];
+---
+<section class="section-trusted-companies relative isolate overflow-hidden py-14 sm:py-20 bg-gradient-to-r from-brand-50/50 via-white to-accent-50/40 dark:from-brand-950/30 dark:via-ink-100 dark:to-accent-900/25 border-y border-ink-200/60">
+  <Container size="xl">
+    <p class="text-center text-[13px] font-medium uppercase tracking-[0.22em] text-ink-500">
+      Talent already hired at
+    </p>
+
+    <div class="relative mt-10 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+      <div class="flex w-max animate-marquee gap-10 sm:gap-14">
+        {row.map((c) => (
+          <a
+            href={`/companies/${c.slug}`}
+            class="group flex shrink-0 items-center gap-3 opacity-80 transition-all hover:opacity-100"
+          >
+            <BrandLogo slug={c.slug} size="sm" class="transition-transform group-hover:scale-110" />
+            <span class="text-lg font-semibold tracking-tight text-ink-700 group-hover:text-ink-900">{c.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </Container>
+</section>

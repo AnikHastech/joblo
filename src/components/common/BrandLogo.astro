@@ -1,0 +1,93 @@
+---
+/**
+ * Real brand marks — inline SVG, based on public brand identities.
+ * Each mark renders inside its own colored surface, sized by `size`.
+ */
+interface Props {
+  slug: string;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  class?: string;
+  fallbackColor?: string;
+  fallbackLetter?: string;
+}
+const { slug, size = "md", class: className = "", fallbackColor, fallbackLetter } = Astro.props;
+
+const sizes = {
+  xs: { box: "h-8 w-8 rounded-lg",   inner: 16 },
+  sm: { box: "h-10 w-10 rounded-xl", inner: 20 },
+  md: { box: "h-12 w-12 rounded-xl", inner: 22 },
+  lg: { box: "h-16 w-16 rounded-2xl", inner: 30 },
+  xl: { box: "h-20 w-20 rounded-2xl", inner: 38 },
+};
+const s = sizes[size];
+
+// bg color + inner SVG for each brand
+const marks: Record<string, { bg: string; svg: (n: number) => string }> = {
+  linear: {
+    bg: "linear-gradient(135deg,#8a8ff5 0%,#5e6ad2 100%)",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="none"><path d="M2.4 12.4l9.2 9.2 2.1-.4L2.8 10.2zM3.7 7.5l12.8 12.8 3-1L4.9 5.7zM6.7 4.5l12.8 12.8 1.6-2.2L8.8 2.9zM11.6 2.3l10 10 .1-1.6a10 10 0 0 0-9.6-9.6z" fill="white"/></svg>`,
+  },
+  vercel: {
+    bg: "#000",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="white"><path d="M12 2 L22 20 H2 Z"/></svg>`,
+  },
+  stripe: {
+    bg: "linear-gradient(135deg,#7b6dff 0%,#635bff 100%)",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="white"><path d="M13.7 10.3c0-.9 1-1.3 2.2-1.3 1.7 0 4 .5 5.7 1.4V5.2C19.7 4.4 17.9 4 16 4c-4.5 0-7.5 2.4-7.5 6.3 0 6.2 8.4 5.2 8.4 7.8 0 1-1 1.4-2.4 1.4-1.9 0-4.4-.8-6.2-1.8v5.4c2.1.9 4.2 1.3 6.2 1.3 4.6 0 7.7-2.3 7.7-6.3.1-6.5-8.5-5.3-8.5-7.8z"/></svg>`,
+  },
+  figma: {
+    bg: "#fff",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24"><path fill="#0acf83" d="M8 24a4 4 0 0 0 4-4v-4H8a4 4 0 0 0 0 8z"/><path fill="#a259ff" d="M4 12a4 4 0 0 1 4-4h4v8H8a4 4 0 0 1-4-4z"/><path fill="#f24e1e" d="M4 4a4 4 0 0 1 4-4h4v8H8a4 4 0 0 1-4-4z"/><path fill="#ff7262" d="M12 0h4a4 4 0 0 1 0 8h-4V0z"/><circle fill="#1abcfe" cx="16" cy="12" r="4"/></svg>`,
+  },
+  notion: {
+    bg: "#fff",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="#111"><path d="M4.5 4.7c.6.5 1 .5 2 .5l9.5-.6c.2 0 0-.2 0-.3l-1.6-1.1c-.3-.2-.7-.5-1.5-.4l-9.2.7c-.4 0-.5.2-.3.4zm.6 2.2v10c0 .5.3.7.9.7l10.4-.6c.6 0 .7-.4.7-.8V6.3c0-.4-.2-.6-.5-.6L5.6 6.3c-.4 0-.5.2-.5.6zm10.2.5c0 .3 0 .5-.4.6l-.5.1v7.4c-.4.2-.8.4-1.2.4-.5 0-.7-.2-1-.7L9.5 9.7v5.3l1 .2s0 .5-.7.5l-2 .1c0-.1 0-.5.3-.6l.5-.1V8.4L7.9 8c-.1-.4.1-.9.6-.9l2.2-.1L14 12.5v-5l-.8-.1c-.1-.4.2-.7.6-.7l2-.1c.1 0 .2.3.2.4z"/></svg>`,
+  },
+  supabase: {
+    bg: "#111",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24"><defs><linearGradient id="sb${n}" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#249361"/><stop offset="1" stop-color="#3ecf8e"/></linearGradient></defs><path fill="url(#sb${n})" d="M13.2 1.4L2.4 14.2c-.5.6-.1 1.6.7 1.6h8V22c0 1 1.2 1.4 1.8.7l10.8-12.8c.5-.6.1-1.6-.7-1.6h-8V2.2c0-1-1.2-1.5-1.8-.8z"/></svg>`,
+  },
+  arc: {
+    bg: "linear-gradient(135deg,#ff9a56 0%,#f97316 60%,#ea580c 100%)",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="white" stroke-width="2.2"/><circle cx="12" cy="12" r="2.6" fill="white"/></svg>`,
+  },
+  rippling: {
+    bg: "#ffcc00",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="#111"><path d="M6 4h6a5 5 0 0 1 3 9l4 7h-4l-3.5-6H10v6H6V4zm4 3v4h2a2 2 0 0 0 0-4h-2z"/></svg>`,
+  },
+  airbnb: {
+    bg: "linear-gradient(135deg,#ff8f95 0%,#ff5a5f 100%)",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 32 32" fill="white"><path d="M16 3c-1.6 0-3 1-3.8 2.5l-8 15c-1.7 3.4.7 7.5 4.5 7.5 1.7 0 3.2-.7 4.3-1.9l3-3.2 3 3.2c1.1 1.2 2.6 1.9 4.3 1.9 3.8 0 6.2-4.1 4.5-7.5l-8-15C19 4 17.6 3 16 3zm0 3c.5 0 1 .3 1.3.9l8 15c.8 1.7-.4 3.6-2.2 3.6-.8 0-1.6-.4-2.1-1L18 21.4l-2 2.3-2-2.3-3 3.1c-.5.6-1.3 1-2.1 1-1.8 0-3-1.9-2.2-3.6l8-15c.3-.6.8-.9 1.3-.9z"/></svg>`,
+  },
+  shopify: {
+    bg: "linear-gradient(135deg,#a3d340 0%,#95bf47 100%)",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="white"><path d="M18.3 5.5c0-.1-.1-.2-.2-.2s-2.4-.1-2.4-.1-1.6-1.6-1.8-1.8c-.2-.2-.5-.1-.6-.1l-.8.3c-.2-.6-.5-1.3-1-1.9C10.5.9 9.7.5 8.8.5c-.1 0-.1 0-.2.1-.1-.1-.1-.1-.2-.2-.6-.6-1.4-.9-2.3-.9-1.8.1-3.6 1.4-5 3.6-1 1.6-1.7 3.5-1.9 5-.1.1 0 .2.1.3l2 .6L4.3 23c.1.3.4.5.7.5l10.9-.5c.3 0 .5-.2.5-.5L18.3 5.5zM12.4 4.1l-1.3.4c0-.6-.1-1.4-.3-2.1.7.1 1.1 1 1.6 1.7zM10.2 4.8L7 5.8c.3-1.2 1-2.4 1.7-3.2.3-.3.7-.6 1.2-.8.4.9.5 2.1.3 3zm-3.4-3c.4 0 .7.1 1 .3-.5.3-1 .6-1.4 1.1-1 1.1-1.7 2.7-2 4.3l-2.3.7c.6-2.7 2.8-6.3 4.7-6.4z"/></svg>`,
+  },
+  anthropic: {
+    bg: "#f5f2ed",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="#cc785c"><path d="M9.5 4L3 20h3.5l1.3-3.5h6.4L15.5 20H19L12.5 4h-3zm1.5 3.8l2.2 6h-4.4l2.2-6z"/></svg>`,
+  },
+  cloudflare: {
+    bg: "linear-gradient(135deg,#faae42 0%,#f38020 100%)",
+    svg: (n) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="white"><path d="M18.5 15.2c.4-1.4-.2-2.7-1.6-2.9l-9.3-.1c-.2 0-.3-.1-.3-.3v-.3c0-.2.2-.3.3-.3l9.4-.1c1.1-.1 2.3-1 2.7-2.1L20.3 7c0-.1.1-.2 0-.3-.6-2.7-3-4.7-5.9-4.7-2.6 0-4.9 1.7-5.7 4.1-.5-.4-1.2-.6-1.9-.5-1.3.1-2.4 1.2-2.5 2.5-.1.3 0 .7.1 1C2.2 9.2.5 10.9.5 13c0 .2 0 .4.1.6l4.4.1 12.4-.1c.5 0 .9.3 1.1.6z"/></svg>`,
+  },
+};
+
+const brand = marks[slug];
+---
+{brand ? (
+  <span
+    class={`inline-flex items-center justify-center shadow-sm ring-1 ring-black/5 ${s.box} ${className}`}
+    style={`background:${brand.bg}`}
+    aria-hidden="true"
+    set:html={brand.svg(s.inner)}
+  />
+) : (
+  <span
+    class={`inline-flex items-center justify-center text-white font-semibold shadow-sm ring-1 ring-black/5 ${s.box} ${className}`}
+    style={`background:${fallbackColor ?? "#111"}`}
+    aria-hidden="true"
+  >
+    {(fallbackLetter ?? slug[0]).toUpperCase()}
+  </span>
+)}

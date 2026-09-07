@@ -1,0 +1,120 @@
+---
+import Icon from "@components/ui/Icon.astro";
+import { currentCandidate, notifications } from "@data/dashboard";
+
+interface Props {
+  title: string;
+  subtitle?: string;
+}
+const { title, subtitle } = Astro.props;
+const unread = notifications.filter((n) => !n.read).length;
+---
+<header class="dashboard-topbar sticky top-0 z-30 border-b border-ink-200/70 bg-white/80 backdrop-blur-md dark:!border-white/10 dark:!bg-ink-50/80">
+  <div class="flex flex-wrap items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
+    <!-- Mobile: menu toggle -->
+    <button
+      type="button"
+      id="dash-menu"
+      class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 lg:hidden dark:!border-white/10 dark:!bg-white/[0.04]"
+      aria-label="Open menu"
+    >
+      <Icon name="menu" size={16} />
+    </button>
+
+    <!-- Title -->
+    <div class="min-w-0 flex-1">
+      <h1 class="text-[18px] font-semibold tracking-tight text-ink-900 sm:text-[22px]">{title}</h1>
+      {subtitle && <p class="mt-0.5 text-[12.5px] text-ink-500">{subtitle}</p>}
+    </div>
+
+    <!-- Search -->
+    <form action="/search" method="get" role="search" class="relative order-3 w-full sm:order-none sm:w-72">
+      <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400">
+        <Icon name="search" size={14} />
+      </span>
+      <input
+        name="q"
+        type="search"
+        placeholder="Search jobs, applications…"
+        aria-label="Search everything"
+        class="h-10 w-full rounded-full border border-ink-200 bg-white pl-10 pr-4 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"
+      />
+    </form>
+
+    <!-- Notifications -->
+    <div class="relative" id="dash-notif">
+      <button
+        type="button"
+        id="dash-notif-trigger"
+        class="relative flex h-10 w-10 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.04]"
+        aria-label="Notifications"
+        aria-expanded="false"
+      >
+        <Icon name="bell" size={15} />
+        {unread > 0 && (
+          <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent-500 px-1 text-[9px] font-bold text-white ring-2 ring-white dark:ring-ink-50">{unread}</span>
+        )}
+      </button>
+
+      <div id="dash-notif-menu" hidden class="absolute right-0 top-full z-40 mt-2 w-[340px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-ink-200/70 bg-white shadow-2xl shadow-ink-900/15 dark:!border-white/10 dark:!bg-ink-100">
+        <div class="flex items-center justify-between border-b border-ink-100 px-4 py-3 dark:!border-white/[0.06]">
+          <p class="text-[13.5px] font-semibold text-ink-900">Notifications</p>
+          <button type="button" class="text-[11.5px] font-medium text-ink-500 hover:text-ink-900">Mark all read</button>
+        </div>
+        <ul class="max-h-[420px] overflow-y-auto">
+          {notifications.map((n) => (
+            <li>
+              <a href={n.href ?? "#"} class="flex items-start gap-3 border-b border-ink-100 px-4 py-3 transition-colors hover:bg-ink-50 dark:!border-white/[0.06] dark:hover:!bg-white/[0.04]">
+                <span class={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${n.read ? "bg-ink-100 text-ink-500 dark:!bg-white/[0.06]" : "bg-brand-100 text-brand-700 dark:!bg-brand-500/20 dark:text-brand-400"}`}>
+                  <Icon name={n.icon as any} size={12} />
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class={`text-[13px] font-semibold ${n.read ? "text-ink-700" : "text-ink-900"}`}>{n.title}</p>
+                  <p class="mt-0.5 text-[12px] leading-relaxed text-ink-500 line-clamp-2">{n.body}</p>
+                  <p class="mt-1 text-[10.5px] uppercase tracking-widest text-ink-400">{n.time}</p>
+                </div>
+                {!n.read && <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-brand-500"></span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href="/dashboard/notifications" class="flex items-center justify-center gap-1.5 px-4 py-3 text-[12.5px] font-medium text-brand-700 hover:bg-brand-50/50 dark:hover:!bg-brand-500/10">
+          View all notifications
+          <Icon name="arrowRight" size={11} />
+        </a>
+      </div>
+    </div>
+
+    <!-- Avatar -->
+    <a href="/dashboard/profile" class="flex h-10 w-10 items-center justify-center rounded-full ring-2 ring-transparent transition-all hover:ring-brand-200 dark:hover:!ring-brand-500/30" aria-label="My profile">
+      <img src={currentCandidate.avatar} alt={currentCandidate.name} class="h-9 w-9 rounded-full bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+    </a>
+  </div>
+</header>
+
+<script>
+  // Notifications dropdown
+  const trigger = document.getElementById("dash-notif-trigger");
+  const menu    = document.getElementById("dash-notif-menu");
+  trigger?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const hidden = menu?.hasAttribute("hidden");
+    if (hidden) menu?.removeAttribute("hidden"); else menu?.setAttribute("hidden", "");
+    trigger.setAttribute("aria-expanded", String(hidden));
+  });
+  document.addEventListener("click", (e) => {
+    if (!(e.target as HTMLElement).closest("#dash-notif")) {
+      menu?.setAttribute("hidden", "");
+      trigger?.setAttribute("aria-expanded", "false");
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { menu?.setAttribute("hidden", ""); trigger?.setAttribute("aria-expanded", "false"); }
+  });
+
+  // Mobile sidebar toggle
+  const menuBtn = document.getElementById("dash-menu");
+  menuBtn?.addEventListener("click", () => {
+    document.body.dataset.dashSidebar = document.body.dataset.dashSidebar === "open" ? "closed" : "open";
+  });
+</script>

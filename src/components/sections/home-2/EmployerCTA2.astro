@@ -1,0 +1,56 @@
+---
+import Container from "@components/ui/Container.astro";
+import Icon from "@components/ui/Icon.astro";
+---
+<section class="section-employer-cta-2 py-20 sm:py-28 bg-white dark:!bg-white/[0.02]">
+  <Container size="xl">
+    <!-- Centered full-width panel -->
+    <div class="relative isolate mx-auto overflow-hidden rounded-2xl bg-[#0c0a09] p-8 text-white shadow-xl sm:p-14 lg:p-16">
+      <div class="pointer-events-none absolute -top-32 -right-20 h-72 w-72 rounded-full bg-brand-500/25 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-accent-500/20 blur-3xl"></div>
+      <div class="pointer-events-none absolute inset-0 bg-grid opacity-15 mask-radial"></div>
+
+      <div class="relative mx-auto max-w-6xl text-center">
+        <p class="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-400">
+          <Icon name="play" size={10} class="text-accent-400" />
+          <span class="tabular-nums">13</span>
+          <span class="text-stone-600">·</span>
+          <span class="text-white">For employers</span>
+        </p>
+
+        <h2 class="mt-6 text-4xl font-semibold leading-[1.02] tracking-tight text-white sm:text-5xl lg:text-6xl">
+          Hire people who <span class="font-display italic font-normal bg-gradient-to-br from-brand-300 to-accent-300 bg-clip-text text-transparent">actually stay</span>.
+        </h2>
+        <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-stone-300">
+          Post in minutes. Reach 1.8M curated candidates. Ship offers in weeks — loved by teams from seed to IPO.
+        </p>
+
+        <div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a href="/post-a-job" class="group inline-flex h-13 items-center gap-2 rounded-full bg-white px-6 text-[15px] font-semibold text-ink-950 transition-all hover:bg-stone-100 hover:shadow-[0_14px_40px_-8px_rgb(255_255_255/0.3)]">
+            Post a job — free
+            <Icon name="arrowRight" size={14} strokeWidth={2} class="transition-transform group-hover:translate-x-0.5" />
+          </a>
+          <a href="/pricing" class="inline-flex h-13 items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 text-[15px] font-semibold text-white transition-all hover:border-white/40 hover:bg-white/10">
+            See pricing
+          </a>
+        </div>
+
+        <!-- Inline proof stats -->
+        <dl class="mx-auto mt-12 grid max-w-2xl grid-cols-3 gap-4 border-t border-white/10 pt-8 text-center">
+          <div>
+            <dt class="text-[11px] font-bold uppercase tracking-widest text-stone-500">Time to hire</dt>
+            <dd class="mt-2 font-display text-3xl italic font-normal leading-none text-white tabular-nums sm:text-4xl">14<span class="text-lg text-stone-500">d</span></dd>
+          </div>
+          <div>
+            <dt class="text-[11px] font-bold uppercase tracking-widest text-stone-500">Cost per hire</dt>
+            <dd class="mt-2 font-display text-3xl italic font-normal leading-none text-white tabular-nums sm:text-4xl">$1.2K</dd>
+          </div>
+          <div>
+            <dt class="text-[11px] font-bold uppercase tracking-widest text-stone-500">Shortlist score</dt>
+            <dd class="mt-2 font-display text-3xl italic font-normal leading-none text-white tabular-nums sm:text-4xl">9.4<span class="text-lg text-stone-500">/10</span></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </Container>
+</section>

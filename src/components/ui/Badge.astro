@@ -1,0 +1,30 @@
+---
+interface Props {
+  variant?: "default" | "brand" | "accent" | "success" | "info" | "outline" | "dark" | "featured";
+  size?: "sm" | "md";
+  dot?: boolean;
+  class?: string;
+}
+const { variant = "default", size = "sm", dot = false, class: className = "" } = Astro.props;
+
+const variants = {
+  default:  "bg-ink-100 text-ink-800",
+  brand:    "bg-brand-50 text-brand-700",
+  accent:   "bg-accent-50 text-accent-700",
+  success:  "bg-success-100 text-emerald-800",
+  info:     "bg-info-100 text-sky-800",
+  outline:  "bg-transparent text-ink-700 ring-1 ring-inset ring-ink-200",
+  dark:     "bg-ink-900 text-ink-50",
+  featured: "bg-violet-100 text-violet-700",
+};
+const sizes = { sm: "text-xs px-2.5 py-1 gap-1.5", md: "text-[13px] px-3 py-1.5 gap-2" };
+const dotColors: Record<string,string> = {
+  default: "bg-ink-500", brand: "bg-brand-500", accent: "bg-accent-500",
+  success: "bg-success-500", info: "bg-info-500", outline: "bg-ink-500", dark: "bg-accent-400",
+  featured: "bg-violet-500",
+};
+---
+<span class={`inline-flex items-center rounded-full font-medium tracking-tight ${variants[variant]} ${sizes[size]} ${className}`}>
+  {dot && <span class={`h-1.5 w-1.5 rounded-full ${dotColors[variant]}`} />}
+  <slot />
+</span>

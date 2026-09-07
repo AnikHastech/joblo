@@ -1,0 +1,59 @@
+---
+import Icon from "@components/ui/Icon.astro";
+---
+<button
+  id="scroll-to-top"
+  type="button"
+  aria-label="Scroll to top"
+  hidden
+  class="group fixed right-4 bottom-5 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-ink-200/70 bg-white/90 text-ink-700 shadow-lg shadow-ink-900/10 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-ink-900 hover:bg-ink-900 hover:text-ink-50 sm:right-5 sm:bottom-6"
+>
+  <Icon name="arrowUp" size={16} strokeWidth={2} />
+  <!-- Progress ring -->
+  <svg
+    class="pointer-events-none absolute inset-0 h-full w-full -rotate-90 text-brand-500"
+    viewBox="0 0 44 44"
+    aria-hidden="true"
+  >
+    <circle
+      id="stt-progress"
+      cx="22"
+      cy="22"
+      r="20"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-dasharray="125.66"
+      stroke-dashoffset="125.66"
+      class="transition-[stroke-dashoffset] duration-100"
+    />
+  </svg>
+</button>
+
+<script is:inline>
+  (function () {
+    const btn = document.getElementById("scroll-to-top");
+    const ring = document.getElementById("stt-progress");
+    if (!btn || !ring) return;
+
+    const CIRCUMFERENCE = 125.66; // 2 * π * r (r=20)
+    const SHOW_AFTER = 300;
+
+    const onScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = height > 0 ? Math.min(scrollTop / height, 1) : 0;
+      ring.setAttribute("stroke-dashoffset", String(CIRCUMFERENCE * (1 - progress)));
+      if (scrollTop > SHOW_AFTER) btn.removeAttribute("hidden");
+      else btn.setAttribute("hidden", "");
+    };
+
+    btn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  })();
+</script>

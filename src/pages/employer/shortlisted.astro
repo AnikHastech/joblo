@@ -1,0 +1,76 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import ApplicantStatusPill from "@components/employer/ApplicantStatusPill.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import Icon from "@components/ui/Icon.astro";
+import { applicants, applicantWithData } from "@data/employer";
+
+const shortlisted = applicants
+  .filter((a) => a.shortlisted)
+  .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+  .map(applicantWithData);
+---
+<EmployerLayout
+  title="Shortlisted candidates"
+  subtitle={`${shortlisted.length} candidates saved for a closer look.`}
+  active="shortlisted"
+>
+  {shortlisted.length === 0 ? (
+    <EmptyState
+      icon="star"
+      title="No shortlisted candidates yet"
+      body="Tap the star on any applicant to shortlist them. They'll appear here for quick access."
+      ctaLabel="Review applicants"
+      ctaHref="/employer/applicants"
+    />
+  ) : (
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {shortlisted.map(({ applicant, candidate, job }) => candidate && job && (
+        <article class="group relative flex flex-col rounded-3xl border border-ink-200/70 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+          <span class="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10.5px] font-semibold text-amber-800 dark:!bg-amber-500/15 dark:text-amber-400"><Icon name="star" size={9} /> Shortlisted</span>
+          <header class="flex items-start gap-4">
+            <img src={candidate.avatar} alt={candidate.name} class="h-14 w-14 shrink-0 rounded-2xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+            <div class="min-w-0 flex-1 pr-16">
+              <a href={`/employer/applicants/${applicant.id}`} class="text-[16px] font-semibold text-ink-900 hover:text-brand-700 transition-colors line-clamp-1">{candidate.name}</a>
+              <p class="mt-0.5 text-[12.5px] text-ink-500 line-clamp-1">{candidate.role}</p>
+            </div>
+          </header>
+
+          <p class="mt-4 text-[12.5px] text-ink-600">Applied to <span class="font-semibold text-ink-800">{job.title}</span></p>
+
+          <div class="mt-3 flex flex-wrap gap-1.5">
+            {candidate.skills.slice(0, 3).map((s) => (
+              <span class="rounded-full border border-ink-200 bg-white px-2.5 py-0.5 text-[11px] text-ink-700 dark:!border-white/10 dark:!bg-white/[0.03]">{s}</span>
+            ))}
+          </div>
+
+          <dl class="mt-5 grid grid-cols-3 gap-3 border-t border-ink-100 pt-4 dark:!border-white/[0.06]">
+            <div>
+              <dt class="text-[10px] uppercase tracking-widest text-ink-400">Match</dt>
+              <dd class="mt-0.5 text-[15px] font-semibold text-ink-900 tabular-nums">{applicant.matchScore}%</dd>
+            </div>
+            <div>
+              <dt class="text-[10px] uppercase tracking-widest text-ink-400">Rating</dt>
+              <dd class="mt-0.5 flex gap-0.5 text-amber-500">
+                {Array.from({ length: 5 }).map((_, i) => <Icon name="star" size={11} class={i < (applicant.rating ?? 0) ? "" : "opacity-25"} />)}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-[10px] uppercase tracking-widest text-ink-400">Stage</dt>
+              <dd class="mt-1"><ApplicantStatusPill status={applicant.status} /></dd>
+            </div>
+          </dl>
+
+          <footer class="mt-5 flex items-center gap-2">
+            <a href={`/employer/applicants/${applicant.id}`} class="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full bg-ink-900 px-3 text-[12.5px] font-semibold text-ink-50 hover:bg-brand-600">
+              Open profile <Icon name="arrowRight" size={11} />
+            </a>
+            <a href="/employer/messages" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400 hover:text-ink-900 dark:!border-white/10" aria-label="Message">
+              <Icon name="send" size={12} />
+            </a>
+          </footer>
+        </article>
+      ))}
+    </div>
+  )}
+</EmployerLayout>

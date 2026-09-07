@@ -1,0 +1,444 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import Badge from "@components/ui/Badge.astro";
+import { site } from "@data/site";
+
+const colorGroups = [
+  {
+    name: "Brand",
+    tokens: [
+      { shade: "50",  swatch: "bg-brand-50",  hex: "#eef1ff" },
+      { shade: "100", swatch: "bg-brand-100", hex: "#dee4ff" },
+      { shade: "200", swatch: "bg-brand-200", hex: "#bec9ff" },
+      { shade: "300", swatch: "bg-brand-300", hex: "#94a3ff" },
+      { shade: "400", swatch: "bg-brand-400", hex: "#7178ff" },
+      { shade: "500", swatch: "bg-brand-500", hex: "#4a3fe6" },
+      { shade: "600", swatch: "bg-brand-600", hex: "#3d33c2" },
+      { shade: "700", swatch: "bg-brand-700", hex: "#332ba0" },
+      { shade: "800", swatch: "bg-brand-800", hex: "#2b247d" },
+      { shade: "900", swatch: "bg-brand-900", hex: "#1e1a58" },
+    ],
+  },
+  {
+    name: "Accent",
+    tokens: [
+      { shade: "50",  swatch: "bg-accent-50",  hex: "#fff4ed" },
+      { shade: "100", swatch: "bg-accent-100", hex: "#ffe4d1" },
+      { shade: "200", swatch: "bg-accent-200", hex: "#ffc19d" },
+      { shade: "300", swatch: "bg-accent-300", hex: "#ff9860" },
+      { shade: "400", swatch: "bg-accent-400", hex: "#ff7833" },
+      { shade: "500", swatch: "bg-accent-500", hex: "#ff5a0a" },
+      { shade: "600", swatch: "bg-accent-600", hex: "#e04600" },
+      { shade: "700", swatch: "bg-accent-700", hex: "#b83600" },
+      { shade: "800", swatch: "bg-accent-800", hex: "#8f2b00" },
+      { shade: "900", swatch: "bg-accent-900", hex: "#6b2200" },
+    ],
+  },
+  {
+    name: "Ink",
+    tokens: [
+      { shade: "50",  swatch: "bg-ink-50",  hex: "auto-invert" },
+      { shade: "100", swatch: "bg-ink-100", hex: "auto-invert" },
+      { shade: "200", swatch: "bg-ink-200", hex: "auto-invert" },
+      { shade: "300", swatch: "bg-ink-300", hex: "auto-invert" },
+      { shade: "400", swatch: "bg-ink-400", hex: "auto-invert" },
+      { shade: "500", swatch: "bg-ink-500", hex: "auto-invert" },
+      { shade: "600", swatch: "bg-ink-600", hex: "auto-invert" },
+      { shade: "700", swatch: "bg-ink-700", hex: "auto-invert" },
+      { shade: "800", swatch: "bg-ink-800", hex: "auto-invert" },
+      { shade: "900", swatch: "bg-ink-900", hex: "auto-invert" },
+    ],
+  },
+];
+
+const semanticTokens = [
+  { name: "Success", swatch: "bg-emerald-500", ring: "ring-emerald-200/60", text: "text-emerald-700 dark:!text-emerald-400", desc: "Confirmations, positive states" },
+  { name: "Warning", swatch: "bg-amber-500",   ring: "ring-amber-200/60",   text: "text-amber-700 dark:!text-amber-400",     desc: "Attention required, non-critical alerts" },
+  { name: "Danger",  swatch: "bg-rose-500",    ring: "ring-rose-200/60",    text: "text-rose-700 dark:!text-rose-400",       desc: "Errors, destructive actions" },
+  { name: "Info",    swatch: "bg-sky-500",     ring: "ring-sky-200/60",     text: "text-sky-700 dark:!text-sky-400",         desc: "Neutral guidance, tips" },
+  { name: "Violet",  swatch: "bg-violet-500",  ring: "ring-violet-200/60",  text: "text-violet-700 dark:!text-violet-400",   desc: "Alt-brand accents, categories" },
+];
+
+const spacingTokens = [
+  { name: "0.5",  px: "2px",  cls: "w-0.5" },
+  { name: "1",    px: "4px",  cls: "w-1"   },
+  { name: "2",    px: "8px",  cls: "w-2"   },
+  { name: "3",    px: "12px", cls: "w-3"   },
+  { name: "4",    px: "16px", cls: "w-4"   },
+  { name: "6",    px: "24px", cls: "w-6"   },
+  { name: "8",    px: "32px", cls: "w-8"   },
+  { name: "12",   px: "48px", cls: "w-12"  },
+  { name: "16",   px: "64px", cls: "w-16"  },
+];
+
+const radiusTokens = [
+  { name: "rounded",       label: "4px",  cls: "rounded" },
+  { name: "rounded-lg",    label: "8px",  cls: "rounded-lg" },
+  { name: "rounded-xl",    label: "12px", cls: "rounded-xl" },
+  { name: "rounded-2xl",   label: "16px", cls: "rounded-2xl" },
+  { name: "rounded-3xl",   label: "24px", cls: "rounded-3xl" },
+  { name: "rounded-full",  label: "9999px", cls: "rounded-full" },
+];
+
+const iconGallery = [
+  "home", "briefcase", "users", "search", "plus", "check", "close", "arrowRight", "arrowUpRight",
+  "chevronDown", "star", "bookmark", "bell", "send", "mapPin", "clock", "wallet", "sparkles",
+  "shield", "globe", "building", "trending", "award", "quote", "grid", "filter", "user",
+];
+---
+<BaseLayout
+  title={`Style guide · ${site.name}`}
+  description="Design tokens, typography, components, and patterns that make Joblo look and feel consistent."
+>
+  <!-- Hero -->
+  <section class="relative isolate pt-14 pb-10 sm:pt-20 sm:pb-14">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-25 mask-radial"></div>
+      <div class="absolute -top-40 right-0 h-[520px] w-[820px] rounded-full bg-gradient-to-bl from-brand-200/40 via-accent-200/25 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="font-medium text-ink-800">Style guide</span>
+      </nav>
+
+      <div class="mt-6 max-w-3xl">
+        <SectionEyebrow number="01" label="Design system" />
+        <h1 class="mt-4 text-[30px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl md:text-5xl lg:text-6xl">
+          The look and <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">feel</span> of Joblo.
+        </h1>
+        <p class="mt-4 max-w-xl text-[15.5px] leading-relaxed text-ink-600 sm:text-[16px]">
+          Every token, type ramp, component, and pattern used across the product. Reference this when contributing so the experience stays coherent.
+        </p>
+      </div>
+
+      <!-- Quick nav -->
+      <div class="mt-8 flex flex-wrap gap-1.5">
+        {[
+          { id: "typography", label: "Typography" },
+          { id: "colors",     label: "Colors" },
+          { id: "spacing",    label: "Spacing" },
+          { id: "radius",     label: "Radius" },
+          { id: "shadows",    label: "Shadows" },
+          { id: "buttons",    label: "Buttons" },
+          { id: "inputs",     label: "Inputs" },
+          { id: "badges",     label: "Badges" },
+          { id: "cards",      label: "Cards" },
+          { id: "icons",      label: "Icons" },
+        ].map((s) => (
+          <a href={`#${s.id}`} class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 transition-colors hover:border-ink-400 hover:bg-ink-50 dark:!border-white/10 dark:!bg-white/[0.04] dark:hover:!bg-white/[0.06]">
+            {s.label}
+          </a>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Typography -->
+  <section id="typography" class="scroll-mt-24 pb-14 sm:pb-20">
+    <Container size="xl">
+      <SectionEyebrow number="02" label="Typography" />
+      <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+        Type <span class="font-display italic font-normal">ramp</span>
+      </h2>
+      <p class="mt-3 max-w-2xl text-[14.5px] text-ink-600">Inter for UI · Instrument Serif for editorial accents. All sizes are pixel-anchored for consistency.</p>
+
+      <div class="mt-8 space-y-3">
+        {[
+          { cls: "text-[64px] leading-[0.98] tracking-[-0.02em]", label: "Display / 64", tw: "text-[64px]" },
+          { cls: "text-[48px] leading-[1]",                        label: "H1 / 48",      tw: "text-[48px]" },
+          { cls: "text-[36px] leading-[1.05]",                     label: "H2 / 36",      tw: "text-3xl" },
+          { cls: "text-[28px] leading-[1.1]",                      label: "H3 / 28",      tw: "text-[28px]" },
+          { cls: "text-[22px] leading-[1.2]",                      label: "H4 / 22",      tw: "text-[22px]" },
+          { cls: "text-[18px] leading-[1.55]",                     label: "Lead / 18",    tw: "text-lg" },
+          { cls: "text-[15px] leading-[1.65]",                     label: "Body / 15",    tw: "text-[15px]" },
+          { cls: "text-[13.5px] leading-[1.6]",                    label: "Small / 13.5", tw: "text-[13.5px]" },
+          { cls: "text-[11px] uppercase tracking-[0.22em]",        label: "Eyebrow / 11", tw: "text-[11px]" },
+        ].map((t) => (
+          <div class="flex flex-wrap items-baseline gap-4 rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <div class="flex-1 min-w-0">
+              <p class={`font-semibold text-ink-900 ${t.cls}`}>The quick brown fox jumps.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="rounded-full bg-ink-100 px-2.5 py-0.5 text-[10.5px] font-semibold text-ink-700 dark:!bg-white/[0.06] dark:!text-ink-800">{t.label}</span>
+              <code class="rounded bg-ink-50 px-2 py-0.5 text-[11px] font-mono text-ink-700 dark:!bg-white/[0.04] dark:!text-ink-800">{t.tw}</code>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Colors -->
+  <section id="colors" class="scroll-mt-24 pb-14 sm:pb-20 bg-white dark:!bg-white/[0.02]">
+    <Container size="xl">
+      <div class="pt-14 sm:pt-20">
+        <SectionEyebrow number="03" label="Colors" />
+        <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+          Color <span class="font-display italic font-normal">tokens</span>
+        </h2>
+        <p class="mt-3 max-w-2xl text-[14.5px] text-ink-600">Ink auto-inverts in dark mode. Brand + Accent scales stay stable across themes.</p>
+
+        <div class="mt-8 space-y-8">
+          {colorGroups.map((g) => (
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">{g.name}</p>
+              <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5 lg:grid-cols-10">
+                {g.tokens.map((t) => (
+                  <div class="flex flex-col gap-2">
+                    <div class={`aspect-square rounded-xl ring-1 ring-ink-200/40 dark:!ring-white/10 ${t.swatch}`}></div>
+                    <div>
+                      <p class="text-[11px] font-semibold text-ink-900 tabular-nums">{g.name.toLowerCase()}-{t.shade}</p>
+                      <p class="text-[10px] text-ink-500 tabular-nums">{t.hex}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <!-- Semantic -->
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Semantic tones</p>
+            <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {semanticTokens.map((s) => (
+                <div class="flex items-start gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+                  <span class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${s.swatch} ring-1 ${s.ring} text-white`}>
+                    <Icon name="check" size={13} strokeWidth={2.5} />
+                  </span>
+                  <div>
+                    <p class={`text-[13px] font-semibold ${s.text}`}>{s.name}</p>
+                    <p class="mt-0.5 text-[11.5px] text-ink-500">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Spacing -->
+  <section id="spacing" class="scroll-mt-24 pt-14 pb-14 sm:pt-20 sm:pb-20">
+    <Container size="xl">
+      <SectionEyebrow number="04" label="Spacing" />
+      <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+        Spacing <span class="font-display italic font-normal">scale</span>
+      </h2>
+      <p class="mt-3 max-w-2xl text-[14.5px] text-ink-600">4 px base grid. Prefer these values over one-off pixel numbers.</p>
+
+      <div class="mt-8 rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:p-6">
+        <ul class="space-y-3">
+          {spacingTokens.map((s) => (
+            <li class="flex items-center gap-4">
+              <span class="w-14 shrink-0 text-[11.5px] font-mono text-ink-500 tabular-nums">{s.name}</span>
+              <span class={`h-3 ${s.cls} rounded bg-brand-500`}></span>
+              <span class="text-[12px] text-ink-500 tabular-nums">{s.px}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Radius + shadows -->
+  <section class="pb-14 sm:pb-20 bg-white dark:!bg-white/[0.02]">
+    <Container size="xl">
+      <div class="pt-14 sm:pt-20 grid gap-10 lg:grid-cols-2">
+        <!-- Radius -->
+        <div id="radius" class="scroll-mt-24">
+          <SectionEyebrow number="05" label="Radius" />
+          <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[28px]">Border radius</h2>
+          <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {radiusTokens.map((r) => (
+              <div class="rounded-2xl border border-ink-200/70 bg-white p-4 text-center dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+                <div class={`mx-auto h-14 w-14 border-2 border-ink-900 ${r.cls} dark:!border-white/60`}></div>
+                <p class="mt-3 text-[11.5px] font-mono text-ink-800">{r.name}</p>
+                <p class="text-[10.5px] text-ink-500 tabular-nums">{r.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Shadows -->
+        <div id="shadows" class="scroll-mt-24">
+          <SectionEyebrow number="06" label="Shadows" />
+          <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[28px]">Elevation</h2>
+          <div class="mt-6 grid grid-cols-2 gap-3">
+            {[
+              { name: "shadow-sm",  cls: "shadow-sm" },
+              { name: "shadow",     cls: "shadow" },
+              { name: "shadow-md",  cls: "shadow-md" },
+              { name: "shadow-lg",  cls: "shadow-lg" },
+              { name: "shadow-xl",  cls: "shadow-xl" },
+              { name: "shadow-2xl", cls: "shadow-2xl" },
+            ].map((s) => (
+              <div class={`rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03] ${s.cls}`}>
+                <p class="text-[11.5px] font-mono text-ink-800">{s.name}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Buttons -->
+  <section id="buttons" class="scroll-mt-24 pt-14 pb-14 sm:pt-20 sm:pb-20">
+    <Container size="xl">
+      <SectionEyebrow number="07" label="Buttons" />
+      <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+        Button <span class="font-display italic font-normal">variants</span>
+      </h2>
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-ink-500">Primary</p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button type="button" class="inline-flex h-11 items-center gap-1.5 rounded-full bg-ink-900 px-5 text-[13.5px] font-semibold text-ink-50 hover:bg-brand-600">
+              Apply now <Icon name="arrowRight" size={13} />
+            </button>
+            <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[12.5px] font-semibold text-ink-50 hover:bg-brand-600">
+              Sm
+            </button>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-ink-500">Outline</p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button type="button" class="inline-flex h-11 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-5 text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+              Save
+            </button>
+            <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 text-[12.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+              Sm
+            </button>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-ink-500">Icon</p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button type="button" class="flex h-10 w-10 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+              <Icon name="bookmark" size={14} />
+            </button>
+            <button type="button" class="flex h-10 w-10 items-center justify-center rounded-full bg-ink-900 text-ink-50 hover:bg-brand-600">
+              <Icon name="plus" size={14} />
+            </button>
+            <button type="button" class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600">
+              <Icon name="check" size={14} strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Inputs -->
+  <section id="inputs" class="scroll-mt-24 pb-14 sm:pb-20 bg-white dark:!bg-white/[0.02]">
+    <Container size="xl">
+      <div class="pt-14 sm:pt-20">
+        <SectionEyebrow number="08" label="Inputs" />
+        <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+          Form <span class="font-display italic font-normal">controls</span>
+        </h2>
+        <div class="mt-8 grid gap-4 sm:grid-cols-2">
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Text input</span>
+            <input type="text" placeholder="Type here" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">With icon</span>
+            <div class="relative mt-1.5">
+              <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400"><Icon name="search" size={14} /></span>
+              <input type="search" placeholder="Search" class="h-11 w-full rounded-xl border border-ink-200 bg-white pl-10 pr-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+            </div>
+          </label>
+          <label class="block sm:col-span-2">
+            <span class="text-[12.5px] font-medium text-ink-700">Textarea</span>
+            <textarea rows="3" placeholder="Longer text goes here" class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white p-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+          </label>
+          <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-ink-200 bg-white px-4 py-3 text-[13.5px] text-ink-800 dark:!border-white/10 dark:!bg-white/[0.03]">
+            <input type="checkbox" class="h-4 w-4 accent-ink-900" checked />
+            Remember me
+          </label>
+          <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-ink-200 bg-white px-4 py-3 text-[13.5px] text-ink-800 dark:!border-white/10 dark:!bg-white/[0.03]">
+            <input type="radio" name="demo-radio" class="h-4 w-4 accent-ink-900" checked />
+            Full time
+          </label>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Badges -->
+  <section id="badges" class="scroll-mt-24 pt-14 pb-14 sm:pt-20 sm:pb-20">
+    <Container size="xl">
+      <SectionEyebrow number="09" label="Badges" />
+      <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+        Badges &amp; <span class="font-display italic font-normal">chips</span>
+      </h2>
+      <div class="mt-8 flex flex-wrap items-center gap-2">
+        <Badge variant="success" size="sm" dot>Verified</Badge>
+        <Badge variant="featured" size="sm" dot>Featured</Badge>
+        <Badge variant="brand" size="sm">Senior</Badge>
+        <Badge variant="outline" size="sm">Remote</Badge>
+        <Badge variant="default" size="sm">Full-time</Badge>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400">
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          Open to offers
+        </span>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Cards -->
+  <section id="cards" class="scroll-mt-24 pb-14 sm:pb-20 bg-white dark:!bg-white/[0.02]">
+    <Container size="xl">
+      <div class="pt-14 sm:pt-20">
+        <SectionEyebrow number="10" label="Cards" />
+        <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+          Card <span class="font-display italic font-normal">patterns</span>
+        </h2>
+        <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-ink-500">Bordered</p>
+            <p class="mt-2 text-[13.5px] text-ink-700">Neutral surface with a subtle border.</p>
+          </div>
+          <div class="rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 p-5 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand-700 dark:!text-brand-400">Gradient</p>
+            <p class="mt-2 text-[13.5px] text-ink-800">Brand + accent wash for calls to action.</p>
+          </div>
+          <div class="rounded-2xl border border-ink-900 bg-ink-900 p-5 text-ink-50 dark:!border-white/[0.08] dark:!bg-[#0c0a09]">
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand-300 dark:!text-brand-400">Dark</p>
+            <p class="mt-2 text-[13.5px] text-white/70">Anchor card for high-contrast moments.</p>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Icons -->
+  <section id="icons" class="scroll-mt-24 pt-14 pb-24 sm:pt-20 sm:pb-32">
+    <Container size="xl">
+      <SectionEyebrow number="11" label="Icons" />
+      <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+        Icon <span class="font-display italic font-normal">library</span>
+      </h2>
+      <p class="mt-3 max-w-2xl text-[14.5px] text-ink-600">27 stroke icons at 1.8–2.5 width. Use the semantic tone map elsewhere for consistent color coding.</p>
+
+      <div class="mt-8 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9">
+        {iconGallery.map((n) => (
+          <div class="flex flex-col items-center gap-2 rounded-2xl border border-ink-200/70 bg-white p-4 text-center dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-ink-100 text-ink-800 dark:!bg-white/[0.06] dark:!text-ink-800">
+              <Icon name={n as any} size={16} />
+            </span>
+            <p class="truncate w-full text-[11px] font-mono text-ink-600">{n}</p>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </section>
+</BaseLayout>

@@ -1,0 +1,352 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import CompaniesHero from "@components/companies/CompaniesHero.astro";
+import CompaniesFilterSidebar from "@components/companies/CompaniesFilterSidebar.astro";
+import CompaniesToolbar from "@components/companies/CompaniesToolbar.astro";
+import CompanyCard from "@components/companies/CompanyCard.astro";
+import Pagination from "@components/jobs/Pagination.astro";
+import Icon from "@components/ui/Icon.astro";
+import { companies } from "@data/companies";
+import { site } from "@data/site";
+
+const perPage = 12;
+const total = companies.length;
+const totalPages = Math.max(1, Math.ceil(total / perPage));
+
+// City slug helper
+const cityToSlug: Record<string, string> = {
+  "San Francisco": "san-francisco",
+  "New York":      "new-york",
+  "London":        "london",
+  "Amsterdam":     "amsterdam",
+  "Berlin":        "berlin",
+  "Dublin":        "dublin",
+  "Tokyo":         "tokyo",
+  "Singapore":     "singapore",
+  "Ottawa":        "ottawa",
+};
+const getCitySlug = (loc: string) => {
+  for (const [city, slug] of Object.entries(cityToSlug)) {
+    if (loc.includes(city)) return slug;
+  }
+  return "";
+};
+const isRemote = (loc: string) => /remote/i.test(loc);
+
+// Team size to numeric ceiling (for sorting)
+const sizeRank: Record<string, number> = {
+  "1-10": 10, "11-50": 50, "51-200": 200, "201-500": 500,
+  "501-1000": 1000, "1001-5000": 5000, "5000+": 10000,
+};
+---
+<BaseLayout
+  title={`Companies · ${site.name}`}
+  description="Discover verified companies hiring right now — filter by industry, team size, and location. Every profile is human-reviewed."
+>
+  <CompaniesHero />
+
+  <section class="pt-4 pb-24 sm:pb-32">
+    <Container size="xl">
+      <div class="grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
+        <!-- Filter sidebar -->
+        <div class="hidden lg:sticky lg:top-28 lg:col-span-3 lg:block lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pb-4 lg:pr-1">
+          <CompaniesFilterSidebar />
+        </div>
+
+        <!-- Results column -->
+        <div class="lg:col-span-9" data-per-page={perPage} data-total={total}>
+          <CompaniesToolbar total={total} showing={Math.min(perPage, total)} />
+
+          <div
+            id="companies-grid"
+            class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3"
+          >
+            {companies.map((c) => (
+              <div
+                class="company-item"
+                data-industry={c.industry.toLowerCase()}
+                data-size={c.size}
+                data-size-rank={sizeRank[c.size] ?? 0}
+                data-city={getCitySlug(c.location)}
+                data-remote={String(isRemote(c.location))}
+                data-verified={String(!!c.verified)}
+                data-featured={String(!!c.featured)}
+                data-openings={c.openings ?? 0}
+                data-name={c.name.toLowerCase()}
+              >
+                <CompanyCard company={c} />
+              </div>
+            ))}
+          </div>
+
+          <!-- Empty state -->
+          <div id="companies-empty" hidden class="mt-10 rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 p-12 text-center dark:!border-white/10 dark:!bg-white/[0.02]">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-ink-100 text-ink-500 dark:!bg-white/[0.06]">
+              <Icon name="search" size={20} />
+            </div>
+            <p class="mt-4 text-[15.5px] font-semibold text-ink-900">No companies match these filters</p>
+            <p class="mt-2 text-[13.5px] text-ink-500">Try clearing some filters or broadening your criteria.</p>
+            <button type="button" id="companies-empty-reset" class="mt-5 inline-flex items-center gap-1.5 rounded-full bg-ink-900 px-4 py-2 text-[13px] font-semibold text-ink-50 transition-colors hover:bg-brand-600">
+              Clear all filters
+            </button>
+          </div>
+
+          {totalPages > 1 && (
+            <div class="mt-12 border-t border-ink-200 pt-8 dark:!border-white/10">
+              <Pagination current={1} total={totalPages} />
+            </div>
+          )}
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
+
+<script>
+  // ─── Pagination (client-side, static-safe) ─────────────────────────
+  const resultsColumn = document.querySelector<HTMLElement>("[data-per-page]");
+  const paginationNav = document.querySelector<HTMLElement>("nav[aria-label='Pagination']");
+  const perPage = Number(resultsColumn?.dataset.perPage ?? 12);
+  const grid = document.getElementById("companies-grid");
+  const items = Array.from(document.querySelectorAll<HTMLElement>(".company-item"));
+  const empty = document.getElementById("companies-empty");
+  const visibleCountEl = document.getElementById("companies-visible-count");
+
+  const getPage = () => {
+    const p = parseInt(new URLSearchParams(window.location.search).get("page") ?? "1", 10) || 1;
+    const visibleItems = items.filter((i) => i.dataset.filteredOut !== "true");
+    const totalPages = Math.max(1, Math.ceil(visibleItems.length / perPage));
+    return Math.min(Math.max(1, p), totalPages);
+  };
+
+  const applyPagination = () => {
+    const page = getPage();
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+
+    // Walk visible-order and hide items outside the current page window
+    let vIdx = 0;
+    items.forEach((item) => {
+      if (item.dataset.filteredOut === "true") {
+        item.hidden = true;
+        return;
+      }
+      item.hidden = vIdx < start || vIdx >= end;
+      vIdx++;
+    });
+
+    // Update pagination active state
+    paginationNav?.querySelectorAll<HTMLAnchorElement>("a[href*='?page=']").forEach((a) => {
+      const match = a.href.match(/[?&]page=(\d+)/);
+      if (!match) return;
+      const linkPage = Number(match[1]);
+      const isCurrent = linkPage === page;
+      if (a.textContent?.trim().match(/^\d+$/)) {
+        a.className = isCurrent
+          ? "flex h-10 w-10 items-center justify-center rounded-full text-[13.5px] font-medium tabular-nums transition-colors !bg-ink-900 !text-ink-50 shadow-sm"
+          : "flex h-10 w-10 items-center justify-center rounded-full text-[13.5px] font-medium tabular-nums transition-colors border border-ink-200 bg-white text-ink-700 hover:border-ink-400 hover:text-ink-900 dark:border-white/10 dark:!bg-white/[0.03]";
+        if (isCurrent) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      }
+    });
+
+    const pageLabel = paginationNav?.querySelector<HTMLElement>("p");
+    if (pageLabel) {
+      const nums = pageLabel.querySelectorAll("span");
+      if (nums[0]) nums[0].textContent = String(page);
+    }
+
+    const visibleShown = items.filter((i) => i.dataset.filteredOut !== "true" && !i.hidden).length;
+    if (visibleCountEl) visibleCountEl.textContent = visibleShown.toString();
+  };
+
+  paginationNav?.querySelectorAll<HTMLAnchorElement>("a[href*='?page=']").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      const href = a.getAttribute("href");
+      if (!href) return;
+      e.preventDefault();
+      history.pushState({}, "", href);
+      applyPagination();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+  window.addEventListener("popstate", applyPagination);
+
+  // ─── Filter engine ──────────────────────────────────────────────────
+  const sidebar = document.querySelector<HTMLElement>(".company-filters");
+  const activeBadge = document.getElementById("cf-active-count");
+  const clearBtn    = document.getElementById("cf-clear-all");
+  const emptyReset  = document.getElementById("companies-empty-reset");
+  const searchInput = document.getElementById("companies-search") as HTMLInputElement | null;
+
+  const getChecked = (name: string): Set<string> => {
+    const s = new Set<string>();
+    sidebar?.querySelectorAll<HTMLInputElement>(`input[name="${name}"]:checked`).forEach((i) => s.add(i.value));
+    return s;
+  };
+  const getSingle = (name: string): string | null => {
+    const el = sidebar?.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`);
+    return el?.value ?? null;
+  };
+
+  const applyFilters = () => {
+    const industries = getChecked("industry");
+    const sizes      = getChecked("size");
+    const cities     = getChecked("city");
+    const verified   = (sidebar?.querySelector<HTMLInputElement>('input[name="verified"]'))?.checked ?? false;
+    const featured   = (sidebar?.querySelector<HTMLInputElement>('input[name="featured"]'))?.checked ?? false;
+    const hiring     = (sidebar?.querySelector<HTMLInputElement>('input[name="hiring"]'))?.checked ?? false;
+    const remote     = (sidebar?.querySelector<HTMLInputElement>('input[name="remote"]'))?.checked ?? false;
+    const openings   = getSingle("openings");
+    const query      = (searchInput?.value ?? "").toLowerCase().trim();
+
+    let matched = 0;
+    items.forEach((item) => {
+      const d = item.dataset;
+      let show = true;
+
+      if (industries.size && !industries.has(d.industry ?? "")) show = false;
+      if (show && sizes.size && !sizes.has(d.size ?? "")) show = false;
+      if (show && cities.size && !cities.has(d.city ?? "")) show = false;
+      if (show && verified && d.verified !== "true") show = false;
+      if (show && featured && d.featured !== "true") show = false;
+      if (show && remote && d.remote !== "true") show = false;
+      if (show && hiring && Number(d.openings) < 1) show = false;
+
+      if (show && openings) {
+        const n = Number(d.openings);
+        if (openings === "1-10"    && !(n >= 1 && n <= 10))  show = false;
+        if (openings === "11-30"   && !(n >= 11 && n <= 30)) show = false;
+        if (openings === "31-plus" && !(n >= 31))            show = false;
+      }
+
+      if (show && query) {
+        const hay = `${d.name} ${d.industry} ${d.city}`;
+        if (!hay.includes(query)) show = false;
+      }
+
+      item.dataset.filteredOut = show ? "false" : "true";
+      if (show) matched++;
+    });
+
+    const activeCount =
+      industries.size + sizes.size + cities.size +
+      (verified ? 1 : 0) + (featured ? 1 : 0) + (hiring ? 1 : 0) +
+      (remote ? 1 : 0) + (openings ? 1 : 0) + (query ? 1 : 0);
+    if (activeBadge) {
+      activeBadge.textContent = `${activeCount} active`;
+      activeBadge.setAttribute("aria-hidden", String(activeCount === 0));
+      activeBadge.classList.toggle("hidden", activeCount === 0);
+    }
+
+    // Reset to page 1 on filter change
+    if (window.location.search.includes("page=")) {
+      history.replaceState({}, "", window.location.pathname);
+    }
+
+    applyPagination();
+
+    if (empty && grid) {
+      empty.hidden = matched !== 0;
+      grid.hidden = matched === 0;
+    }
+  };
+
+  sidebar?.querySelectorAll<HTMLInputElement>("input").forEach((i) => i.addEventListener("change", applyFilters));
+  searchInput?.addEventListener("input", () => {
+    // debounce lightweight
+    window.clearTimeout((searchInput as any)._t);
+    (searchInput as any)._t = window.setTimeout(applyFilters, 150);
+  });
+
+  const clearAll = () => {
+    sidebar?.querySelectorAll<HTMLInputElement>("input").forEach((i) => { i.checked = false; });
+    if (searchInput) searchInput.value = "";
+    applyFilters();
+  };
+  clearBtn?.addEventListener("click", clearAll);
+  emptyReset?.addEventListener("click", clearAll);
+
+  // ─── View toggle ────────────────────────────────────────────────────
+  const viewButtons = document.querySelectorAll<HTMLButtonElement>("#cf-view-toggle .cf-view-btn");
+  viewButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const view = btn.dataset.view;
+      viewButtons.forEach((b) => (b.dataset.active = String(b === btn)));
+      if (grid) {
+        grid.className = view === "grid"
+          ? "mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3"
+          : "mt-6 grid gap-3";
+      }
+    });
+  });
+
+  // ─── Sort ───────────────────────────────────────────────────────────
+  const sortTrigger = document.getElementById("cf-sort-trigger");
+  const sortMenu    = document.getElementById("cf-sort-menu");
+  const sortLabel   = document.getElementById("cf-sort-label");
+  const sortChevron = sortTrigger?.querySelector(".cf-sort-chevron");
+  const sortOpts    = sortMenu?.querySelectorAll<HTMLButtonElement>(".cf-sort-option");
+
+  const openSort  = () => { sortMenu?.removeAttribute("hidden"); sortTrigger?.setAttribute("aria-expanded", "true"); sortChevron?.classList.add("rotate-180"); };
+  const closeSort = () => { sortMenu?.setAttribute("hidden", ""); sortTrigger?.setAttribute("aria-expanded", "false"); sortChevron?.classList.remove("rotate-180"); };
+
+  sortTrigger?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sortMenu?.hasAttribute("hidden") ? openSort() : closeSort();
+  });
+  document.addEventListener("click", (e) => {
+    const t = e.target as HTMLElement;
+    if (!t.closest("#cf-sort-dropdown")) closeSort();
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSort(); });
+
+  const sortItems = (mode: string) => {
+    if (!grid) return;
+    const arr = [...items];
+    const num = (el: HTMLElement, k: string) => Number(el.dataset[k] ?? 0);
+    switch (mode) {
+      case "featured":   arr.sort((a, b) => num(b, "featured" as any) - num(a, "featured" as any) || (a.dataset.featured === "true" ? -1 : 1)); break;
+      case "openings":   arr.sort((a, b) => num(b, "openings") - num(a, "openings")); break;
+      case "az":         arr.sort((a, b) => (a.dataset.name ?? "").localeCompare(b.dataset.name ?? "")); break;
+      case "za":         arr.sort((a, b) => (b.dataset.name ?? "").localeCompare(a.dataset.name ?? "")); break;
+      case "size-large": arr.sort((a, b) => num(b, "sizeRank") - num(a, "sizeRank")); break;
+      case "size-small": arr.sort((a, b) => num(a, "sizeRank") - num(b, "sizeRank")); break;
+    }
+    // Featured mode needs a proper stable comparator
+    if (mode === "featured") {
+      arr.sort((a, b) => (a.dataset.featured === "true" ? -1 : 1) - (b.dataset.featured === "true" ? -1 : 1));
+    }
+    arr.forEach((el) => grid.appendChild(el));
+    // Refresh items order in place
+    items.length = 0;
+    arr.forEach((el) => items.push(el));
+    if (window.location.search.includes("page=")) {
+      history.replaceState({}, "", window.location.pathname);
+    }
+    applyPagination();
+  };
+
+  sortOpts?.forEach((opt) => {
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sortOpts.forEach((o) => {
+        o.setAttribute("aria-selected", String(o === opt));
+        o.querySelector(".cf-sort-check")?.classList.toggle("hidden", o !== opt);
+      });
+      const label = Array.from(opt.childNodes)
+        .filter((n) => n.nodeType === Node.TEXT_NODE)
+        .map((n) => n.textContent?.trim())
+        .filter(Boolean)
+        .join(" ") || opt.textContent?.trim() || "";
+      if (sortLabel) sortLabel.textContent = label;
+      const value = opt.dataset.value ?? "featured";
+      sortItems(value);
+      closeSort();
+    });
+  });
+
+  // Initial run
+  applyPagination();
+</script>

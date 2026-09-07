@@ -1,0 +1,43 @@
+# ═══════════════════════════════════════════════════════════
+# Netlify — Joblo (Astro static)
+# Docs: https://docs.astro.build/en/guides/deploy/netlify/
+# ═══════════════════════════════════════════════════════════
+
+[build]
+  command   = "npm run build"
+  publish   = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Immutable cache for hashed Astro assets
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Static assets (fonts, images, icons in /public)
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/favicon.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# Security headers for every response
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
+    Permissions-Policy     = "camera=(), microphone=(), geolocation=()"
+
+# Pretty-URL 404
+[[redirects]]
+  from   = "/*"
+  to     = "/404.html"
+  status = 404

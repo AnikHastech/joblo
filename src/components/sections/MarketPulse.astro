@@ -1,0 +1,206 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import BrandLogo from "@components/common/BrandLogo.astro";
+import { liveHireAvatars } from "@data/testimonials";
+
+const hotSkills = [
+  { name: "TypeScript",     delta: "+42%",  roles: "18,240" },
+  { name: "AI/ML",          delta: "+128%", roles: "12,890", hot: true },
+  { name: "Rust",           delta: "+64%",  roles: "3,420" },
+  { name: "Product Design", delta: "+18%",  roles: "9,180" },
+  { name: "Go",             delta: "+31%",  roles: "6,540" },
+  { name: "Growth",         delta: "+22%",  roles: "5,220" },
+  { name: "SwiftUI",        delta: "+38%",  roles: "2,140" },
+  { name: "Data Eng.",      delta: "+45%",  roles: "7,890" },
+];
+
+const salaryBars = [
+  { role: "AI Research Eng.", min: 240, max: 380, med: 310 },
+  { role: "Staff Engineer",   min: 220, max: 320, med: 270 },
+  { role: "Product Manager",  min: 165, max: 260, med: 210 },
+  { role: "Sr. Designer",     min: 155, max: 220, med: 185 },
+  { role: "Data Scientist",   min: 150, max: 240, med: 195 },
+];
+
+const liveFeed = [
+  { name: "Maya",   avatar: liveHireAvatars.Maya,  role: "Sr. Designer", company: "Linear", slug: "linear", time: "just now" },
+  { name: "Devon",  avatar: liveHireAvatars.Devon, role: "Staff Eng.",   company: "Vercel", slug: "vercel", time: "2m ago"   },
+  { name: "Priya",  avatar: liveHireAvatars.Priya, role: "PM",           company: "Stripe", slug: "stripe", time: "6m ago"   },
+];
+
+const maxSalary = 400;
+---
+<section class="section-market-pulse relative isolate overflow-hidden py-20 sm:py-28">
+  <!-- soft ambient washes -->
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-40 mask-radial"></div>
+  <div class="pointer-events-none absolute -top-40 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-brand-200/40 blur-3xl"></div>
+  <div class="pointer-events-none absolute -bottom-40 left-0 -z-10 h-[500px] w-[500px] rounded-full bg-accent-200/40 blur-3xl"></div>
+
+  <Container size="xl">
+    <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+      <div class="max-w-2xl">
+        <SectionEyebrow number={10} label="Market pulse — live" />
+        <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+          The <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">signal</span> behind
+          the salary.
+        </h2>
+        <p class="mt-4 text-lg text-ink-600">
+          Trending skills, real compensation ranges, and who's hiring right now — updated every hour.
+        </p>
+      </div>
+      <a href="/blog" class="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-5 py-3 text-[14.5px] font-medium text-ink-900 transition-all hover:border-ink-900 hover:bg-ink-900 hover:text-ink-50">
+        Full insights report
+        <Icon name="arrowRight" size={14} />
+      </a>
+    </div>
+
+    <!-- Bento grid -->
+    <div class="mt-14 grid gap-5 lg:grid-cols-12 lg:items-stretch">
+      <!-- Salary chart -->
+      <div class="flex flex-col rounded-3xl border border-ink-200/70 bg-white/90 p-7 shadow-sm backdrop-blur lg:col-span-7">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] uppercase tracking-widest text-ink-500">Salary ranges — USD, annualized</p>
+            <h3 class="mt-1 text-xl font-semibold tracking-tight text-ink-900">Top-paying tech roles, 2026</h3>
+          </div>
+          <div class="hidden items-center gap-3 text-[11px] text-ink-500 sm:flex">
+            <span class="inline-flex items-center gap-1.5"><span class="h-2 w-4 rounded-full bg-gradient-to-r from-brand-400 to-accent-400 opacity-60"></span>Range</span>
+            <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-accent-500"></span>Median</span>
+          </div>
+        </div>
+
+        <ul class="mt-6 flex flex-1 flex-col justify-between gap-4">
+          {salaryBars.map((s) => {
+            const left  = (s.min / maxSalary) * 100;
+            const width = ((s.max - s.min) / maxSalary) * 100;
+            const med   = (s.med / maxSalary) * 100;
+            return (
+              <li>
+                <div class="flex items-baseline justify-between">
+                  <span class="text-[14px] font-medium text-ink-900">{s.role}</span>
+                  <span class="text-[13px] tabular-nums text-ink-500">${s.min}K – ${s.max}K</span>
+                </div>
+                <div class="relative mt-2 h-3 w-full rounded-full bg-ink-100">
+                  <span class="absolute inset-y-0 rounded-full bg-gradient-to-r from-brand-500/80 to-accent-500/80 shadow-sm" style={`left:${left}%;width:${width}%`}></span>
+                  <span class="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white bg-accent-500 shadow-[0_0_0_3px_rgb(255_77_23/0.2)]" style={`left:calc(${med}% - 8px)`}></span>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        <!-- Key insights strip -->
+        <div class="mt-6 grid grid-cols-3 gap-3 border-t border-ink-100 pt-5">
+          {[
+            { k: "+12%", v: "Median YoY", tone: "text-emerald-600" },
+            { k: "+8%",  v: "Remote premium", tone: "text-brand-600" },
+            { k: "$340K", v: "Top 10% earn", tone: "text-accent-600" },
+          ].map((s) => (
+            <div>
+              <p class={`text-lg font-semibold tracking-tight tabular-nums ${s.tone}`}>{s.k}</p>
+              <p class="text-[12px] text-ink-500">{s.v}</p>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-5 flex items-center justify-between border-t border-ink-100 pt-4">
+          <p class="text-[13px] text-ink-500">Sourced from 128K+ verified listings</p>
+          <a href="/blog" class="inline-flex items-center gap-1 text-[13px] font-medium text-brand-700 hover:gap-2 transition-all">
+            Explore salary tool
+            <Icon name="arrowRight" size={12} />
+          </a>
+        </div>
+      </div>
+
+      <!-- Right column stack -->
+      <div class="flex flex-col gap-5 lg:col-span-5">
+
+      <!-- Hot skills -->
+      <div class="rounded-3xl border border-ink-200/70 bg-white/90 p-7 shadow-sm backdrop-blur">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] uppercase tracking-widest text-ink-500">Trending skills · 7d</p>
+            <h3 class="mt-1 text-lg font-semibold tracking-tight text-ink-900">What teams want right now</h3>
+          </div>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+            <Icon name="trending" size={10} strokeWidth={2.2} />
+            Rising
+          </span>
+        </div>
+
+        <ul class="mt-5 flex flex-wrap gap-2">
+          {hotSkills.map((s) => (
+            <li>
+              <a href={`/jobs?skill=${encodeURIComponent(s.name)}`}
+                 class={[
+                   "group inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] transition-all",
+                   s.hot
+                     ? "border-accent-300 bg-gradient-to-br from-accent-50 to-white text-accent-700 hover:border-accent-400 hover:shadow-sm"
+                     : "border-ink-200 bg-white text-ink-700 hover:border-ink-900 hover:text-ink-900 hover:shadow-sm",
+                 ].join(" ")}
+              >
+                {s.hot && <span class="text-accent-500" aria-hidden="true">◆</span>}
+                <span class="font-medium">{s.name}</span>
+                <span class={`text-[11px] tabular-nums ${s.hot ? "text-accent-600" : "text-emerald-600"}`}>{s.delta}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <!-- Spotlight card -->
+        <a
+          href="/jobs?skill=AI%2FML"
+          class="group mt-5 flex items-center gap-4 rounded-2xl border border-accent-200 bg-gradient-to-br from-accent-50 via-white to-accent-50/50 p-4 transition-all hover:border-accent-400 hover:shadow-md"
+        >
+          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-sm">
+            <Icon name="sparkles" size={18} strokeWidth={2} />
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[11px] uppercase tracking-wider text-accent-700">This week's #1</p>
+            <p class="mt-0.5 text-[14.5px] font-semibold text-ink-900">AI/ML roles up <span class="tabular-nums text-accent-600">128%</span></p>
+          </div>
+          <Icon name="arrowRight" size={16} class="text-ink-400 transition-all group-hover:translate-x-0.5 group-hover:text-accent-600" />
+        </a>
+      </div>
+
+      <!-- Live hires -->
+      <div class="rounded-3xl border border-ink-200/70 bg-white/90 p-7 shadow-sm backdrop-blur">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] uppercase tracking-widest text-ink-500">Hires happening now</p>
+            <h3 class="mt-1 text-lg font-semibold tracking-tight text-ink-900">Latest signings on Joblo</h3>
+          </div>
+          <span class="flex items-center gap-1.5">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </span>
+            <span class="text-[11px] font-semibold tracking-wider text-emerald-700">LIVE</span>
+          </span>
+        </div>
+
+        <ul class="mt-5 space-y-3">
+          {liveFeed.map((f) => (
+            <li class="flex items-center gap-3 rounded-xl border border-ink-100 bg-ink-50/50 p-3 transition-colors hover:border-ink-200 hover:bg-white">
+              <img src={f.avatar} alt="" width="36" height="36" loading="lazy" class="h-9 w-9 shrink-0 rounded-full bg-white ring-1 ring-ink-100" />
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-[14px] text-ink-900">
+                  <span class="font-medium">{f.name}</span>
+                  <span class="text-ink-500"> joined </span>
+                  <span class="font-medium">{f.company}</span>
+                </p>
+                <p class="truncate text-[12px] text-ink-500">{f.role} · {f.time}</p>
+              </div>
+              <BrandLogo slug={f.slug} size="xs" class="shrink-0" />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      </div>
+      <!-- /right column stack -->
+    </div>
+  </Container>
+</section>

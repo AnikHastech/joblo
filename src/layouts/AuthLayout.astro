@@ -1,0 +1,284 @@
+---
+import "../styles/global.css";
+import Icon from "@components/ui/Icon.astro";
+import ThemeToggle from "@components/ui/ThemeToggle.astro";
+import { site } from "@data/site";
+import { liveHireAvatars } from "@data/testimonials";
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  heading: string;
+  subheading?: string;
+  aside?: "candidate" | "employer" | "brand";
+  pageTitle?: string;
+}
+
+const {
+  title, eyebrow, heading, subheading,
+  aside = "brand",
+  pageTitle,
+} = Astro.props;
+
+const asides = {
+  candidate: {
+    tagline: "Where careers begin.",
+    quote: "\"I found my dream role at Linear in three weeks. Joblo cut months off my search.\"",
+    author: "Maya Okonkwo",
+    role: "Senior Product Designer @ Linear",
+    authorAvatar: liveHireAvatars.Maya,
+    // Sample product preview
+    preview: {
+      role: "Senior Product Designer",
+      company: "Linear",
+      companyMark: "L",
+      companyColor: "#5e6ad2",
+      location: "Remote — Worldwide",
+      salary: "$180K – $220K",
+      match: 97,
+      tags: ["Figma", "Design Systems", "B2B SaaS"],
+    },
+    stats: [
+      { label: "Curated jobs",    value: site.stats.jobs,      icon: "briefcase" },
+      { label: "Companies",       value: site.stats.companies, icon: "building" },
+      { label: "Hires",           value: site.stats.hires,     icon: "award" },
+    ],
+  },
+  employer: {
+    tagline: "Hire smarter, not harder.",
+    quote: "\"We've hired seven senior engineers through Joblo this year. The candidate quality is in a different league.\"",
+    author: "Rafael Chen",
+    role: "Head of Engineering @ Vercel",
+    authorAvatar: liveHireAvatars.Kenji,
+    preview: {
+      role: "Senior Full-stack Engineer",
+      company: "Vercel",
+      companyMark: "▲",
+      companyColor: "#000",
+      location: "New York, NY",
+      salary: "$220K – $280K",
+      match: 94,
+      tags: ["TypeScript", "Next.js", "Systems"],
+    },
+    stats: [
+      { label: "Candidates", value: site.stats.candidates, icon: "users" },
+      { label: "Time to hire", value: "23d",              icon: "clock" },
+      { label: "Companies",  value: site.stats.companies,  icon: "building" },
+    ],
+  },
+  brand: {
+    tagline: "Where careers begin.",
+    quote: "\"The job marketplace we've been waiting for. Both sides win when quality beats volume.\"",
+    author: "Priya Anand",
+    role: "Product Manager @ Stripe",
+    authorAvatar: liveHireAvatars.Priya,
+    preview: {
+      role: "Product Manager, Payments",
+      company: "Stripe",
+      companyMark: "S",
+      companyColor: "#635bff",
+      location: "Dublin · Hybrid",
+      salary: "€145K – €185K",
+      match: 96,
+      tags: ["Fintech", "Payments", "Growth"],
+    },
+    stats: [
+      { label: "Jobs",       value: site.stats.jobs,      icon: "briefcase" },
+      { label: "Companies",  value: site.stats.companies, icon: "building" },
+      { label: "Hires",      value: site.stats.hires,     icon: "award" },
+    ],
+  },
+};
+
+const a = asides[aside];
+const recentHires = [liveHireAvatars.Maya, liveHireAvatars.Devon, liveHireAvatars.Priya, liveHireAvatars.Kenji, liveHireAvatars.Elena];
+---
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{pageTitle ?? `${title} · ${site.name}`}</title>
+    <meta name="description" content={subheading ?? site.description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var prefers = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var theme = stored || (prefers ? "dark" : "light");
+          document.documentElement.classList.toggle("dark", theme === "dark");
+          document.documentElement.dataset.theme = theme;
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-ink-50 antialiased">
+    <div class="grid min-h-screen lg:grid-cols-2">
+      <!-- Form column -->
+      <main class="flex flex-col justify-between px-6 py-8 sm:px-10 lg:px-16 lg:py-12">
+        <!-- Top bar -->
+        <div class="flex items-center justify-between">
+          <a href="/" class="flex items-center gap-2">
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-ink-900 text-ink-50 font-bold dark:!bg-brand-500">J</span>
+            <span class="text-[16px] font-semibold tracking-tight text-ink-900">{site.name}</span>
+          </a>
+          <a href="/" class="inline-flex items-center gap-1 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-700 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+            <Icon name="arrowRight" size={11} class="rotate-180" />
+            Back to site
+          </a>
+        </div>
+
+        <!-- Form content (centered vertically) -->
+        <div class="mx-auto w-full max-w-md py-12">
+          {eyebrow && (
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-700 dark:text-brand-400">{eyebrow}</p>
+          )}
+          <h1 class="mt-2 text-[32px] font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-[38px]">{heading}</h1>
+          {subheading && <p class="mt-3 text-[14.5px] text-ink-600">{subheading}</p>}
+
+          <div class="mt-8">
+            <slot />
+          </div>
+        </div>
+
+        <!-- Bottom links -->
+        <div class="flex items-center justify-between text-[12px] text-ink-500">
+          <p>&copy; {new Date().getFullYear()} {site.name}. All rights reserved.</p>
+          <div class="flex items-center gap-4">
+            <a href="/privacy" class="hover:text-ink-900">Privacy</a>
+            <a href="/terms" class="hover:text-ink-900">Terms</a>
+            <a href="/contact" class="hover:text-ink-900">Help</a>
+          </div>
+        </div>
+      </main>
+
+      <!-- Aside (right, hidden on mobile) — editorial product preview -->
+      <aside class="relative isolate hidden overflow-hidden bg-ink-900 dark:!bg-ink-100 lg:block">
+        <!-- Ambient gradient blooms -->
+        <div aria-hidden="true" class="pointer-events-none absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-gradient-to-br from-brand-500/40 via-accent-500/30 to-transparent blur-3xl"></div>
+        <div aria-hidden="true" class="pointer-events-none absolute -bottom-40 -left-32 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-violet-500/30 via-brand-500/20 to-transparent blur-3xl"></div>
+        <!-- Grid texture -->
+        <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-grid opacity-[0.08] mix-blend-overlay"></div>
+        <!-- Corner mark decoration -->
+        <div aria-hidden="true" class="pointer-events-none absolute right-10 top-10 h-24 w-24 rounded-full border border-white/10"></div>
+        <div aria-hidden="true" class="pointer-events-none absolute right-16 top-16 h-14 w-14 rounded-full border border-white/5"></div>
+
+        <div class="relative flex h-full flex-col justify-between p-12 text-white xl:p-16">
+          <!-- Top: Live indicator + tagline -->
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3 py-1.5 backdrop-blur">
+                <span class="relative flex h-1.5 w-1.5">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                </span>
+                <span class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-white/80">Live · updated just now</span>
+              </span>
+              <p class="mt-6 font-display text-[42px] italic leading-[1.05] text-white xl:text-[48px]">
+                <span class="bg-gradient-to-br from-[#ffffff] via-brand-200 to-accent-200 bg-clip-text text-transparent">{a.tagline}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Middle: Product preview card (glassmorphism job card) -->
+          <div class="my-8">
+            <p class="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-white/50">Sample match</p>
+
+            <article class="group relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-white/[0.08] via-white/[0.04] to-white/[0.02] p-6 backdrop-blur-md transition-all hover:border-white/25">
+              <!-- Match score badge (top-right) -->
+              <span class="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-1 text-[11px] font-semibold text-emerald-300 ring-1 ring-emerald-400/30 backdrop-blur">
+                <Icon name="sparkles" size={10} />
+                {a.preview.match}% match
+              </span>
+
+              <!-- Company mark + role -->
+              <div class="flex items-start gap-3">
+                <span
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[14px] font-bold text-white shadow-lg ring-1 ring-white/20"
+                  style={`background:${a.preview.companyColor}`}
+                >
+                  {a.preview.companyMark}
+                </span>
+                <div class="min-w-0 flex-1 pr-16">
+                  <p class="text-[11.5px] font-medium text-white/70">{a.preview.company}</p>
+                  <p class="mt-0.5 text-[15px] font-semibold text-white leading-snug">{a.preview.role}</p>
+                </div>
+              </div>
+
+              <!-- Meta -->
+              <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-white/70">
+                <span class="inline-flex items-center gap-1.5">
+                  <Icon name="mapPin" size={11} class="text-white/50" />
+                  {a.preview.location}
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                  <Icon name="wallet" size={11} class="text-white/50" />
+                  {a.preview.salary}
+                </span>
+              </div>
+
+              <!-- Tags -->
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                {a.preview.tags.map((t) => (
+                  <span class="rounded-full border border-white/15 bg-white/[0.05] px-2.5 py-0.5 text-[10.5px] text-white/80">{t}</span>
+                ))}
+              </div>
+
+              <!-- Ambient hover glow -->
+              <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 -bottom-1 h-px bg-gradient-to-r from-transparent via-brand-400/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></span>
+            </article>
+
+            <!-- Recent hires ticker below preview -->
+            <div class="mt-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 backdrop-blur">
+              <div class="flex -space-x-2">
+                {recentHires.slice(0, 4).map((src) => (
+                  <img src={src} alt="" class="h-7 w-7 rounded-full bg-ink-800 ring-2 ring-ink-900" />
+                ))}
+              </div>
+              <p class="flex-1 text-[11.5px] text-white/70">
+                <span class="font-semibold text-white">7 candidates</span> hired via Joblo this week
+              </p>
+              <Icon name="arrowUpRight" size={11} class="text-white/40" />
+            </div>
+          </div>
+
+          <!-- Testimonial + Stats -->
+          <div>
+            <!-- Compact quote (smaller than before, since preview card is hero now) -->
+            <figure class="border-l-2 border-accent-400/70 pl-5">
+              <blockquote class="font-display text-[20px] italic leading-[1.35] text-white/90 xl:text-[22px]">
+                {a.quote}
+              </blockquote>
+              <figcaption class="mt-4 flex items-center gap-3">
+                <img src={a.authorAvatar} alt={a.author} class="h-9 w-9 rounded-xl bg-white/10 ring-1 ring-white/20" />
+                <div>
+                  <p class="text-[12.5px] font-semibold text-white">{a.author}</p>
+                  <p class="mt-0.5 text-[11.5px] text-white/60">{a.role}</p>
+                </div>
+              </figcaption>
+            </figure>
+
+            <!-- Stats trio -->
+            <dl class="mt-8 grid grid-cols-3 gap-4 border-t border-white/15 pt-6">
+              {a.stats.map((s) => (
+                <div>
+                  <dt class="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                    <Icon name={s.icon as any} size={9} />
+                    {s.label}
+                  </dt>
+                  <dd class="mt-1.5 text-[22px] font-semibold tracking-tight text-white tabular-nums xl:text-[24px]">{s.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <ThemeToggle />
+  </body>
+</html>

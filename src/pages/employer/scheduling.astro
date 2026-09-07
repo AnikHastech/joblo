@@ -1,0 +1,163 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import StatCard from "@components/dashboard/StatCard.astro";
+import Icon from "@components/ui/Icon.astro";
+
+const stats = [
+  { label: "This week",     value: 14, icon: "sparkles",   tone: "brand"   as const, change: 12 },
+  { label: "Slots offered", value: 42, icon: "clock",      tone: "info"    as const, change:  8 },
+  { label: "Confirmed",     value: 11, icon: "checkCircle",tone: "success" as const, change: 20 },
+  { label: "No-shows",      value: "3%",icon: "close",     tone: "accent"  as const, change: -1 },
+];
+
+const days = ["Mon 09", "Tue 10", "Wed 11", "Thu 12", "Fri 13"];
+const times = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"];
+
+// Random-ish slot state (booked/pending/free)
+const slotState = (dayIdx: number, timeIdx: number): "booked" | "pending" | "free" | "off" => {
+  const n = (dayIdx * 7 + timeIdx * 3) % 11;
+  if (n < 3) return "booked";
+  if (n === 3) return "pending";
+  if (n === 4) return "off";
+  return "free";
+};
+
+const upcoming = [
+  { time: "Today, 15:00", candidate: "Maya Okonkwo",   role: "Sr. Designer",       kind: "Portfolio review", host: "Sam Okafor",    length: "45 min" },
+  { time: "Tomorrow, 10:00", candidate: "Rafael Chen", role: "Staff Engineer",     kind: "System design",    host: "Priya Ramanathan",length: "60 min" },
+  { time: "Wed, 13:30",       candidate: "Priya Anand", role: "Product Manager",   kind: "Product sense",    host: "Alex Morgan",    length: "60 min" },
+  { time: "Thu, 09:30",       candidate: "Devon Park",  role: "Growth Lead",       kind: "Hiring manager",   host: "Sam Okafor",    length: "45 min" },
+];
+
+const hosts = [
+  { name: "Sam Okafor",       role: "VP Engineering",  slots: 12, booked: 8  },
+  { name: "Priya Ramanathan", role: "Head of Product", slots: 10, booked: 7  },
+  { name: "Alex Morgan",      role: "CEO",              slots: 8,  booked: 3  },
+  { name: "Elena Marquez",    role: "Design Lead",      slots: 12, booked: 9  },
+];
+
+const stateChip: Record<string, string> = {
+  booked:  "bg-brand-500 text-white",
+  pending: "bg-amber-300 text-amber-900",
+  free:    "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:!bg-emerald-500/15 dark:!text-emerald-400",
+  off:     "bg-ink-100 text-ink-400 dark:!bg-white/[0.04] dark:!text-ink-500",
+};
+---
+<EmployerLayout title="Scheduling" active="scheduling">
+  <header class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Interview scheduling</p>
+      <h1 class="mt-2 text-[26px] font-semibold leading-tight tracking-tight text-ink-900 sm:text-[32px]">
+        Pick a <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">time</span> that works
+      </h1>
+      <p class="mt-2 text-[13.5px] text-ink-500">Share a link. Candidates book. Slots sync to every host's calendar automatically.</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3.5 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+        <Icon name="globe" size={13} />
+        Calendar sync
+      </button>
+      <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+        <Icon name="send" size={13} />
+        Share booking link
+      </button>
+    </div>
+  </header>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    {stats.map((s) => <StatCard {...s} />)}
+  </div>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-3">
+    <!-- Slot picker (main) -->
+    <div class="lg:col-span-2 rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:p-6">
+      <header class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Week of Sep 9</p>
+          <h2 class="mt-1 text-[17px] font-semibold text-ink-900">Available slots</h2>
+        </div>
+        <div class="flex items-center gap-1">
+          <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 hover:border-ink-400 dark:!border-white/10">
+            <Icon name="chevronDown" size={12} class="rotate-90" />
+          </button>
+          <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 hover:border-ink-400 dark:!border-white/10">
+            <Icon name="chevronDown" size={12} class="-rotate-90" />
+          </button>
+        </div>
+      </header>
+
+      <!-- Legend -->
+      <div class="mt-4 flex flex-wrap items-center gap-3 text-[11.5px] text-ink-500">
+        <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded bg-emerald-400"></span> Free</span>
+        <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded bg-amber-300"></span> Pending</span>
+        <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded bg-brand-500"></span> Booked</span>
+        <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded bg-ink-200"></span> Off</span>
+      </div>
+
+      <!-- Grid -->
+      <div class="mt-4 overflow-x-auto">
+        <div class="grid gap-1.5" style="grid-template-columns: 56px repeat(5, minmax(72px, 1fr));">
+          <span></span>
+          {days.map((d) => (
+            <span class="text-center text-[11.5px] font-semibold text-ink-800">{d}</span>
+          ))}
+          {times.map((t, ti) => (
+            <>
+              <span class="pr-2 text-right text-[11px] font-mono text-ink-500 tabular-nums">{t}</span>
+              {days.map((_, di) => {
+                const s = slotState(di, ti);
+                return (
+                  <button
+                    type="button"
+                    disabled={s === "booked" || s === "off"}
+                    class={`h-8 rounded-md text-[10.5px] font-semibold transition-colors disabled:cursor-not-allowed ${stateChip[s]}`}
+                    aria-label={`${days[di]} ${t} — ${s}`}
+                  >
+                    {s === "booked" ? "•" : s === "pending" ? "…" : ""}
+                  </button>
+                );
+              })}
+            </>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming + hosts -->
+    <div class="space-y-4">
+      <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Upcoming</p>
+        <ul class="mt-4 space-y-3">
+          {upcoming.map((u) => (
+            <li class="rounded-xl border border-ink-200/70 p-3 dark:!border-white/[0.08]">
+              <p class="text-[11.5px] font-semibold text-brand-700 dark:!text-brand-400 tabular-nums">{u.time}</p>
+              <p class="mt-1 text-[13px] font-semibold text-ink-900">{u.candidate}</p>
+              <p class="mt-0.5 text-[11.5px] text-ink-500">{u.role} · {u.kind}</p>
+              <p class="mt-1.5 text-[11px] text-ink-500">with {u.host} · {u.length}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Interview hosts</p>
+        <ul class="mt-4 space-y-3">
+          {hosts.map((h) => (
+            <li class="flex items-center gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink-900 text-[11px] font-bold text-ink-50 dark:!bg-brand-500 dark:!text-white">
+                {h.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-[13px] font-semibold text-ink-900">{h.name}</p>
+                <p class="mt-0.5 text-[11.5px] text-ink-500 tabular-nums">{h.booked} of {h.slots} slots booked</p>
+                <div class="mt-1.5 h-1 overflow-hidden rounded-full bg-ink-100 dark:!bg-white/[0.06]">
+                  <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500" style={`width:${(h.booked / h.slots) * 100}%`}></div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</EmployerLayout>

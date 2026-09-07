@@ -1,0 +1,228 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import { currentCandidate } from "@data/dashboard";
+
+const tabs = [
+  { key: "account",     label: "Account",       icon: "user" },
+  { key: "notifications", label: "Notifications", icon: "bell" },
+  { key: "privacy",     label: "Privacy",        icon: "shield" },
+  { key: "connected",   label: "Connected apps", icon: "globe" },
+  { key: "billing",     label: "Billing",        icon: "wallet" },
+  { key: "danger",      label: "Danger zone",    icon: "close" },
+];
+
+const notificationSettings = [
+  { key: "email-matches",   label: "Job matches",              body: "When new jobs match your alerts.",       email: true,  push: true  },
+  { key: "email-messages",  label: "Messages from recruiters", body: "When someone reaches out directly.",     email: true,  push: true  },
+  { key: "email-app",       label: "Application updates",      body: "Interview invites, offers, and status changes.", email: true, push: true },
+  { key: "email-digest",    label: "Weekly digest",            body: "Roundup of trending jobs and market insights.", email: true, push: false },
+  { key: "email-product",   label: "Product updates",          body: "New features, tips, and occasional announcements.", email: false, push: false },
+];
+---
+<DashboardLayout
+  title="Settings"
+  subtitle="Account, notifications, privacy, and everything else."
+  active="settings"
+>
+  <div class="grid gap-6 lg:grid-cols-12">
+    <!-- Tabs -->
+    <aside class="lg:col-span-3">
+      <div class="rounded-3xl border border-ink-200/70 bg-white p-3 dark:!border-white/[0.08] dark:!bg-white/[0.035] lg:sticky lg:top-24">
+        <nav class="space-y-0.5">
+          {tabs.map((t, i) => (
+            <a href={`#s-${t.key}`} class={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium ${i === 0 ? "bg-ink-100 text-ink-900 dark:!bg-white/[0.08]" : "text-ink-700 hover:bg-ink-100 dark:hover:!bg-white/[0.06]"}`}>
+              <Icon name={t.icon as any} size={13} class="text-ink-500" />
+              {t.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </aside>
+
+    <div class="lg:col-span-9 space-y-6">
+      <!-- Account -->
+      <section id="s-account" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">01 · Account</p>
+          <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Login & credentials</h2>
+        </header>
+        <div class="mt-6 grid gap-5 sm:grid-cols-2">
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Email address</span>
+            <input type="email" value={currentCandidate.email} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Phone</span>
+            <input type="tel" value={currentCandidate.phone} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Password</p>
+              <p class="mt-0.5 text-[12px] text-ink-500">Last changed 3 months ago.</p>
+            </div>
+            <button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 py-2 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">Change password</button>
+          </div>
+          <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Two-factor authentication</p>
+              <p class="mt-0.5 text-[12px] text-ink-500">Add an extra layer of security using an authenticator app.</p>
+            </div>
+            <label class="inline-flex cursor-pointer items-center gap-2">
+              <input type="checkbox" class="peer sr-only" />
+              <span class="relative h-6 w-11 rounded-full bg-ink-200 transition-colors peer-checked:bg-brand-600 dark:!bg-white/10">
+                <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition-transform peer-checked:translate-x-5"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Notifications -->
+      <section id="s-notifications" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">02 · Notifications</p>
+          <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">What we notify you about</h2>
+        </header>
+        <table class="mt-6 w-full text-[13.5px]">
+          <thead>
+            <tr class="border-b border-ink-100 text-[11px] font-bold uppercase tracking-widest text-ink-500 dark:!border-white/[0.06]">
+              <th class="py-3 text-left">Type</th>
+              <th class="py-3 text-center w-20">Email</th>
+              <th class="py-3 text-center w-20">Push</th>
+            </tr>
+          </thead>
+          <tbody>
+            {notificationSettings.map((n) => (
+              <tr class="border-b border-ink-100 last:border-b-0 dark:!border-white/[0.06]">
+                <td class="py-4">
+                  <p class="font-semibold text-ink-900">{n.label}</p>
+                  <p class="mt-0.5 text-[12px] text-ink-500">{n.body}</p>
+                </td>
+                <td class="py-4 text-center">
+                  <label class="inline-flex cursor-pointer">
+                    <input type="checkbox" checked={n.email} class="peer sr-only" />
+                    <span class="relative h-5 w-9 rounded-full bg-ink-200 transition-colors peer-checked:bg-brand-600 dark:!bg-white/10">
+                      <span class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform peer-checked:translate-x-4"></span>
+                    </span>
+                  </label>
+                </td>
+                <td class="py-4 text-center">
+                  <label class="inline-flex cursor-pointer">
+                    <input type="checkbox" checked={n.push} class="peer sr-only" />
+                    <span class="relative h-5 w-9 rounded-full bg-ink-200 transition-colors peer-checked:bg-brand-600 dark:!bg-white/10">
+                      <span class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform peer-checked:translate-x-4"></span>
+                    </span>
+                  </label>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Privacy -->
+      <section id="s-privacy" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">03 · Privacy</p>
+          <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Who sees your profile</h2>
+        </header>
+        <div class="mt-6 space-y-3">
+          <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 has-[input:checked]:border-brand-500 has-[input:checked]:bg-brand-50/40 dark:!border-white/10 dark:has-[input:checked]:!bg-brand-500/10">
+            <input type="radio" name="visibility" checked class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Public — visible to recruiters</p>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">Verified recruiters at hiring companies can find you and reach out.</p>
+            </div>
+          </label>
+          <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+            <input type="radio" name="visibility" class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Selective — invite only</p>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">Only companies you've explicitly interacted with can see your full profile.</p>
+            </div>
+          </label>
+          <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+            <input type="radio" name="visibility" class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Hidden — profile off</p>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">You'll still be able to apply, but nobody can find you organically.</p>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Connected apps -->
+      <section id="s-connected" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">04 · Connected apps</p>
+          <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Linked accounts</h2>
+        </header>
+        <ul class="mt-5 divide-y divide-ink-100 dark:!divide-white/[0.06]">
+          {[
+            { name: "Google",   status: "Connected", icon: "sparkles" },
+            { name: "LinkedIn", status: "Connected", icon: "linkedin" },
+            { name: "GitHub",   status: "Not connected", icon: "github" },
+            { name: "Dribbble", status: "Not connected", icon: "dribbble" },
+          ].map((s) => (
+            <li class="flex items-center justify-between py-4">
+              <div class="flex items-center gap-3">
+                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-ink-100 text-ink-700 dark:!bg-white/[0.06]"><Icon name={s.icon as any} size={14} /></span>
+                <div>
+                  <p class="text-[14px] font-semibold text-ink-900">{s.name}</p>
+                  <p class="mt-0.5 text-[11.5px] text-ink-500">{s.status}</p>
+                </div>
+              </div>
+              <button type="button" class="inline-flex h-9 items-center rounded-full border border-ink-200 bg-white px-3.5 text-[12.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+                {s.status === "Connected" ? "Disconnect" : "Connect"}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Billing (placeholder) -->
+      <section id="s-billing" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">05 · Billing</p>
+          <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Plan & invoices</h2>
+        </header>
+        <div class="mt-6 rounded-2xl bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-5 dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-400">Current plan</p>
+          <div class="mt-2 flex flex-wrap items-baseline gap-3">
+            <p class="text-[22px] font-semibold tracking-tight text-ink-900">Candidate · Free</p>
+            <p class="text-[13px] text-ink-500">Full access. Forever.</p>
+          </div>
+          <p class="mt-4 text-[13px] text-ink-600">Candidates never pay to use Joblo. Companies pay to hire.</p>
+        </div>
+      </section>
+
+      <!-- Danger zone -->
+      <section id="s-danger" class="scroll-mt-24 rounded-3xl border border-rose-200 bg-rose-50/40 p-6 sm:p-8 dark:!border-rose-500/30 dark:!bg-rose-500/5">
+        <header>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-rose-700 dark:!text-rose-400">06 · Danger zone</p>
+          <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Irreversible actions</h2>
+        </header>
+        <div class="mt-6 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-white p-4 dark:!border-rose-500/30 dark:!bg-white/[0.03]">
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Export your data</p>
+              <p class="mt-0.5 text-[12px] text-ink-500">Download everything we have about you as JSON.</p>
+            </div>
+            <button type="button" class="inline-flex h-9 items-center rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10">Export data</button>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-white p-4 dark:!border-rose-500/30 dark:!bg-white/[0.03]">
+            <div>
+              <p class="text-[13.5px] font-semibold text-rose-700 dark:!text-rose-400">Delete account</p>
+              <p class="mt-0.5 text-[12px] text-ink-500">Permanent. All applications, alerts, and profile data will be wiped.</p>
+            </div>
+            <button type="button" class="inline-flex h-9 items-center gap-1.5 rounded-full bg-rose-600 px-4 text-[13px] font-semibold text-white hover:bg-rose-700">
+              <Icon name="close" size={12} />
+              Delete account
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</DashboardLayout>

@@ -1,0 +1,184 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import { currentEmployer, team } from "@data/employer";
+import { getCompany } from "@data/companies";
+
+const company = getCompany(currentEmployer.companyId);
+
+const tabs = [
+  { key: "account",    label: "Account",      icon: "user" },
+  { key: "team",       label: "Team",         icon: "users" },
+  { key: "hiring",     label: "Hiring prefs", icon: "briefcase" },
+  { key: "integrations",label: "Integrations", icon: "globe" },
+  { key: "danger",     label: "Danger zone",  icon: "close" },
+];
+
+const permissionStyle = {
+  Owner:  "bg-brand-100 text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400",
+  Admin:  "bg-violet-100 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400",
+  Editor: "bg-ink-100 text-ink-700 dark:!bg-white/[0.06]",
+} as const;
+---
+<EmployerLayout
+  title="Settings"
+  subtitle="Manage your account, team, and integrations."
+  active="settings"
+>
+  <div class="grid gap-6 lg:grid-cols-12">
+    <!-- Tabs -->
+    <aside class="lg:col-span-3">
+      <div class="rounded-3xl border border-ink-200/70 bg-white p-3 dark:!border-white/[0.08] dark:!bg-white/[0.035] lg:sticky lg:top-24">
+        <nav class="space-y-0.5">
+          {tabs.map((t, i) => (
+            <a href={`#s-${t.key}`} class={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium ${i === 0 ? "bg-ink-100 text-ink-900 dark:!bg-white/[0.08]" : "text-ink-700 hover:bg-ink-100 dark:hover:!bg-white/[0.06]"}`}>
+              <Icon name={t.icon as any} size={13} class="text-ink-500" />
+              {t.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </aside>
+
+    <div class="lg:col-span-9 space-y-6">
+      <!-- Account -->
+      <section id="s-account" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">01 · Account</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Your details</h2>
+        <div class="mt-6 flex items-center gap-4">
+          <img src={currentEmployer.avatar} alt={currentEmployer.name} class="h-16 w-16 rounded-2xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+          <div>
+            <button type="button" class="inline-flex items-center gap-1.5 rounded-full bg-ink-900 px-3 py-1.5 text-[12px] font-semibold text-ink-50 hover:bg-brand-600">
+              <Icon name="plus" size={11} /> Upload photo
+            </button>
+            <p class="mt-1.5 text-[11.5px] text-ink-500">JPG or PNG, max 4 MB.</p>
+          </div>
+        </div>
+        <div class="mt-6 grid gap-5 sm:grid-cols-2">
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Full name</span>
+            <input type="text" value={currentEmployer.name} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Role at {company.name}</span>
+            <input type="text" value={currentEmployer.role} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Email</span>
+            <input type="email" value={currentEmployer.email} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Phone</span>
+            <input type="tel" value={currentEmployer.phone} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+        </div>
+      </section>
+
+      <!-- Team -->
+      <section id="s-team" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">02 · Team</p>
+            <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">People with access</h2>
+          </div>
+          <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+            <Icon name="plus" size={12} strokeWidth={2.2} /> Invite teammate
+          </button>
+        </header>
+        <ul class="mt-5 divide-y divide-ink-100 dark:!divide-white/[0.06]">
+          {team.map((m) => (
+            <li class="flex flex-wrap items-center gap-4 py-4">
+              <img src={m.avatar} alt={m.name} class="h-11 w-11 shrink-0 rounded-xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+              <div class="min-w-0 flex-1">
+                <p class="text-[14px] font-semibold text-ink-900">{m.name}</p>
+                <p class="mt-0.5 text-[12px] text-ink-500">{m.role} · {m.email}</p>
+              </div>
+              <span class={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${permissionStyle[m.permission as keyof typeof permissionStyle]}`}>{m.permission}</span>
+              <p class="hidden text-[11.5px] text-ink-500 sm:block">Added {m.addedOn}</p>
+              <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400 dark:!border-white/10" aria-label="Manage">
+                <Icon name="chevronDown" size={11} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Hiring prefs -->
+      <section id="s-hiring" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">03 · Hiring preferences</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">How you like to hire</h2>
+        <div class="mt-6 space-y-4">
+          {[
+            { title: "Auto-shortlist high-match candidates", body: "Applicants with 90%+ match are moved to Shortlisted automatically.", on: true },
+            { title: "Send weekly hiring digest",             body: "Email summary of new applicants, funnel changes, and open roles every Monday.", on: true },
+            { title: "Anonymize applicants during initial review", body: "Hide name, photo, and location until Shortlisted stage.", on: false },
+            { title: "Auto-reply to new applications",         body: "Send a friendly acknowledgement within 5 minutes of any new application.", on: true },
+          ].map((p) => (
+            <label class="flex items-start justify-between gap-4 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+              <div>
+                <p class="text-[13.5px] font-semibold text-ink-900">{p.title}</p>
+                <p class="mt-0.5 text-[12.5px] text-ink-500">{p.body}</p>
+              </div>
+              <input type="checkbox" checked={p.on} class="peer sr-only" />
+              <span class="relative mt-1 h-6 w-11 shrink-0 rounded-full bg-ink-200 transition-colors peer-checked:bg-brand-600 dark:!bg-white/10">
+                <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition-transform peer-checked:translate-x-5"></span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <!-- Integrations -->
+      <section id="s-integrations" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">04 · Integrations</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Connected tools</h2>
+        <ul class="mt-5 divide-y divide-ink-100 dark:!divide-white/[0.06]">
+          {[
+            { name: "Slack",     status: "Connected", body: "Post new applicants to #hiring." },
+            { name: "Greenhouse",status: "Connected", body: "Two-way sync with your ATS." },
+            { name: "Lever",     status: "Not connected", body: "Sync candidates and stages." },
+            { name: "Ashby",     status: "Not connected", body: "Two-way sync + interviewer availability." },
+            { name: "Zapier",    status: "Not connected", body: "Trigger 5,000+ apps from Joblo events." },
+          ].map((i) => (
+            <li class="flex items-center justify-between py-4">
+              <div class="flex items-center gap-3">
+                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-ink-100 text-ink-700 text-[13px] font-bold dark:!bg-white/[0.06]">{i.name[0]}</span>
+                <div>
+                  <p class="text-[14px] font-semibold text-ink-900">{i.name}</p>
+                  <p class="mt-0.5 text-[11.5px] text-ink-500">{i.body}</p>
+                </div>
+              </div>
+              <button type="button" class={`inline-flex h-9 items-center rounded-full border px-3.5 text-[12.5px] font-medium ${i.status === "Connected" ? "border-ink-200 bg-white text-ink-800 hover:border-ink-400 dark:!border-white/10" : "border-ink-900 bg-ink-900 text-ink-50 hover:bg-brand-600 hover:border-brand-600"}`}>
+                {i.status === "Connected" ? "Disconnect" : "Connect"}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Danger -->
+      <section id="s-danger" class="scroll-mt-24 rounded-3xl border border-rose-200 bg-rose-50/40 p-6 sm:p-8 dark:!border-rose-500/30 dark:!bg-rose-500/5">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-rose-700 dark:!text-rose-400">05 · Danger zone</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Irreversible actions</h2>
+        <div class="mt-6 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-white p-4 dark:!border-rose-500/30 dark:!bg-white/[0.03]">
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Close all jobs & pause billing</p>
+              <p class="mt-0.5 text-[12px] text-ink-500">All active postings will be closed. Team retains read-only access.</p>
+            </div>
+            <button type="button" class="inline-flex h-9 items-center rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10">Pause account</button>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-white p-4 dark:!border-rose-500/30 dark:!bg-white/[0.03]">
+            <div>
+              <p class="text-[13.5px] font-semibold text-rose-700 dark:!text-rose-400">Delete workspace</p>
+              <p class="mt-0.5 text-[12px] text-ink-500">Permanently delete {company.name}'s workspace, all postings, and applicant history.</p>
+            </div>
+            <button type="button" class="inline-flex h-9 items-center gap-1.5 rounded-full bg-rose-600 px-4 text-[13px] font-semibold text-white hover:bg-rose-700">
+              <Icon name="close" size={12} /> Delete workspace
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</EmployerLayout>

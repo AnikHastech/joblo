@@ -1,0 +1,179 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import StatCard from "@components/dashboard/StatCard.astro";
+import StatusPill from "@components/dashboard/StatusPill.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import Icon from "@components/ui/Icon.astro";
+import JobCard from "@components/jobs/JobCard.astro";
+import {
+  currentCandidate, dashboardStats, applications, applicationWithJob,
+  activity, recommendedJobs, jobAlerts,
+} from "@data/dashboard";
+
+const nextInterviews = applications
+  .filter((a) => a.status === "Interview")
+  .slice(0, 3)
+  .map(applicationWithJob);
+
+const recentActivity = activity.slice(0, 5);
+
+const activityIcons: Record<string, string> = {
+  application: "briefcase",
+  view: "user",
+  save: "bookmark",
+  message: "send",
+  alert: "bell",
+};
+---
+<DashboardLayout
+  title={`Hi, ${currentCandidate.firstName}`}
+  subtitle="Here's what's happening with your search this week."
+  active="home"
+>
+  <!-- Stats row -->
+  <section aria-labelledby="stats-heading">
+    <h2 id="stats-heading" class="sr-only">Overview stats</h2>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StatCard
+        label="Active applications"
+        value={dashboardStats.activeApplications}
+        icon="briefcase"
+        href="/dashboard/applications"
+        tone="brand"
+        changeLabel={`${dashboardStats.interviews} in interview stage`}
+      />
+      <StatCard
+        label="Profile views"
+        value={dashboardStats.profileViews}
+        icon="user"
+        change={dashboardStats.viewsChangePct}
+        changeLabel="vs. last week"
+        tone="accent"
+      />
+      <StatCard
+        label="Saved jobs"
+        value={dashboardStats.savedJobs}
+        icon="bookmark"
+        href="/dashboard/saved"
+        tone="info"
+      />
+      <StatCard
+        label="Active alerts"
+        value={dashboardStats.alerts}
+        icon="bell"
+        href="/dashboard/alerts"
+        tone="success"
+        changeLabel="Auto-matching daily"
+      />
+    </div>
+  </section>
+
+  <!-- Main split -->
+  <div class="mt-8 grid gap-6 lg:grid-cols-12">
+    <!-- Left column: pipeline + activity -->
+    <div class="lg:col-span-8 space-y-6">
+      <!-- Pipeline (interviews next) -->
+      <section class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Coming up</p>
+            <h3 class="mt-1 text-[18px] font-semibold tracking-tight text-ink-900">Your next interviews</h3>
+          </div>
+          <a href="/dashboard/applications" class="text-[12.5px] font-medium text-brand-700 hover:underline">View all</a>
+        </div>
+
+        {nextInterviews.length === 0 ? (
+          <div class="mt-6">
+            <EmptyState compact icon="bell" title="No interviews scheduled" body="When a company invites you to interview, it'll show up here." />
+          </div>
+        ) : (
+          <ul class="mt-5 space-y-3">
+            {nextInterviews.map(({ application, job, company }) => job && company && (
+              <li class="group flex items-center gap-4 rounded-2xl border border-ink-200/70 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.02]">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[13px] font-bold text-white" style={`background:${company.brandColor}`}>{company.name[0]}</span>
+                <div class="min-w-0 flex-1">
+                  <p class="flex flex-wrap items-center gap-2">
+                    <a href={`/jobs/${job.slug}`} class="text-[14.5px] font-semibold text-ink-900 hover:text-brand-700 transition-colors">{job.title}</a>
+                    <StatusPill status={application.status} />
+                  </p>
+                  <p class="mt-1 text-[12.5px] text-ink-500">
+                    {company.name} · {application.nextStep ?? "Next step TBD"}
+                  </p>
+                </div>
+                <div class="hidden text-right sm:block">
+                  <p class="text-[11.5px] font-semibold uppercase tracking-widest text-ink-400">Update</p>
+                  <p class="mt-0.5 text-[12.5px] text-ink-700 line-clamp-1 max-w-[240px]">{application.lastUpdate}</p>
+                </div>
+                <a href={`/dashboard/applications`} class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10">
+                  <Icon name="arrowUpRight" size={13} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <!-- Recommended jobs -->
+      <section>
+        <div class="flex items-end justify-between">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Matched to your profile</p>
+            <h3 class="mt-1 text-[18px] font-semibold tracking-tight text-ink-900">Recommended for you</h3>
+          </div>
+          <a href="/jobs" class="text-[12.5px] font-medium text-brand-700 hover:underline">See all jobs →</a>
+        </div>
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+          {recommendedJobs.slice(0, 4).map((j) => <JobCard job={j} />)}
+        </div>
+      </section>
+    </div>
+
+    <!-- Right column: activity + alerts -->
+    <div class="lg:col-span-4 space-y-6">
+      <!-- Activity feed -->
+      <section class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <div class="flex items-center justify-between">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Recent activity</p>
+          <span class="flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.15)]" aria-hidden="true"></span>
+        </div>
+        <ol class="relative mt-5 space-y-4">
+          <span class="absolute left-[15px] top-2 bottom-2 w-px bg-ink-200 dark:!bg-white/10" aria-hidden="true"></span>
+          {recentActivity.map((e) => (
+            <li class="relative flex gap-3 pl-1">
+              <span class="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-ink-200 text-ink-700 dark:!bg-ink-100 dark:!ring-white/10 dark:!text-ink-800">
+                <Icon name={activityIcons[e.type] as any} size={12} />
+              </span>
+              <div class="min-w-0 flex-1 pt-1">
+                <p class="text-[13px] font-semibold text-ink-900 line-clamp-1">{e.title}</p>
+                <p class="mt-0.5 text-[12px] text-ink-500 line-clamp-1">{e.meta}</p>
+                <p class="mt-1 text-[10.5px] uppercase tracking-widest text-ink-400">{e.time}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Active alerts -->
+      <section class="rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+        <div class="flex items-center gap-2 text-brand-700 dark:text-brand-400">
+          <Icon name="bell" size={13} />
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em]">Active alerts</p>
+        </div>
+        <ul class="mt-4 space-y-3">
+          {jobAlerts.filter((a) => a.active).slice(0, 3).map((a) => (
+            <li class="flex items-center justify-between gap-3 rounded-xl bg-white/70 p-3 backdrop-blur-sm dark:!bg-white/[0.04]">
+              <div class="min-w-0">
+                <p class="truncate text-[13px] font-semibold text-ink-900">{a.name}</p>
+                <p class="mt-0.5 text-[11.5px] text-ink-500">{a.frequency} · {a.matches} matches</p>
+              </div>
+              <a href="/dashboard/alerts" class="text-[11.5px] font-semibold text-brand-700 hover:underline">Edit</a>
+            </li>
+          ))}
+        </ul>
+        <a href="/dashboard/alerts" class="mt-4 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-ink-900 hover:text-brand-700 transition-colors">
+          Manage alerts <Icon name="arrowRight" size={11} />
+        </a>
+      </section>
+    </div>
+  </div>
+</DashboardLayout>

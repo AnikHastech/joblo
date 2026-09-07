@@ -1,0 +1,66 @@
+---
+import Container from "@components/ui/Container.astro";
+import Button from "@components/ui/Button.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { testimonials, liveHireAvatars } from "@data/testimonials";
+const t = testimonials[0];
+---
+<section class="section-candidate-cta py-20 sm:py-28">
+  <Container size="xl">
+    <div class="relative isolate overflow-hidden rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 dark:border-white/10 dark:from-brand-950/40 dark:via-ink-100 dark:to-accent-900/30 p-6 sm:p-12 lg:p-20 shadow-sm">
+      <!-- ambient glows -->
+      <div class="pointer-events-none absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-brand-300/30 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-40 -right-20 h-[400px] w-[400px] rounded-full bg-accent-300/25 blur-3xl"></div>
+      <div class="pointer-events-none absolute inset-0 bg-grid opacity-30 mask-radial"></div>
+
+      <div class="relative grid gap-12 lg:grid-cols-12 lg:items-center">
+        <div class="lg:col-span-7">
+          <SectionEyebrow number={12} label="For candidates" />
+          <h2 class="mt-6 text-[32px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+            Your <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">résumé</span> deserves better than a black hole.
+          </h2>
+          <p class="mt-6 max-w-xl text-lg leading-relaxed text-ink-600">
+            Get matched to roles that fit — and hear back from real humans. Free forever. No spam. No noise.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <Button href="/register" variant="primary" size="lg" icon>Create free account</Button>
+            <Button href="/about" variant="ghost" size="lg" class="text-ink-800 hover:bg-white/60">How it works</Button>
+          </div>
+
+          <div class="mt-10 flex items-center gap-4">
+            <div class="flex -space-x-2">
+              {Object.values(liveHireAvatars).slice(0,5).map((src) => (
+                <img src={src} alt="" width="36" height="36" loading="lazy" class="h-9 w-9 rounded-full ring-2 ring-white bg-ink-100" />
+              ))}
+            </div>
+            <div class="text-sm text-ink-600">
+              <span class="font-medium text-ink-900">1,284 people</span> joined this week
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5">
+          <figure class="relative rounded-2xl border border-ink-200 bg-white p-7 shadow-lg shadow-ink-900/[0.06]">
+            <div class="absolute -top-3 -left-3 h-full w-full rounded-2xl bg-gradient-to-br from-brand-100 to-accent-100 -z-10"></div>
+            <Icon name="quote" size={36} class="text-brand-500" />
+            <blockquote class="mt-5 text-xl leading-relaxed text-ink-800 sm:text-2xl">
+              "{t.quote}"
+            </blockquote>
+            <figcaption class="mt-6 flex items-center gap-3 border-t border-ink-100 pt-6">
+              <img src={t.avatarUrl} alt={t.name} width="44" height="44" loading="lazy" class="h-11 w-11 rounded-full bg-ink-100 ring-2 ring-white" />
+              <div>
+                <p class="text-[15px] font-semibold text-ink-900">{t.name}</p>
+                <p class="text-[13px] text-ink-500">{t.role} · {t.company}</p>
+              </div>
+              <span class="ml-auto inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+                <Icon name="checkCircle" size={11} strokeWidth={2.2} />
+                Hired in {t.hired}
+              </span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

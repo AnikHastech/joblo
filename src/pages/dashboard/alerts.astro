@@ -1,0 +1,92 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import Icon from "@components/ui/Icon.astro";
+import { jobAlerts } from "@data/dashboard";
+
+const totalActive = jobAlerts.filter((a) => a.active).length;
+const totalMatches = jobAlerts.filter((a) => a.active).reduce((s, a) => s + a.matches, 0);
+---
+<DashboardLayout
+  title="Job alerts"
+  subtitle={`${totalActive} active · ${totalMatches} matched roles this week`}
+  active="alerts"
+>
+  <!-- Create new alert form -->
+  <section class="rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+    <div class="flex items-center gap-2 text-brand-700 dark:text-brand-400">
+      <Icon name="bell" size={14} />
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em]">Create a new alert</p>
+    </div>
+    <h2 class="mt-2 text-[20px] font-semibold tracking-tight text-ink-900">Never miss a role you'd love.</h2>
+
+    <form class="mt-5 grid gap-3 sm:grid-cols-[1fr_180px_auto]">
+      <input type="text" placeholder="e.g. Senior Product Designer at seed-stage startups" class="h-11 rounded-full border border-ink-200 bg-white px-4 text-[13.5px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+      <select class="h-11 rounded-full border border-ink-200 bg-white px-4 text-[13.5px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">
+        <option>Daily digest</option>
+        <option>Weekly digest</option>
+        <option>Instant</option>
+      </select>
+      <button type="submit" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink-900 px-5 text-[13.5px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600">
+        <Icon name="plus" size={13} />
+        Create alert
+      </button>
+    </form>
+  </section>
+
+  <!-- Alerts list -->
+  <section class="mt-8 rounded-3xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+    <div class="flex items-center justify-between border-b border-ink-100 p-4 dark:!border-white/[0.06]">
+      <p class="text-[13.5px] font-semibold text-ink-900">Your alerts</p>
+      <p class="text-[11.5px] text-ink-500">{jobAlerts.length} total</p>
+    </div>
+    {jobAlerts.length === 0 ? (
+      <div class="p-10">
+        <EmptyState compact icon="bell" title="No alerts yet" body="Set up your first alert above to start getting matched roles delivered." />
+      </div>
+    ) : (
+      <ul class="divide-y divide-ink-100 dark:!divide-white/[0.06]">
+        {jobAlerts.map((a) => (
+          <li class="flex flex-wrap items-center gap-4 p-5 sm:gap-6">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="text-[14.5px] font-semibold text-ink-900">{a.name}</p>
+                <span class={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-widest ${a.active ? "bg-emerald-100 text-emerald-700 dark:!bg-emerald-500/15 dark:text-emerald-400" : "bg-ink-100 text-ink-500 dark:!bg-white/[0.06]"}`}>
+                  {a.active ? "Live" : "Paused"}
+                </span>
+                <span class="text-[10.5px] font-semibold uppercase tracking-widest text-ink-400">{a.frequency}</span>
+              </div>
+              <p class="mt-1 text-[12.5px] text-ink-500">
+                Keyword: <span class="font-medium text-ink-700">{a.keyword}</span>
+              </p>
+              <div class="mt-2 flex flex-wrap gap-1.5">
+                {a.filters.map((f) => (
+                  <span class="rounded-full border border-ink-200 bg-white px-2.5 py-0.5 text-[11px] text-ink-700 dark:!border-white/10 dark:!bg-white/[0.03]">{f}</span>
+                ))}
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-400">Matches</p>
+              <p class="mt-0.5 text-[18px] font-semibold text-ink-900 tabular-nums">{a.matches}</p>
+              <p class="mt-0.5 text-[10.5px] text-ink-500">since {a.createdOn}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="inline-flex cursor-pointer items-center gap-2">
+                <input type="checkbox" checked={a.active} class="peer sr-only" />
+                <span class="relative h-6 w-10 rounded-full bg-ink-200 transition-colors peer-checked:bg-brand-600 dark:!bg-white/10">
+                  <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition-transform peer-checked:translate-x-4"></span>
+                </span>
+              </label>
+              <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400 hover:text-ink-900 dark:!border-white/10" aria-label="Edit alert">
+                <Icon name="filter" size={13} />
+              </button>
+              <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-rose-400 hover:text-rose-600 dark:!border-white/10" aria-label="Delete alert">
+                <Icon name="close" size={13} />
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</DashboardLayout>

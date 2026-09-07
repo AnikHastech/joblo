@@ -1,0 +1,130 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import StatusPill from "@components/dashboard/StatusPill.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import Icon from "@components/ui/Icon.astro";
+import { applications, applicationWithJob, statusStyle, type ApplicationStatus } from "@data/dashboard";
+
+const pipeline: ApplicationStatus[] = ["Applied", "Reviewing", "Interview", "Offer", "Rejected"];
+const countBy = (s: ApplicationStatus) => applications.filter((a) => a.status === s).length;
+
+const rows = applications.map(applicationWithJob).filter(r => r.job && r.company);
+---
+<DashboardLayout
+  title="Applications"
+  subtitle={`${applications.length} total · ${countBy("Interview")} in interview · ${countBy("Offer")} offers`}
+  active="applications"
+>
+  <!-- Pipeline board -->
+  <section aria-labelledby="pipeline-heading">
+    <h2 id="pipeline-heading" class="sr-only">Application pipeline</h2>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      {pipeline.map((stage) => {
+        const s = statusStyle[stage];
+        const n = countBy(stage);
+        return (
+          <div class="rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <div class="flex items-center justify-between">
+              <span class={`inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest ${s.text}`}>
+                <span class={`h-1.5 w-1.5 rounded-full ${s.dot}`}></span>
+                {stage}
+              </span>
+              <span class="text-[11.5px] tabular-nums text-ink-500">{n}</span>
+            </div>
+            <p class="mt-3 text-[24px] font-semibold tracking-tight text-ink-900 tabular-nums">{n}</p>
+          </div>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- Table -->
+  <section class="mt-8 rounded-3xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-100 p-4 dark:!border-white/[0.06]">
+      <div class="inline-flex rounded-full border border-ink-200 bg-white p-0.5 dark:!border-white/10 dark:!bg-white/[0.04]" role="group">
+        <button type="button" data-filter="all"       data-active="true"  class="app-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">All ({applications.length})</button>
+        <button type="button" data-filter="Interview" data-active="false" class="app-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Interviews</button>
+        <button type="button" data-filter="Offer"     data-active="false" class="app-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Offers</button>
+        <button type="button" data-filter="active"    data-active="false" class="app-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Active only</button>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 transition-colors hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+          <Icon name="filter" size={12} />
+          Filter
+        </button>
+        <button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 transition-colors hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+          Export
+          <Icon name="arrowUpRight" size={12} />
+        </button>
+      </div>
+    </div>
+
+    <!-- Rows -->
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[820px] text-left text-[13.5px]">
+        <thead>
+          <tr class="text-[11px] font-bold uppercase tracking-widest text-ink-500">
+            <th class="px-6 py-3.5">Role</th>
+            <th class="px-4 py-3.5">Status</th>
+            <th class="px-4 py-3.5">Last update</th>
+            <th class="px-4 py-3.5">Applied</th>
+            <th class="px-6 py-3.5 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody id="app-rows">
+          {rows.map(({ application, job, company }) => job && company && (
+            <tr class="app-row border-t border-ink-100 transition-colors hover:bg-ink-50/40 dark:!border-white/[0.06] dark:hover:!bg-white/[0.02]" data-status={application.status}>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[12px] font-bold text-white" style={`background:${company.brandColor}`}>{company.name[0]}</span>
+                  <div class="min-w-0">
+                    <a href={`/jobs/${job.slug}`} class="line-clamp-1 text-[14px] font-semibold text-ink-900 hover:text-brand-700 transition-colors">{job.title}</a>
+                    <p class="mt-0.5 text-[12px] text-ink-500">{company.name} · {job.location}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-4"><StatusPill status={application.status} /></td>
+              <td class="px-4 py-4 text-ink-700 line-clamp-1 max-w-[280px]">{application.lastUpdate}</td>
+              <td class="px-4 py-4 text-ink-500 tabular-nums">{application.appliedOn}</td>
+              <td class="px-6 py-4 text-right">
+                <a href={`/jobs/${job.slug}`} class="inline-flex h-8 items-center gap-1 rounded-full border border-ink-200 bg-white px-3 text-[12px] font-medium text-ink-800 transition-colors hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+                  View
+                  <Icon name="arrowUpRight" size={11} />
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div id="app-empty" hidden class="p-10">
+      <EmptyState compact icon="briefcase" title="No applications match this filter" body="Try a different filter or start applying to jobs." ctaLabel="Browse jobs" ctaHref="/jobs" />
+    </div>
+  </section>
+</DashboardLayout>
+
+<script>
+  const btns  = document.querySelectorAll<HTMLButtonElement>(".app-filter");
+  const rows  = document.querySelectorAll<HTMLTableRowElement>(".app-row");
+  const empty = document.getElementById("app-empty");
+  const activeSet = new Set(["Applied", "Reviewing", "Interview", "Offer"]);
+  btns.forEach((b) => {
+    b.addEventListener("click", () => {
+      btns.forEach((x) => (x.dataset.active = String(x === b)));
+      const f = b.dataset.filter;
+      let matched = 0;
+      rows.forEach((r) => {
+        const s = r.dataset.status ?? "";
+        let show = false;
+        if (f === "all") show = true;
+        else if (f === "active") show = activeSet.has(s);
+        else show = s === f;
+        r.hidden = !show;
+        if (show) matched++;
+      });
+      if (empty) empty.hidden = matched !== 0;
+    });
+  });
+</script>

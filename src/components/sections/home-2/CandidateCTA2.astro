@@ -1,0 +1,60 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { liveHireAvatars } from "@data/testimonials";
+---
+<section class="section-candidate-cta-2 relative isolate overflow-hidden py-20 sm:py-28 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/60 dark:!from-brand-950/30 dark:!via-ink-100 dark:!to-accent-900/25">
+  <Container size="xl">
+    <div class="grid gap-12 lg:grid-cols-12 lg:items-center">
+      <!-- Left: message + CTA -->
+      <div class="lg:col-span-6">
+        <SectionEyebrow number={12} label="For candidates" />
+        <h2 class="mt-4 text-4xl font-semibold leading-[1.02] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+          Your <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">résumé</span> deserves better than a black hole.
+        </h2>
+        <p class="mt-6 max-w-lg text-lg leading-relaxed text-ink-600">
+          Skip the résumé black hole. Get matched to roles from verified teams — and message hiring managers directly.
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="/register" class="group inline-flex h-12 items-center gap-2 rounded-full bg-ink-900 px-5 text-[14.5px] font-semibold text-ink-50 transition-all hover:bg-brand-600 hover:shadow-[0_10px_30px_-8px_rgb(74_63_230/0.4)]">
+            Create free account
+            <Icon name="arrowRight" size={14} strokeWidth={2} class="transition-transform group-hover:translate-x-0.5" />
+          </a>
+          <a href="/about" class="text-[14.5px] font-medium text-ink-700 hover:text-brand-700 transition-colors">Watch demo →</a>
+        </div>
+
+        <div class="mt-8 flex items-center gap-4">
+          <div class="flex -space-x-2">
+            {Object.values(liveHireAvatars).slice(0,5).map((src) => (
+              <img src={src} alt="" width="36" height="36" loading="lazy" class="h-9 w-9 rounded-full ring-2 ring-white bg-ink-100 dark:ring-ink-100" />
+            ))}
+          </div>
+          <p class="text-sm text-ink-600">
+            <span class="font-semibold text-ink-900">1,284 people</span> joined this week
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: 3 mini feature cards vertically stacked -->
+      <div class="grid gap-3 lg:col-span-6">
+        {[
+          { icon: "sparkles"    as const, title: "AI-matched roles",          body: "98% precision on the 20 best-fit roles — not 2,000 applications.", tone: "text-brand-600 bg-brand-50 ring-brand-200" },
+          { icon: "checkCircle" as const, title: "Verified employers only",   body: "Every listing salary-banded, funding-checked, and manager-owned.",   tone: "text-emerald-700 bg-emerald-50 ring-emerald-200" },
+          { icon: "bolt"        as const, title: "Real humans reply",         body: "Average 12-day time-to-first-response. No ghosting.",                tone: "text-accent-700 bg-accent-50 ring-accent-200" },
+        ].map((f) => (
+          <div class="flex items-start gap-4 rounded-2xl border border-ink-200/70 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-md dark:border-white/[0.08] dark:!bg-white/[0.035]">
+            <span class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-4 ${f.tone}`}>
+              <Icon name={f.icon} size={18} strokeWidth={1.8} />
+            </span>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[15.5px] font-semibold text-ink-900">{f.title}</h3>
+              <p class="mt-1 text-[13.5px] leading-relaxed text-ink-600">{f.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Container>
+</section>

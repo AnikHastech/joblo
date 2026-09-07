@@ -1,0 +1,80 @@
+---
+import "../styles/global.css";
+import EmployerSidebar from "@components/employer/EmployerSidebar.astro";
+import EmployerTopbar from "@components/employer/EmployerTopbar.astro";
+import ThemeToggle from "@components/ui/ThemeToggle.astro";
+import { site } from "@data/site";
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  pageTitle?: string;
+  description?: string;
+  active?: string;
+}
+const {
+  title, subtitle, pageTitle,
+  description = "Employer suite — hire smarter",
+  active,
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{pageTitle ?? `${title} · ${site.name} Hire`}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var prefers = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var theme = stored || (prefers ? "dark" : "light");
+          document.documentElement.classList.toggle("dark", theme === "dark");
+          document.documentElement.dataset.theme = theme;
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-ink-50 antialiased" data-emp-sidebar="closed">
+    <div class="emp-shell grid min-h-screen lg:grid-cols-[280px_1fr]">
+      <div class="emp-sidebar-wrap fixed inset-y-0 left-0 z-40 w-[280px] -translate-x-full transform overflow-y-auto border-r border-ink-200/70 bg-white transition-transform duration-300 [scrollbar-width:thin] lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 dark:!border-white/10 dark:!bg-ink-100">
+        <EmployerSidebar active={active} />
+      </div>
+      <div class="emp-overlay pointer-events-none fixed inset-0 z-30 bg-ink-900/50 opacity-0 transition-opacity duration-300 lg:hidden"></div>
+
+      <div class="emp-main min-w-0 flex flex-col">
+        <EmployerTopbar title={title} subtitle={subtitle} />
+        <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <slot />
+        </main>
+      </div>
+    </div>
+
+    <ThemeToggle />
+
+    <style is:global>
+      body[data-emp-sidebar="open"] .emp-sidebar-wrap { transform: translateX(0) !important; translate: 0 0 !important; }
+      body[data-emp-sidebar="open"] .emp-overlay     { opacity: 1; pointer-events: auto; }
+    </style>
+    <script is:inline>
+      document.addEventListener("click", (e) => {
+        const t = e.target;
+        if (t && t.classList && t.classList.contains("emp-overlay")) {
+          document.body.dataset.empSidebar = "closed";
+        }
+        if (t && t.closest && t.closest("#emp-sidebar-close")) {
+          document.body.dataset.empSidebar = "closed";
+        }
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") document.body.dataset.empSidebar = "closed";
+      });
+    </script>
+  </body>
+</html>

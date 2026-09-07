@@ -1,0 +1,93 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import { notifications } from "@data/dashboard";
+
+const unreadCount = notifications.filter((n) => !n.read).length;
+
+// Group by "day"
+const groups: { title: string; items: typeof notifications }[] = [
+  { title: "Today",       items: notifications.filter((n) => ["2h","6h"].includes(n.time)) },
+  { title: "Earlier",     items: notifications.filter((n) => !["2h","6h"].includes(n.time)) },
+];
+---
+<DashboardLayout
+  title="Notifications"
+  subtitle={`${unreadCount} unread · ${notifications.length} total this month`}
+  active="notifications"
+>
+  <!-- Toolbar -->
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div class="inline-flex flex-wrap gap-1 rounded-full border border-ink-200 bg-white p-0.5 dark:!border-white/10 dark:!bg-white/[0.04]" role="group">
+      <button type="button" data-filter="all"    data-active="true"  class="notif-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">All ({notifications.length})</button>
+      <button type="button" data-filter="unread" data-active="false" class="notif-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Unread ({unreadCount})</button>
+      <button type="button" data-filter="apps"   data-active="false" class="notif-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Applications</button>
+      <button type="button" data-filter="alerts" data-active="false" class="notif-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Alerts</button>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+        <Icon name="check" size={11} strokeWidth={2.5} /> Mark all read
+      </button>
+      <a href="/dashboard/settings" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+        <Icon name="filter" size={11} /> Preferences
+      </a>
+    </div>
+  </div>
+
+  {notifications.length === 0 ? (
+    <EmptyState icon="bell" title="You're all caught up" body="We'll ping you here when something needs your attention." />
+  ) : (
+    <div class="space-y-8">
+      {groups.map((g) => g.items.length > 0 && (
+        <section>
+          <p class="mb-3 px-1 text-[11px] font-bold uppercase tracking-widest text-ink-500">{g.title}</p>
+          <div class="rounded-3xl border border-ink-200/70 bg-white overflow-hidden dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <ul>
+              {g.items.map((n) => (
+                <li>
+                  <a href={n.href ?? "#"} class="notif-row flex items-start gap-4 border-b border-ink-100 px-5 py-4 transition-colors last:border-b-0 hover:bg-ink-50/60 dark:!border-white/[0.06] dark:hover:!bg-white/[0.02]" data-read={String(n.read)} data-cat={n.icon === "bell" ? "alerts" : "apps"}>
+                    <span class={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${n.read ? "bg-ink-100 text-ink-500 dark:!bg-white/[0.06]" : "bg-gradient-to-br from-brand-100 to-accent-100 text-brand-700 ring-1 ring-brand-200 dark:!from-brand-500/20 dark:!to-accent-500/20 dark:!ring-white/10 dark:!text-brand-400"}`}>
+                      <Icon name={n.icon as any} size={15} />
+                    </span>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <p class={`text-[14.5px] ${n.read ? "font-medium text-ink-700" : "font-semibold text-ink-900"}`}>{n.title}</p>
+                        <span class="shrink-0 text-[11px] uppercase tracking-widest text-ink-400">{n.time}</span>
+                      </div>
+                      <p class="mt-1 text-[13px] leading-relaxed text-ink-600">{n.body}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      {!n.read && <span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-brand-500"></span>}
+                      <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full text-ink-400 opacity-0 transition-opacity hover:bg-ink-100 hover:text-ink-700 group-hover:opacity-100 dark:hover:!bg-white/[0.06]" aria-label="Dismiss">
+                        <Icon name="close" size={11} />
+                      </button>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ))}
+    </div>
+  )}
+</DashboardLayout>
+
+<script>
+  const btns = document.querySelectorAll<HTMLButtonElement>(".notif-filter");
+  const rows = document.querySelectorAll<HTMLElement>(".notif-row");
+  btns.forEach((b) => {
+    b.addEventListener("click", () => {
+      btns.forEach((x) => (x.dataset.active = String(x === b)));
+      const f = b.dataset.filter;
+      rows.forEach((r) => {
+        let show = true;
+        if (f === "unread") show = r.dataset.read === "false";
+        else if (f === "apps") show = r.dataset.cat === "apps";
+        else if (f === "alerts") show = r.dataset.cat === "alerts";
+        r.hidden = !show;
+      });
+    });
+  });
+</script>

@@ -1,0 +1,17 @@
+---
+import Icon from "@components/ui/Icon.astro";
+
+interface Props {
+  number: string | number;
+  label: string;
+  class?: string;
+}
+const { number, label, class: className = "" } = Astro.props;
+const num = typeof number === "number" ? String(number).padStart(2, "0") : number;
+---
+<p class={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500 ${className}`}>
+  <Icon name="play" size={10} class="text-accent-500" />
+  <span class="tabular-nums">{num}</span>
+  <span class="text-ink-300">·</span>
+  <span class="text-ink-800">{label}</span>
+</p>

@@ -1,0 +1,256 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import { categories } from "@data/categories";
+import { pricingPlans } from "@data/pricing";
+
+const steps = [
+  { key: "basics",   n: "01", label: "Basics",       description: "Title, category, type" },
+  { key: "details",  n: "02", label: "Details",      description: "Location, salary, level" },
+  { key: "content",  n: "03", label: "Description",  description: "What, how, why" },
+  { key: "apply",    n: "04", label: "How to apply", description: "Method + deadline" },
+  { key: "boost",    n: "05", label: "Boost",        description: "Featured + alerts" },
+  { key: "preview",  n: "06", label: "Preview",      description: "Final review" },
+];
+
+const testimonial = {
+  quote: "\"We've hired seven senior engineers through Joblo this year. The candidate quality is in a different league.\"",
+  author: "Rafael Chen",
+  role: "Head of Engineering",
+  company: "Vercel",
+  avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Rafael-Post&backgroundColor=c0aede",
+};
+---
+<EmployerLayout
+  title="Post a job"
+  subtitle="It takes about 4 minutes. You can save a draft any time."
+  active="post"
+>
+  <div class="grid gap-6 lg:grid-cols-12">
+    <!-- Steps sidebar + helpful cards (parity w/ public /post-a-job sidebar) -->
+    <aside class="lg:col-span-3 space-y-4 lg:sticky lg:top-24 lg:h-fit">
+      <!-- Step nav -->
+      <ol class="rounded-3xl border border-ink-200/70 bg-white p-3 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        {steps.map((s, i) => (
+          <li>
+            <a href={`#s-${s.key}`} class={`flex items-start gap-3 rounded-xl p-3 text-[13.5px] font-medium transition-colors ${i === 0 ? "bg-ink-100 text-ink-900 dark:!bg-white/[0.08]" : "text-ink-700 hover:bg-ink-100 dark:hover:!bg-white/[0.06]"}`}>
+              <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-[11px] font-bold tabular-nums text-ink-700 shadow-sm ring-1 ring-ink-200 dark:!bg-white/[0.08] dark:!ring-white/10">{s.n}</span>
+              <div>
+                <p>{s.label}</p>
+                <p class="mt-0.5 text-[11px] font-normal text-ink-500">{s.description}</p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ol>
+
+      <!-- Testimonial (matches /post-a-job) -->
+      <figure class="rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-5 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+        <blockquote class="font-display text-[15px] italic leading-snug text-ink-900">
+          {testimonial.quote}
+        </blockquote>
+        <figcaption class="mt-4 flex items-center gap-2.5 text-[11.5px]">
+          <img src={testimonial.avatar} alt={testimonial.author} class="h-8 w-8 rounded-lg bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+          <div>
+            <p class="font-semibold text-ink-900">{testimonial.author}</p>
+            <p class="mt-0.5 text-ink-500">{testimonial.role} · {testimonial.company}</p>
+          </div>
+        </figcaption>
+      </figure>
+
+      <!-- Pricing snippet -->
+      <div class="rounded-3xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Your plan</p>
+        <div class="mt-3 space-y-2">
+          {pricingPlans.map((p) => (
+            <div class={`rounded-xl border p-3 ${p.id === "growth" ? "border-ink-900 bg-ink-900 text-ink-50" : "border-ink-200 dark:!border-white/10"}`}>
+              <div class="flex items-baseline justify-between">
+                <p class={`text-[12.5px] font-semibold ${p.id === "growth" ? "text-white" : "text-ink-900"}`}>
+                  {p.name}
+                  {p.id === "growth" && <span class="ml-1 text-[9px] font-bold uppercase tracking-widest text-accent-400">Current</span>}
+                </p>
+                <p class={`text-[13px] font-semibold tabular-nums ${p.id === "growth" ? "text-white" : "text-ink-900"}`}>
+                  {p.monthly === 0 ? "Free" : `$${p.yearly}`}
+                  {p.monthly > 0 && <span class={`text-[10px] font-normal ${p.id === "growth" ? "text-ink-400" : "text-ink-500"}`}> /mo</span>}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <a href="/pricing" class="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-brand-700 hover:underline">
+          Manage plan <Icon name="arrowRight" size={11} />
+        </a>
+      </div>
+    </aside>
+
+    <!-- Form -->
+    <form class="lg:col-span-9 space-y-6">
+      <!-- 01 Basics -->
+      <section id="s-basics" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">01 · Basics</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Tell us the role</h2>
+        <div class="mt-6 space-y-5">
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Job title <span class="text-rose-500">*</span></span>
+            <input type="text" required placeholder="e.g. Senior Product Designer" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <label class="block">
+              <span class="text-[12.5px] font-medium text-ink-700">Category</span>
+              <select class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">
+                {categories.map((c) => <option value={c.slug}>{c.name}</option>)}
+              </select>
+            </label>
+            <label class="block">
+              <span class="text-[12.5px] font-medium text-ink-700">Employment type</span>
+              <select class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">
+                {["Full-time","Part-time","Contract","Freelance","Internship"].map((t) => <option>{t}</option>)}
+              </select>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 Details -->
+      <section id="s-details" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">02 · Details</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Where & how much</h2>
+        <div class="mt-6 grid gap-5 sm:grid-cols-2">
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Experience level</span>
+            <select class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">
+              {["Entry","Mid","Senior","Lead","Executive"].map((l) => <option>{l}</option>)}
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Location</span>
+            <input type="text" placeholder="e.g. San Francisco, CA" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="sm:col-span-2 flex items-start gap-3 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 dark:!border-brand-500/30 dark:!bg-brand-500/10">
+            <input type="checkbox" checked class="mt-1 h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Remote-friendly</p>
+              <p class="mt-0.5 text-[12px] text-ink-600">Roles marked remote-friendly get 3× more qualified applicants on average.</p>
+            </div>
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Salary min (yearly)</span>
+            <div class="mt-1.5 flex h-11 w-full rounded-xl border border-ink-200 bg-white focus-within:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+              <span class="flex items-center pl-3.5 text-[13px] text-ink-500">$</span>
+              <input type="number" placeholder="160000" class="flex-1 border-0 bg-transparent px-2 text-[14px] text-ink-900 focus:outline-none" />
+              <select class="mr-1 h-full rounded-xl border-0 bg-transparent px-2 text-[12px] text-ink-500 focus:outline-none">
+                <option>USD</option><option>EUR</option><option>GBP</option><option>CAD</option>
+              </select>
+            </div>
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Salary max (yearly)</span>
+            <div class="mt-1.5 flex h-11 w-full rounded-xl border border-ink-200 bg-white focus-within:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+              <span class="flex items-center pl-3.5 text-[13px] text-ink-500">$</span>
+              <input type="number" placeholder="210000" class="flex-1 border-0 bg-transparent px-2 text-[14px] text-ink-900 focus:outline-none" />
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- 03 Description -->
+      <section id="s-content" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">03 · Description</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Tell candidates the story</h2>
+        <div class="mt-6 space-y-5">
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Role overview <span class="text-rose-500">*</span></span>
+            <textarea rows="5" required placeholder="What's the mission of this role? Who will they work with? What are you building?" class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Responsibilities</span>
+            <textarea rows="6" placeholder={"• Own the design of major surfaces from concept to shipped\n• Partner with PMs and engineers to define what to build\n• Run user research to inform decisions"} class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Requirements</span>
+            <textarea rows="6" placeholder={"• 5+ years of product design experience\n• A portfolio showing shipped work at scale\n• Strong systems thinking"} class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Benefits & perks</span>
+            <textarea rows="4" placeholder={"• Competitive salary + equity\n• Fully remote or hybrid HQ\n• $2K/yr learning stipend"} class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+          </label>
+        </div>
+      </section>
+
+      <!-- 04 Apply -->
+      <section id="s-apply" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">04 · How to apply</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Application method</h2>
+        <div class="mt-6 grid gap-3">
+          <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 has-[input:checked]:border-brand-500 has-[input:checked]:bg-brand-50/40 dark:!border-white/10 dark:has-[input:checked]:!bg-brand-500/10">
+            <input type="radio" name="apply" checked class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Apply through Joblo</p>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">Candidates submit via our ATS. You get profile + resume + optional cover letter.</p>
+            </div>
+          </label>
+          <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+            <input type="radio" name="apply" class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">External URL</p>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">Redirect candidates to your own ATS or careers site.</p>
+            </div>
+          </label>
+          <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+            <input type="radio" name="apply" class="mt-1 h-4 w-4 border-ink-300 text-brand-600" />
+            <div>
+              <p class="text-[13.5px] font-semibold text-ink-900">Email application</p>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">Candidates email a specified address directly.</p>
+            </div>
+          </label>
+        </div>
+        <label class="mt-5 block">
+          <span class="text-[12.5px] font-medium text-ink-700">Application deadline (optional)</span>
+          <input type="date" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+        </label>
+      </section>
+
+      <!-- 05 Boost visibility (parity w/ /post-a-job) -->
+      <section id="s-boost" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">05 · Boost visibility (optional)</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Reach more of the right people</h2>
+        <div class="mt-6 grid gap-3">
+          <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 has-[input:checked]:border-brand-500 has-[input:checked]:bg-brand-50/40 dark:!border-white/10 dark:has-[input:checked]:!bg-brand-500/10">
+            <input type="checkbox" class="mt-1 h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="text-[13.5px] font-semibold text-ink-900">Feature this posting</p>
+                <span class="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-700 dark:!bg-accent-500/15 dark:!text-accent-400">+$79</span>
+              </div>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">Featured placement on the homepage + category pages + job feed. Averages 4× more qualified applicants.</p>
+            </div>
+          </label>
+          <label class="flex items-start gap-3 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+            <input type="checkbox" checked class="mt-1 h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="text-[13.5px] font-semibold text-ink-900">Send to matching alerts instantly</p>
+                <span class="rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400">Included</span>
+              </div>
+              <p class="mt-0.5 text-[12.5px] text-ink-500">Candidates with a matching job alert get notified within 5 minutes.</p>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- 06 Preview & publish -->
+      <section id="s-preview" class="scroll-mt-24 rounded-3xl border border-brand-200 bg-brand-50/40 p-6 sm:p-8 dark:!border-brand-500/30 dark:!bg-brand-500/10">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-400">06 · Preview & publish</p>
+        <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Ready to go live?</h2>
+        <p class="mt-3 text-[13.5px] text-ink-600">Free · no credit card · edit any time from Manage jobs. Live within 5 minutes of publishing.</p>
+        <div class="mt-5 flex flex-wrap items-center gap-2">
+          <button type="button" class="inline-flex h-11 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-5 text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">Preview posting</button>
+          <button type="button" class="inline-flex h-11 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-5 text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">Save as draft</button>
+          <button type="submit" class="group inline-flex h-11 items-center gap-2 rounded-full bg-ink-900 px-5 text-[13.5px] font-semibold text-ink-50 shadow-sm hover:bg-brand-600">
+            Publish job <Icon name="arrowRight" size={13} class="transition-transform group-hover:translate-x-0.5" />
+          </button>
+        </div>
+      </section>
+    </form>
+  </div>
+</EmployerLayout>

@@ -1,0 +1,398 @@
+---
+import Icon from "@components/ui/Icon.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import type { Job } from "@types/index";
+import type { JobContent } from "@data/jobContent";
+
+interface Props {
+  job: Job;
+  content: JobContent;
+}
+const { job, content } = Astro.props;
+
+// Derived salary math for the comp breakdown
+const baseLow = Math.round(job.salaryMin * 0.85);
+const baseHigh = Math.round(job.salaryMax * 0.85);
+const equityLow = Math.round(job.salaryMin * 0.10);
+const equityHigh = Math.round(job.salaryMax * 0.10);
+const bonusLow = job.salaryMin - baseLow - equityLow;
+const bonusHigh = job.salaryMax - baseHigh - equityHigh;
+const fmt = (n: number) => `${job.currency === "USD" ? "$" : job.currency === "EUR" ? "€" : job.currency + " "}${(n / 1000).toFixed(0)}k`;
+
+// Curated tech stack (derived from job tags + sensible defaults)
+const stackByTag: Record<string, string[]> = {
+  Figma: ["Figma", "FigJam", "Framer"],
+  React: ["React", "TypeScript", "Vite"],
+  Node:  ["Node.js", "PostgreSQL", "Redis"],
+  Go:    ["Go", "gRPC", "PostgreSQL"],
+  Rust:  ["Rust", "Tokio", "PostgreSQL"],
+};
+const detectedStack = [...new Set(job.tags.flatMap((t) => stackByTag[t] || [t]))].slice(0, 8);
+const stack = detectedStack.length ? detectedStack : ["Figma", "Notion", "Linear", "Slack", "GitHub"];
+
+// Team snapshot
+const team = [
+  { icon: "users",     label: "Team size",       value: "8 people" },
+  { icon: "building",  label: "Reports to",      value: "Head of Design" },
+  { icon: "globe",     label: "Timezone overlap",value: "≥ 4h with PST" },
+  { icon: "sparkles",  label: "Peers include",   value: "3 senior ICs, 1 EM" },
+];
+
+// Day in the life (illustrative)
+const day = [
+  { time: "09:00", title: "Async stand-up",       body: "Skim overnight PRs and Linear updates. Post priorities for the day." },
+  { time: "10:30", title: "Deep work block",      body: "Ship the meaningful thing — flows, prototypes, or specs. Notifications off." },
+  { time: "13:30", title: "Design critique",      body: "Present WIP, gather structured feedback, or review a peer's work." },
+  { time: "15:30", title: "Cross-functional sync",body: "Pair with PM + eng on scope, edge cases, and rollout plan." },
+  { time: "17:00", title: "Wrap + docs",          body: "Write up decisions, publish new components, hand off cleanly for async." },
+];
+
+// Role FAQs
+const roleFaqs = [
+  { q: "Is relocation supported?",   a: `Yes — full package plus a 3-month serviced apartment in ${job.location.split(",")[0]}. Remote hires stay put.` },
+  { q: "Do you sponsor visas?",       a: "Yes, for senior roles in our supported jurisdictions. Timelines vary — we're happy to walk through options on the first call." },
+  { q: "What does the offer include?",a: `Base + equity + performance bonus (see breakdown above). Fully covered health, dental, and vision from day one.` },
+  { q: "When do I start?",            a: "We're flexible — the ideal start is within 8 weeks of signing, but we can accommodate longer notice periods." },
+];
+---
+<div class="job-body space-y-14">
+  <!-- Overview -->
+  <section aria-labelledby="overview-heading" class="section-overview">
+    <SectionEyebrow number="02" label="Overview" />
+    <h2 id="overview-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      About the opportunity
+    </h2>
+    <div class="mt-5 rounded-2xl border-l-2 border-brand-500/60 bg-gradient-to-br from-brand-50/50 via-white to-accent-50/30 p-5 dark:!border-brand-400/60 dark:!from-brand-500/[0.06] dark:!via-white/[0.02] dark:!to-accent-500/[0.05]">
+      <p class="text-[16px] leading-[1.75] text-ink-800 dark:!text-ink-800">
+        {content.overview}
+      </p>
+    </div>
+    <p class="mt-5 text-[15.5px] leading-[1.75] text-ink-700">
+      {content.aboutRole}
+    </p>
+  </section>
+
+  <!-- Responsibilities -->
+  <section aria-labelledby="resp-heading" class="section-responsibilities">
+    <SectionEyebrow number="03" label="What you'll do" />
+    <h2 id="resp-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      Your responsibilities
+    </h2>
+    <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+      {content.responsibilities.map((item, i) => (
+        <li class="group relative flex gap-3 rounded-xl border border-ink-200/70 bg-white p-4 transition-colors hover:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-[11px] font-semibold text-brand-700 tabular-nums dark:!bg-brand-500/10 dark:text-brand-400">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <p class="text-[14.5px] leading-relaxed text-ink-800">{item}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- Requirements + Nice to have -->
+  <section aria-labelledby="req-heading" class="section-requirements grid gap-10 lg:grid-cols-5 lg:gap-12">
+    <div class="lg:col-span-3">
+      <SectionEyebrow number="04" label="Requirements" />
+      <h2 id="req-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+        What we're looking for
+      </h2>
+      <ul class="mt-6 space-y-3">
+        {content.requirements.map((item) => (
+          <li class="flex items-start gap-3">
+            <span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink-900 text-ink-50 dark:!bg-brand-500 dark:text-white">
+              <Icon name="check" size={11} strokeWidth={2.5} />
+            </span>
+            <p class="text-[15px] leading-relaxed text-ink-800">{item}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="lg:col-span-2">
+      <SectionEyebrow number="05" label="Bonus" />
+      <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+        Nice to have
+      </h2>
+      <div class="mt-6 rounded-2xl border border-dashed border-ink-200 bg-ink-50/40 p-5 dark:!border-white/10 dark:!bg-white/[0.02]">
+        <ul class="space-y-2.5">
+          {content.niceToHave.map((item) => (
+            <li class="flex items-start gap-2.5 text-[14.5px] leading-relaxed text-ink-700">
+              <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500"></span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech stack -->
+  <section aria-labelledby="stack-heading" class="section-stack">
+    <SectionEyebrow number="06" label="Tech stack" />
+    <h2 id="stack-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      Tools you'll live in
+    </h2>
+    <p class="mt-3 text-[14.5px] leading-relaxed text-ink-600">
+      Day-to-day toolchain — no proprietary lock-in, all industry-standard.
+    </p>
+    <div class="mt-6 rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+      <div class="flex flex-wrap gap-1.5">
+        {stack.map((t, i) => (
+          <span class={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium ${
+            i < 3
+              ? "border-brand-200 bg-brand-50 text-brand-800 dark:!border-brand-500/20 dark:!bg-brand-500/10 dark:!text-brand-400"
+              : "border-ink-200 bg-ink-50/60 text-ink-800 dark:!border-white/10 dark:!bg-white/[0.04] dark:!text-ink-800"
+          }`}>
+            {i < 3 && <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>}
+            {t}
+          </span>
+        ))}
+      </div>
+      <p class="mt-4 text-[11.5px] text-ink-500">
+        <span class="inline-flex items-center gap-1"><span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span> Primary — used daily</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section aria-labelledby="ben-heading" class="section-benefits">
+    <SectionEyebrow number="07" label="Perks & benefits" />
+    <h2 id="ben-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      What comes with the role
+    </h2>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {content.benefits.map((b) => (
+        <div class="group flex items-start gap-3 rounded-2xl border border-ink-200/70 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 text-brand-700 ring-1 ring-brand-100/50 dark:!from-brand-500/10 dark:!to-accent-500/10 dark:ring-white/10 dark:text-brand-400">
+            <Icon name={b.icon as any} size={18} />
+          </span>
+          <div>
+            <p class="text-[14.5px] font-semibold text-ink-900">{b.label}</p>
+            {b.sub && <p class="mt-0.5 text-[12.5px] text-ink-500">{b.sub}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Team you'll join -->
+  <section aria-labelledby="team-heading" class="section-team">
+    <SectionEyebrow number="08" label="Team" />
+    <h2 id="team-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      Who you'll work with
+    </h2>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2">
+      {team.map((t) => (
+        <div class="flex items-start gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 text-brand-700 ring-1 ring-brand-100/60 dark:!from-brand-500/10 dark:!to-accent-500/10 dark:!text-brand-400 dark:ring-brand-500/20">
+            <Icon name={t.icon as any} size={15} strokeWidth={2} />
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">{t.label}</p>
+            <p class="mt-0.5 text-[14px] font-semibold text-ink-900">{t.value}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Compensation breakdown -->
+  <section aria-labelledby="comp-heading" class="section-comp">
+    <SectionEyebrow number="09" label="Compensation" />
+    <h2 id="comp-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      How the offer is structured
+    </h2>
+    <p class="mt-3 text-[14.5px] leading-relaxed text-ink-600">
+      Total comp range shown on the sidebar — this is how it breaks down.
+    </p>
+    <div class="mt-6 overflow-hidden rounded-3xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+      <!-- Bar visual -->
+      <div class="flex h-3 w-full overflow-hidden">
+        <span class="h-full flex-[85] bg-brand-500"></span>
+        <span class="h-full flex-[10] bg-accent-500"></span>
+        <span class="h-full flex-[5]  bg-emerald-500"></span>
+      </div>
+      <dl class="grid gap-0 sm:grid-cols-3 divide-y divide-ink-200 sm:divide-y-0 sm:divide-x dark:!divide-white/[0.06]">
+        <div class="p-5">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+            <dt class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">Base salary</dt>
+          </div>
+          <dd class="mt-2 text-[20px] font-semibold text-ink-900 tabular-nums">{fmt(baseLow)}–{fmt(baseHigh)}</dd>
+          <p class="mt-1 text-[12px] text-ink-500">Paid monthly · reviewed yearly</p>
+        </div>
+        <div class="p-5">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-accent-500"></span>
+            <dt class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">Equity</dt>
+          </div>
+          <dd class="mt-2 text-[20px] font-semibold text-ink-900 tabular-nums">{fmt(equityLow)}–{fmt(equityHigh)}</dd>
+          <p class="mt-1 text-[12px] text-ink-500">4-yr vest · 1-yr cliff</p>
+        </div>
+        <div class="p-5">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            <dt class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">Perf. bonus</dt>
+          </div>
+          <dd class="mt-2 text-[20px] font-semibold text-ink-900 tabular-nums">{fmt(bonusLow)}–{fmt(bonusHigh)}</dd>
+          <p class="mt-1 text-[12px] text-ink-500">Target 100% attainment</p>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Day in the life -->
+  <section aria-labelledby="day-heading" class="section-day">
+    <SectionEyebrow number="10" label="A typical day" />
+    <h2 id="day-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      What a workday looks like
+    </h2>
+    <p class="mt-3 text-[14.5px] leading-relaxed text-ink-600">
+      Not a script — but a fair sketch of how the good days go.
+    </p>
+    <ol class="relative mt-6 space-y-3">
+      <span class="absolute left-[57px] top-3 bottom-3 w-px bg-gradient-to-b from-ink-200 via-ink-200/50 to-transparent dark:!from-white/10 dark:!via-white/5" aria-hidden="true"></span>
+      {day.map((d) => (
+        <li class="relative flex items-start gap-4">
+          <span class="relative z-10 inline-flex h-8 min-w-[52px] shrink-0 items-center justify-center rounded-full bg-ink-900 px-2 text-[11.5px] font-semibold tabular-nums text-ink-50 ring-4 ring-white dark:!bg-brand-500 dark:!ring-ink-100">
+            {d.time}
+          </span>
+          <div class="min-w-0 flex-1 rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <p class="text-[14px] font-semibold text-ink-900">{d.title}</p>
+            <p class="mt-1 text-[13.5px] leading-relaxed text-ink-600">{d.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Hiring process -->
+  <section aria-labelledby="proc-heading" class="section-process">
+    <SectionEyebrow number="11" label="Hiring process" />
+    <h2 id="proc-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      How we'll get to know each other
+    </h2>
+    <ol class="mt-8 relative">
+      <span class="absolute left-4 top-2 bottom-2 w-px bg-gradient-to-b from-ink-200 via-ink-200/50 to-transparent dark:!from-white/10 dark:!via-white/5" aria-hidden="true"></span>
+      {content.process.map((step, i) => (
+        <li class="relative flex gap-5 pb-8 last:pb-0">
+          <span class="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-ink-200 text-[12px] font-semibold text-ink-900 tabular-nums dark:!bg-ink-900 dark:ring-white/15 dark:text-ink-50">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <div class="min-w-0 flex-1 pt-1">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h3 class="text-[15.5px] font-semibold text-ink-900">{step.title}</h3>
+              <span class="rounded-full bg-ink-100 px-2.5 py-0.5 text-[11px] font-medium text-ink-600 tabular-nums dark:!bg-white/[0.06] dark:text-ink-700">
+                {step.days}
+              </span>
+            </div>
+            <p class="mt-1.5 text-[14.5px] leading-relaxed text-ink-600">{step.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Role FAQs -->
+  <section aria-labelledby="faq-heading" class="section-role-faqs">
+    <SectionEyebrow number="12" label="Role FAQs" />
+    <h2 id="faq-heading" class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+      Common questions, up front
+    </h2>
+    <ul id="role-faq-list" class="mt-6 space-y-2.5">
+      {roleFaqs.map((f, i) => (
+        <li>
+          <details open={i === 0} class="role-faq-details group rounded-2xl border border-ink-200/70 bg-white transition-colors open:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.03] dark:open:!border-brand-500/40">
+            <summary class="flex cursor-pointer items-center justify-between gap-3 list-none p-4 select-none sm:p-5">
+              <div class="flex min-w-0 items-center gap-3">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-[11.5px] font-bold text-ink-700 tabular-nums dark:!bg-white/[0.06] dark:!text-ink-800 group-open:!bg-ink-900 group-open:!text-ink-50 dark:group-open:!bg-brand-500 dark:group-open:!text-white">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <p class="text-[14.5px] font-semibold text-ink-900">{f.q}</p>
+              </div>
+              <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-transform group-open:rotate-180 dark:!border-white/10">
+                <Icon name="chevronDown" size={12} />
+              </span>
+            </summary>
+            <div class="role-faq-body grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
+              <div class="overflow-hidden">
+                <div class="px-4 pb-4 pl-[3.75rem] sm:px-5 sm:pb-5 sm:pl-[4.75rem]">
+                  <p class="text-[13.5px] leading-[1.7] text-ink-600 border-l-2 border-ink-200 pl-3 dark:!border-white/10">{f.a}</p>
+                </div>
+              </div>
+            </div>
+          </details>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <script>
+    const roleAll = document.querySelectorAll<HTMLDetailsElement>("#role-faq-list details");
+
+    // Seed default-open body height
+    roleAll.forEach((d) => {
+      const body = d.querySelector<HTMLElement>(".role-faq-body");
+      if (d.open && body) body.style.gridTemplateRows = "1fr";
+    });
+
+    const openIt = (d: HTMLDetailsElement) => {
+      const body = d.querySelector<HTMLElement>(".role-faq-body");
+      if (!body) return;
+      d.open = true;
+      requestAnimationFrame(() => { body.style.gridTemplateRows = "1fr"; });
+    };
+    const closeIt = (d: HTMLDetailsElement) => {
+      const body = d.querySelector<HTMLElement>(".role-faq-body");
+      if (!body) return;
+      body.style.gridTemplateRows = "0fr";
+      body.addEventListener("transitionend", function once(e) {
+        if (e.propertyName !== "grid-template-rows") return;
+        body.removeEventListener("transitionend", once);
+        d.open = false;
+      });
+    };
+
+    roleAll.forEach((d) => {
+      const summary = d.querySelector<HTMLElement>("summary");
+      summary?.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Clicking the open one keeps it open (one always open)
+        if (d.open) return;
+        roleAll.forEach((other) => { if (other !== d && other.open) closeIt(other); });
+        openIt(d);
+      });
+    });
+  </script>
+
+  <!-- Apply CTA anchor -->
+  <section id="apply" aria-labelledby="apply-heading" class="section-apply scroll-mt-28 overflow-hidden rounded-3xl border border-ink-200/70 bg-gradient-to-br from-ink-50 via-white to-brand-50/40 p-8 sm:p-10 dark:!border-white/10 dark:!from-white/[0.04] dark:!via-white/[0.02] dark:!to-brand-500/10">
+    <div class="grid gap-6 sm:grid-cols-5 sm:items-center">
+      <div class="sm:col-span-3">
+        <SectionEyebrow number="13" label="Ready?" />
+        <h2 id="apply-heading" class="mt-3 text-[26px] font-semibold leading-[1.15] tracking-tight text-ink-900 sm:text-[32px]">
+          Apply for <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">{job.title}</span>
+        </h2>
+        <p class="mt-3 text-[14.5px] leading-relaxed text-ink-600">
+          Takes two minutes. You'll hear back within 3 business days — one way or the other.
+        </p>
+      </div>
+      <div class="flex flex-col gap-2.5 sm:col-span-2">
+        <a
+          href={`#apply-form`}
+          class="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink-900 px-6 text-[14.5px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md"
+        >
+          Submit application
+          <Icon name="arrowRight" size={16} class="transition-transform group-hover:translate-x-0.5" />
+        </a>
+        <a
+          href={`mailto:careers@${job.slug.split("-").pop()}.com?subject=${encodeURIComponent(job.title)}`}
+          class="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-ink-200 bg-white px-6 text-[14px] font-medium text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.03] dark:text-ink-800"
+        >
+          Or email the hiring manager
+        </a>
+      </div>
+    </div>
+  </section>
+</div>

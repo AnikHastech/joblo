@@ -1,0 +1,212 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import { offers, applications } from "@data/dashboard";
+import { jobs } from "@data/jobs";
+import { getCompany } from "@data/companies";
+
+const pending = offers.filter((o) => o.status === "Pending");
+const totalOffered = offers.reduce((s, o) => s + o.baseSalary + o.bonus, 0);
+
+const enriched = offers.map((o) => {
+  const job = jobs.find((j) => j.id === o.jobId)!;
+  const company = getCompany(job.companyId);
+  return { offer: o, job, company };
+});
+
+// Comparison values
+const bestBase = Math.max(...offers.map((o) => o.baseSalary));
+const bestTotal = Math.max(...offers.map((o) => o.baseSalary + o.bonus));
+
+const fmtK = (n: number) => `$${(n / 1000).toFixed(0)}k`;
+---
+<DashboardLayout
+  title="Offers"
+  subtitle={`${pending.length} pending decision · ${offers.length} total this year`}
+  active="offers"
+>
+  <!-- Summary bar -->
+  <section class="mb-6 grid gap-4 sm:grid-cols-3">
+    <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Pending decision</p>
+      <p class="mt-2 text-[28px] font-semibold tracking-tight text-ink-900 tabular-nums">{pending.length}</p>
+      {pending.length > 0 && <p class="mt-1 text-[11.5px] text-amber-700 dark:!text-amber-400">Respond soon · earliest in {Math.min(...pending.map((o) => o.daysLeft))} days</p>}
+    </div>
+    <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Best base offered</p>
+      <p class="mt-2 text-[28px] font-semibold tracking-tight text-ink-900 tabular-nums">{fmtK(bestBase)}</p>
+      <p class="mt-1 text-[11.5px] text-ink-500">Range: {fmtK(Math.min(...offers.map(o => o.baseSalary)))} – {fmtK(bestBase)}</p>
+    </div>
+    <div class="rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-5 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+      <p class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-400">
+        <Icon name="sparkles" size={11} /> Signal
+      </p>
+      <p class="mt-2 text-[13px] leading-relaxed text-ink-800">You're in the <span class="font-semibold text-ink-900">top 8%</span> of designers on Joblo by offer conversion. Nice work.</p>
+    </div>
+  </section>
+
+  {offers.length === 0 ? (
+    <EmptyState icon="award" title="No offers yet" body="When a company extends an offer, you'll be able to compare and accept it here." ctaLabel="Browse jobs" ctaHref="/jobs" />
+  ) : (
+    <>
+      <!-- Detailed cards -->
+      <div class="space-y-5">
+        {enriched.map(({ offer, job, company }, i) => {
+          const isBestBase = offer.baseSalary === bestBase;
+          const isBestTotal = (offer.baseSalary + offer.bonus) === bestTotal;
+          return (
+            <article class="group relative overflow-hidden rounded-3xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+              <span class="absolute left-0 top-0 bottom-0 w-1" style={`background:${company.brandColor}`}></span>
+              <div class="p-6 pl-8 sm:p-8 sm:pl-9 grid gap-6 lg:grid-cols-12">
+                <!-- Left: identity -->
+                <div class="lg:col-span-5">
+                  <div class="flex items-start gap-4">
+                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-[14px] font-bold text-white" style={`background:${company.brandColor}`}>{company.name[0]}</span>
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-400">Offer</p>
+                        <span class={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${offer.status === "Pending" ? "bg-amber-100 text-amber-800 dark:!bg-amber-500/15 dark:!text-amber-400" : "bg-emerald-100 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400"}`}>
+                          <span class="h-1.5 w-1.5 rounded-full bg-current opacity-60"></span>
+                          {offer.status}
+                        </span>
+                      </div>
+                      <a href={`/jobs/${job.slug}`} class="mt-2 block text-[20px] font-semibold tracking-tight text-ink-900 hover:text-brand-700 transition-colors">{job.title}</a>
+                      <p class="mt-0.5 text-[13px] text-ink-500">{company.name} · {offer.remote ? "Remote" : offer.location}</p>
+                    </div>
+                  </div>
+
+                  <!-- Deadline countdown -->
+                  {offer.status === "Pending" && (
+                    <div class="mt-5 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50/50 p-4 dark:!border-amber-500/30 dark:!bg-amber-500/10">
+                      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white"><Icon name="clock" size={16} /></span>
+                      <div class="min-w-0 flex-1">
+                        <p class="text-[13px] font-semibold text-amber-900 dark:!text-amber-300">Respond by {offer.respondBy}</p>
+                        <p class="mt-0.5 text-[11.5px] text-amber-800 dark:!text-amber-400">{offer.daysLeft} {offer.daysLeft === 1 ? "day" : "days"} remaining · received {offer.receivedOn}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <p class="mt-4 text-[13px] leading-relaxed text-ink-600">{offer.notes}</p>
+                </div>
+
+                <!-- Middle: comp breakdown -->
+                <div class="lg:col-span-4">
+                  <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Compensation</p>
+                  <dl class="mt-4 space-y-3">
+                    <div class="flex items-baseline justify-between border-b border-ink-100 pb-3 dark:!border-white/[0.06]">
+                      <dt class="text-[12.5px] text-ink-500">Base salary</dt>
+                      <dd class="flex items-center gap-2">
+                        {isBestBase && offers.length > 1 && <span class="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400">Best</span>}
+                        <span class="text-[18px] font-semibold text-ink-900 tabular-nums">{offer.currency}{offer.baseSalary.toLocaleString()}</span>
+                      </dd>
+                    </div>
+                    <div class="flex items-baseline justify-between border-b border-ink-100 pb-3 dark:!border-white/[0.06]">
+                      <dt class="text-[12.5px] text-ink-500">Sign-on bonus</dt>
+                      <dd class="text-[16px] font-semibold text-ink-900 tabular-nums">{offer.currency}{offer.bonus.toLocaleString()}</dd>
+                    </div>
+                    <div class="flex items-baseline justify-between border-b border-ink-100 pb-3 dark:!border-white/[0.06]">
+                      <dt class="text-[12.5px] text-ink-500">Equity</dt>
+                      <dd class="text-right text-[13px] font-medium text-ink-800">{offer.equity}</dd>
+                    </div>
+                    <div class="flex items-baseline justify-between">
+                      <dt class="text-[12.5px] font-semibold uppercase tracking-widest text-ink-500">Year 1 total</dt>
+                      <dd class="flex items-center gap-2">
+                        {isBestTotal && offers.length > 1 && <span class="rounded-full bg-brand-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400">Top total</span>}
+                        <span class="font-display text-[24px] italic bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent tabular-nums">{offer.currency}{(offer.baseSalary + offer.bonus).toLocaleString()}</span>
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <!-- Benefits -->
+                  <ul class="mt-5 space-y-1.5">
+                    {offer.benefits.map((b) => (
+                      <li class="flex items-center gap-2 text-[12.5px] text-ink-700">
+                        <Icon name={b.icon as any} size={11} class="text-brand-600 dark:text-brand-400 shrink-0" />
+                        {b.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <!-- Right: actions -->
+                <aside class="lg:col-span-3">
+                  <div class="rounded-2xl bg-ink-50/60 p-4 dark:!bg-white/[0.03]">
+                    <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Start date</p>
+                    <p class="mt-1 text-[16px] font-semibold text-ink-900 tabular-nums">{offer.startDate}</p>
+                    <p class="mt-0.5 text-[11.5px] text-ink-500">{offer.remote ? "Remote — worldwide" : offer.location}</p>
+                  </div>
+                  <div class="mt-4 flex flex-col gap-2">
+                    <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-emerald-600 px-4 text-[13.5px] font-semibold text-white shadow-sm hover:bg-emerald-700">
+                      <Icon name="check" size={12} strokeWidth={2.5} /> Accept offer
+                    </button>
+                    <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+                      <Icon name="filter" size={12} /> Counter offer
+                    </button>
+                    <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-rose-700 hover:border-rose-400 hover:bg-rose-50/40 dark:!border-white/10 dark:!bg-white/[0.03]">
+                      <Icon name="close" size={12} /> Decline
+                    </button>
+                    <button type="button" class="inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-[12px] font-medium text-ink-600 hover:text-ink-900">
+                      <Icon name="arrowUp" size={11} class="rotate-180" /> Download offer letter
+                    </button>
+                  </div>
+                </aside>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <!-- Comparison table -->
+      {offers.length > 1 && (
+        <section class="mt-8 rounded-3xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+          <div class="border-b border-ink-100 px-6 py-4 dark:!border-white/[0.06]">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Side-by-side</p>
+            <h3 class="mt-0.5 text-[16px] font-semibold text-ink-900">Compare all offers</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[720px] text-left text-[13px]">
+              <thead>
+                <tr class="text-[11px] font-bold uppercase tracking-widest text-ink-500">
+                  <th class="px-6 py-3.5"></th>
+                  {enriched.map(({ company, job }) => (
+                    <th class="px-4 py-3.5">
+                      <p class="text-ink-900 text-[13px] normal-case tracking-normal">{company.name}</p>
+                      <p class="mt-0.5 font-normal text-[11px] normal-case tracking-normal text-ink-500 line-clamp-1">{job.title}</p>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody class="[&_tr:not(:last-child)]:border-b [&_tr:not(:last-child)]:border-ink-100 dark:[&_tr:not(:last-child)]:!border-white/[0.06]">
+                <tr>
+                  <td class="px-6 py-3.5 text-[12px] text-ink-500">Base</td>
+                  {enriched.map(({ offer }) => <td class="px-4 py-3.5 tabular-nums font-semibold text-ink-900">{offer.currency}{offer.baseSalary.toLocaleString()}</td>)}
+                </tr>
+                <tr>
+                  <td class="px-6 py-3.5 text-[12px] text-ink-500">Sign-on bonus</td>
+                  {enriched.map(({ offer }) => <td class="px-4 py-3.5 tabular-nums text-ink-800">{offer.currency}{offer.bonus.toLocaleString()}</td>)}
+                </tr>
+                <tr>
+                  <td class="px-6 py-3.5 text-[12px] text-ink-500">Equity</td>
+                  {enriched.map(({ offer }) => <td class="px-4 py-3.5 text-ink-800">{offer.equity}</td>)}
+                </tr>
+                <tr>
+                  <td class="px-6 py-3.5 text-[12px] text-ink-500">Year 1 total</td>
+                  {enriched.map(({ offer }) => <td class={`px-4 py-3.5 tabular-nums font-semibold ${(offer.baseSalary + offer.bonus) === bestTotal ? "text-emerald-700 dark:!text-emerald-400" : "text-ink-900"}`}>{offer.currency}{(offer.baseSalary + offer.bonus).toLocaleString()}</td>)}
+                </tr>
+                <tr>
+                  <td class="px-6 py-3.5 text-[12px] text-ink-500">Location</td>
+                  {enriched.map(({ offer }) => <td class="px-4 py-3.5 text-ink-800">{offer.remote ? "Remote" : offer.location.split(",")[0]}</td>)}
+                </tr>
+                <tr>
+                  <td class="px-6 py-3.5 text-[12px] text-ink-500">Respond by</td>
+                  {enriched.map(({ offer }) => <td class="px-4 py-3.5 text-ink-800 tabular-nums">{offer.respondBy}</td>)}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+    </>
+  )}
+</DashboardLayout>

@@ -1,0 +1,75 @@
+---
+import Icon from "@components/ui/Icon.astro";
+
+interface Props {
+  total: number;
+  showing?: number;
+}
+const { total, showing } = Astro.props;
+const showCount = showing ?? total;
+
+const sortOptions = [
+  { value: "featured",   label: "Featured first" },
+  { value: "openings",   label: "Most openings"  },
+  { value: "az",         label: "Name A–Z"        },
+  { value: "za",         label: "Name Z–A"        },
+  { value: "size-large", label: "Largest teams"   },
+  { value: "size-small", label: "Smallest teams"  },
+];
+---
+<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+    <p class="text-[14.5px] text-ink-800">
+      <span id="companies-visible-count" class="font-semibold tabular-nums text-ink-900">{showCount.toLocaleString()}</span>
+      <span class="text-ink-500"> of </span>
+      <span class="font-semibold tabular-nums text-ink-900">{total.toLocaleString()}</span>
+      <span class="text-ink-500"> companies</span>
+    </p>
+    <span class="hidden h-4 w-px bg-ink-200 sm:block dark:!bg-white/10"></span>
+    <button type="button" id="cf-mobile-filters" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 transition-colors hover:border-ink-400 lg:hidden dark:border-white/10 dark:!bg-white/[0.04]">
+      <Icon name="filter" size={13} />
+      Filters
+    </button>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <div id="cf-view-toggle" class="inline-flex rounded-full border border-ink-200 bg-white p-0.5 dark:border-white/10 dark:!bg-white/[0.04]" role="group">
+      <button type="button" data-view="grid" data-active="true" class="cf-view-btn flex h-8 w-8 items-center justify-center rounded-full text-ink-500 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 hover:text-ink-900" aria-label="Grid view">
+        <Icon name="grid" size={12} />
+      </button>
+      <button type="button" data-view="list" data-active="false" class="cf-view-btn flex h-8 w-8 items-center justify-center rounded-full text-ink-500 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 hover:text-ink-900" aria-label="List view">
+        <Icon name="menu" size={13} />
+      </button>
+    </div>
+
+    <div class="relative" id="cf-sort-dropdown">
+      <button
+        type="button"
+        id="cf-sort-trigger"
+        class="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3.5 py-2 text-[13px] font-medium text-ink-800 transition-colors hover:border-ink-400 dark:border-white/10 dark:!bg-white/[0.04]"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+      >
+        <span class="text-ink-500">Sort:</span>
+        <span id="cf-sort-label">Featured first</span>
+        <Icon name="chevronDown" size={11} class="cf-sort-chevron text-ink-400 transition-transform" />
+      </button>
+      <ul id="cf-sort-menu" hidden role="listbox" class="absolute right-0 top-full z-30 mt-2 min-w-[210px] rounded-xl border border-ink-200/70 bg-white p-1.5 shadow-2xl shadow-ink-900/15 dark:border-white/10 dark:!bg-ink-100">
+        {sortOptions.map((s, i) => (
+          <li>
+            <button
+              type="button"
+              role="option"
+              data-value={s.value}
+              class="cf-sort-option flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[13px] text-ink-800 transition-colors hover:bg-ink-50 aria-selected:!bg-brand-50 aria-selected:!font-semibold aria-selected:!text-brand-700 dark:hover:!bg-white/[0.04] dark:aria-selected:!bg-brand-500/15"
+              aria-selected={i === 0 ? "true" : "false"}
+            >
+              {s.label}
+              <Icon name="check" size={12} strokeWidth={2.2} class="cf-sort-check hidden text-brand-600" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</div>

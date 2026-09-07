@@ -1,0 +1,194 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import BrandLogo from "@components/common/BrandLogo.astro";
+import { liveHireAvatars } from "@data/testimonials";
+
+const bars = [
+  { role: "AI Research Eng.", min: 240, max: 380, med: 310 },
+  { role: "Staff Engineer",   min: 220, max: 320, med: 270 },
+  { role: "Product Manager",  min: 165, max: 260, med: 210 },
+  { role: "Sr. Designer",     min: 155, max: 220, med: 185 },
+  { role: "Data Scientist",   min: 150, max: 240, med: 195 },
+];
+
+const hotSkills = [
+  { name: "TypeScript",     delta: "+42%",  hot: false },
+  { name: "AI/ML",          delta: "+128%", hot: true  },
+  { name: "Rust",           delta: "+64%",  hot: false },
+  { name: "Product Design", delta: "+18%",  hot: false },
+  { name: "Go",             delta: "+31%",  hot: false },
+  { name: "Growth",         delta: "+22%",  hot: false },
+  { name: "SwiftUI",        delta: "+38%",  hot: false },
+  { name: "Data Eng.",      delta: "+45%",  hot: false },
+];
+
+const liveFeed = [
+  { name: "Maya",  avatar: liveHireAvatars.Maya,  role: "Sr. Designer", company: "Linear",    slug: "linear",    time: "just now" },
+  { name: "Devon", avatar: liveHireAvatars.Devon, role: "Staff Eng.",   company: "Vercel",    slug: "vercel",    time: "2m ago"   },
+  { name: "Priya", avatar: liveHireAvatars.Priya, role: "PM",           company: "Stripe",    slug: "stripe",    time: "6m ago"   },
+];
+
+const max = 400;
+---
+<section class="section-market-pulse-2 relative isolate overflow-hidden py-20 sm:py-28 bg-gradient-to-b from-accent-50/30 via-white to-brand-50/30 dark:!from-accent-900/20 dark:!via-ink-100 dark:!to-brand-950/25">
+  <div class="pointer-events-none absolute -right-40 top-20 h-[400px] w-[400px] rounded-full bg-brand-200/30 blur-3xl dark:!bg-brand-500/15"></div>
+  <div class="pointer-events-none absolute -left-40 bottom-20 h-[400px] w-[400px] rounded-full bg-accent-200/30 blur-3xl dark:!bg-accent-500/15"></div>
+  <Container size="xl">
+    <div class="mx-auto max-w-6xl text-center">
+      <SectionEyebrow number={10} label="Market pulse" class="justify-center" />
+      <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+        The <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">signal</span> behind the salary.
+      </h2>
+      <p class="mt-4 text-lg text-ink-600">
+        Trending skills, real compensation ranges, and who's hiring right now — updated every hour.
+      </p>
+    </div>
+
+    <!-- ═══════ Row 1: HERO STATS strip (4 big display numbers) ═══════ -->
+    <div class="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5">
+      {[
+        { k: "+12%",   v: "Median YoY salary",  tone: "text-emerald-600", bg: "bg-emerald-50 dark:!bg-emerald-500/15" },
+        { k: "+8%",    v: "Remote premium",     tone: "text-brand-600",   bg: "bg-brand-50 dark:!bg-brand-500/15"     },
+        { k: "$340K",  v: "Top 10% earn",       tone: "text-accent-600",  bg: "bg-accent-50 dark:!bg-accent-500/15"   },
+        { k: "128K+",  v: "Verified listings",  tone: "text-ink-900",     bg: "bg-ink-100 dark:!bg-white/[0.06]"      },
+      ].map((s) => (
+        <div class={`rounded-2xl border border-ink-200/70 p-6 dark:border-white/[0.08] ${s.bg}`}>
+          <p class={`font-display text-[42px] italic font-normal leading-none tracking-tight tabular-nums sm:text-[52px] ${s.tone}`}>{s.k}</p>
+          <p class="mt-3 text-[12.5px] text-ink-600">{s.v}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- ═══════ Row 2: FULL-WIDTH salary chart ═══════ -->
+    <div class="mt-5 rounded-2xl border border-ink-200/70 bg-white p-7 shadow-sm sm:p-10 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Salary ranges — USD, annualized</p>
+          <h3 class="mt-1 text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">Top-paying tech roles, 2026</h3>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3 text-[11px] text-ink-500">
+            <span class="inline-flex items-center gap-1.5"><span class="h-2 w-4 rounded-full bg-gradient-to-r from-brand-400 to-accent-400 opacity-60"></span>Range</span>
+            <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-accent-500"></span>Median</span>
+          </div>
+          <a href="/blog" class="hidden items-center gap-1 text-[13px] font-semibold text-brand-700 hover:gap-2 transition-all sm:inline-flex">
+            Salary tool
+            <Icon name="arrowRight" size={12} />
+          </a>
+        </div>
+      </div>
+
+      <ul class="mt-8 grid gap-5 sm:grid-cols-2 sm:gap-x-10">
+        {bars.map((s, i) => {
+          const left  = (s.min / max) * 100;
+          const width = ((s.max - s.min) / max) * 100;
+          const med   = (s.med / max) * 100;
+          return (
+            <li class={i === 4 ? "sm:col-span-2" : ""}>
+              <div class="flex items-baseline justify-between">
+                <span class="flex items-center gap-2">
+                  <span class="text-[11px] font-bold tabular-nums text-ink-400">0{i+1}</span>
+                  <span class="text-[14px] font-medium text-ink-900">{s.role}</span>
+                </span>
+                <span class="text-[13px] tabular-nums text-ink-500">${s.min}K – ${s.max}K</span>
+              </div>
+              <div class="relative mt-2 h-3 w-full rounded-full bg-ink-100 dark:!bg-white/[0.06]">
+                <span class="absolute inset-y-0 rounded-full bg-gradient-to-r from-brand-500/80 to-accent-500/80" style={`left:${left}%;width:${width}%`}></span>
+                <span class="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white bg-accent-500" style={`left:calc(${med}% - 8px)`}></span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+
+    <!-- ═══════ Row 3: 2-col — Trending skills | Live hires ═══════ -->
+    <div class="mt-5 grid gap-5 lg:grid-cols-12">
+      <!-- LEFT: Trending skills with spotlight -->
+      <div class="rounded-2xl border border-ink-200/70 bg-white p-7 shadow-sm lg:col-span-7 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Trending skills · 7d</p>
+            <h3 class="mt-1 text-lg font-semibold tracking-tight text-ink-900">What teams want right now</h3>
+          </div>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+            <Icon name="trending" size={10} strokeWidth={2.2} />
+            Rising
+          </span>
+        </div>
+
+        <div class="mt-6 grid gap-4 sm:grid-cols-5 sm:items-center">
+          <!-- Skill pills cloud -->
+          <ul class="flex flex-wrap gap-2 sm:col-span-3">
+            {hotSkills.map((s) => (
+              <li>
+                <a href={`/jobs?skill=${encodeURIComponent(s.name)}`}
+                   class={[
+                     "group inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12.5px] transition-all",
+                     s.hot
+                       ? "border-accent-300 bg-gradient-to-br from-accent-50 to-white text-accent-700 hover:border-accent-400 hover:shadow-sm dark:!border-accent-500/40 dark:!from-transparent dark:!to-transparent dark:!bg-accent-500/10 dark:!text-accent-300"
+                       : "border-ink-200 bg-white text-ink-700 hover:border-ink-900 hover:text-ink-900 hover:shadow-sm dark:border-white/10 dark:!bg-white/[0.03]",
+                   ].join(" ")}
+                >
+                  {s.hot && <span class="text-accent-500" aria-hidden="true">◆</span>}
+                  <span class="font-medium">{s.name}</span>
+                  <span class={`text-[10.5px] tabular-nums ${s.hot ? "text-accent-600" : "text-emerald-600"}`}>{s.delta}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <!-- Spotlight card (side-by-side with pills) -->
+          <a
+            href="/jobs?skill=AI%2FML"
+            class="group flex items-center gap-3 rounded-xl border border-accent-200 bg-gradient-to-br from-accent-50 via-white to-accent-50/50 p-4 transition-all hover:border-accent-400 hover:shadow-md sm:col-span-2 dark:!border-white/10 dark:!from-transparent dark:!via-transparent dark:!to-transparent dark:!bg-white/[0.035]"
+          >
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-sm">
+              <Icon name="sparkles" size={16} strokeWidth={2} />
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-accent-700 dark:!text-accent-400">This week's #1</p>
+              <p class="mt-0.5 text-[13px] font-semibold text-ink-900">AI/ML <span class="tabular-nums text-accent-600 dark:!text-accent-400">+128%</span></p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live hires (horizontal-ish) -->
+      <div class="rounded-2xl border border-ink-200/70 bg-white p-7 shadow-sm lg:col-span-5 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Hires happening now</p>
+            <h3 class="mt-1 text-lg font-semibold tracking-tight text-ink-900">Latest signings</h3>
+          </div>
+          <span class="flex items-center gap-1.5">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </span>
+            <span class="text-[11px] font-semibold tracking-wider text-emerald-700">LIVE</span>
+          </span>
+        </div>
+
+        <ul class="mt-5 space-y-2.5">
+          {liveFeed.map((f) => (
+            <li class="flex items-center gap-3 rounded-lg border border-ink-100 bg-ink-50/50 p-2.5 transition-colors hover:border-ink-200 hover:bg-white dark:border-white/[0.06] dark:!bg-white/[0.02] dark:hover:!bg-white/[0.05]">
+              <img src={f.avatar} alt="" width="32" height="32" loading="lazy" class="h-8 w-8 shrink-0 rounded-full bg-white ring-1 ring-ink-100 dark:ring-white/10" />
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-[13px] text-ink-900">
+                  <span class="font-medium">{f.name}</span>
+                  <span class="text-ink-500"> → </span>
+                  <span class="font-medium">{f.company}</span>
+                </p>
+                <p class="truncate text-[11px] text-ink-500">{f.role} · {f.time}</p>
+              </div>
+              <BrandLogo slug={f.slug} size="xs" class="shrink-0" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Container>
+</section>

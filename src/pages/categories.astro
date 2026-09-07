@@ -1,0 +1,154 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { categories } from "@data/categories";
+import { jobs } from "@data/jobs";
+import { companies } from "@data/companies";
+import { site } from "@data/site";
+
+const categoriesEnriched = categories.map((c) => {
+  const inCat = jobs.filter((j) => j.categorySlug === c.slug);
+  const companyIds = new Set(inCat.map((j) => j.companyId));
+  const avgMin = inCat.length ? Math.round(inCat.reduce((a, j) => a + j.salaryMin, 0) / inCat.length / 1000) : 0;
+  const avgMax = inCat.length ? Math.round(inCat.reduce((a, j) => a + j.salaryMax, 0) / inCat.length / 1000) : 0;
+  const remoteCount = inCat.filter((j) => j.remote).length;
+  return {
+    ...c,
+    live: inCat.length,
+    companies: companyIds.size,
+    avg: inCat.length ? `$${avgMin}k – $${avgMax}k` : "—",
+    remoteCount,
+  };
+});
+---
+<BaseLayout
+  title={`Explore categories · ${site.name}`}
+  description="Browse open roles across every discipline — design, engineering, product, marketing, data, sales, customer success, and more."
+>
+  <!-- Hero -->
+  <section class="section-categories-hero relative isolate pt-14 pb-14 sm:pt-20 sm:pb-16">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-40 mask-radial"></div>
+      <div class="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-200/40 via-accent-200/30 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="font-medium text-ink-800">Categories</span>
+      </nav>
+
+      <div class="mt-6 max-w-3xl">
+        <SectionEyebrow number="01" label="Job categories" />
+        <h1 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+          Every discipline, <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">one directory</span>.
+        </h1>
+        <p class="mt-4 max-w-xl text-[16px] leading-relaxed text-ink-600">
+          Jump straight to the roles that match your craft. Every category is updated in real time as new opportunities land.
+        </p>
+      </div>
+
+      <!-- Search -->
+      <div class="mt-8 max-w-xl">
+        <div class="relative">
+          <span class="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-ink-400">
+            <Icon name="search" size={16} />
+          </span>
+          <input
+            id="cat-search"
+            type="search"
+            placeholder="Search categories…"
+            class="h-13 w-full rounded-full border border-ink-200 bg-white pl-13 pr-5 text-[14.5px] text-ink-900 placeholder:text-ink-400 shadow-sm focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"
+          />
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Grid -->
+  <section class="pt-4 pb-24 sm:pb-32">
+    <Container size="xl">
+      <div id="cat-grid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {categoriesEnriched.map((c) => (
+          <a
+            href={`/categories/${c.slug}`}
+            class="cat-item group relative flex flex-col overflow-hidden rounded-3xl border border-ink-200/70 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg dark:!border-white/[0.08] dark:!bg-white/[0.035]"
+            data-name={c.name.toLowerCase()}
+            data-slug={c.slug}
+          >
+            <div class="flex items-start justify-between">
+              <span
+                class="flex h-14 w-14 items-center justify-center rounded-2xl text-2xl font-semibold text-white shadow-sm ring-1 ring-black/5"
+                style={`background:${c.gradient}`}
+                aria-hidden="true"
+              >
+                {c.icon}
+              </span>
+              <span class="rounded-full bg-ink-100 px-2.5 py-1 text-[10.5px] font-semibold tabular-nums text-ink-700 dark:!bg-white/[0.06] dark:text-ink-800">
+                {c.live} live
+              </span>
+            </div>
+            <h2 class="mt-5 text-[18px] font-semibold tracking-tight text-ink-900 group-hover:text-brand-700 transition-colors">
+              {c.name}
+            </h2>
+            <p class="mt-1 text-[13px] text-ink-500 tabular-nums">
+              {c.openings.toLocaleString()} indexed openings globally
+            </p>
+            <dl class="mt-5 grid grid-cols-2 gap-3 text-[12.5px]">
+              <div>
+                <dt class="text-ink-400">Companies</dt>
+                <dd class="mt-0.5 font-semibold text-ink-800 tabular-nums">{c.companies}</dd>
+              </div>
+              <div>
+                <dt class="text-ink-400">Avg salary</dt>
+                <dd class="mt-0.5 font-semibold text-ink-800 tabular-nums">{c.avg}</dd>
+              </div>
+              <div>
+                <dt class="text-ink-400">Remote</dt>
+                <dd class="mt-0.5 font-semibold text-ink-800 tabular-nums">{c.remoteCount} / {c.live || 0}</dd>
+              </div>
+              <div>
+                <dt class="text-ink-400">Update</dt>
+                <dd class="mt-0.5 font-semibold text-emerald-700 dark:text-emerald-400">Live now</dd>
+              </div>
+            </dl>
+            <footer class="mt-6 flex items-center justify-between border-t border-ink-100 pt-4 dark:!border-white/[0.06]">
+              <span class="text-[13px] font-medium text-brand-700 group-hover:gap-2 transition-all inline-flex items-center gap-1.5">
+                Browse roles
+                <Icon name="arrowRight" size={13} class="transition-transform group-hover:translate-x-0.5" />
+              </span>
+              <span class="text-[11px] uppercase tracking-widest text-ink-400">/{c.slug}</span>
+            </footer>
+          </a>
+        ))}
+      </div>
+
+      <div id="cat-empty" hidden class="mt-10 rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 p-12 text-center dark:!border-white/10 dark:!bg-white/[0.02]">
+        <p class="text-[15.5px] font-semibold text-ink-900">No categories match your search</p>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
+
+<script>
+  const search = document.getElementById("cat-search") as HTMLInputElement | null;
+  const items  = document.querySelectorAll<HTMLElement>(".cat-item");
+  const empty  = document.getElementById("cat-empty");
+  const grid   = document.getElementById("cat-grid");
+  search?.addEventListener("input", () => {
+    const q = search.value.toLowerCase().trim();
+    let matched = 0;
+    items.forEach((el) => {
+      const show = !q || (el.dataset.name ?? "").includes(q) || (el.dataset.slug ?? "").includes(q);
+      el.hidden = !show;
+      if (show) matched++;
+    });
+    if (empty && grid) {
+      empty.hidden = matched !== 0;
+      grid.hidden = matched === 0;
+    }
+  });
+</script>

@@ -1,0 +1,254 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { site } from "@data/site";
+
+type ChangeType = "new" | "improved" | "fixed" | "breaking";
+
+interface Release {
+  version: string;
+  date: string;
+  title: string;
+  changes: { type: ChangeType; text: string }[];
+}
+
+const releases: Release[] = [
+  {
+    version: "1.6.0",
+    date: "2026-09-04",
+    title: "Editorial + trust upgrades",
+    changes: [
+      { type: "new",      text: "Blog details now include Key takeaways, mid-article CTA, FAQ, and a reading progress bar" },
+      { type: "new",      text: "Candidate portfolio cards open a case-study popup with metrics, contributions, and tools" },
+      { type: "new",      text: "Gallery lightbox on company details (keyboard + touch)" },
+      { type: "improved", text: "Job details left column expanded with Tech stack, Team, Compensation breakdown, Day in the life, and Role FAQs" },
+      { type: "improved", text: "Company profile hero redesigned with brand-tinted glow, trust bar, and reply-rate signal" },
+      { type: "fixed",    text: "Dark-mode white-band bug on Category and Company hero fades" },
+    ],
+  },
+  {
+    version: "1.5.0",
+    date: "2026-07-18",
+    title: "Pagination + search across the board",
+    changes: [
+      { type: "new",      text: "Universal /search page with grouped results (jobs · companies · candidates · posts)" },
+      { type: "new",      text: "Pagination on the candidate directory (6 per page)" },
+      { type: "improved", text: "Header search modal now filters real data with an 80 ms debounce" },
+      { type: "improved", text: "Home 2 FAQ replaced with the sticky sidebar + smooth accordion pattern" },
+    ],
+  },
+  {
+    version: "1.4.0",
+    date: "2026-05-22",
+    title: "Pricing + auth polish",
+    changes: [
+      { type: "new",      text: "New /reset-password page with strength meter and match check" },
+      { type: "improved", text: "Compare plans table redesigned with icon-led headers and gradient Growth column" },
+      { type: "improved", text: "Auth pages get editorial right-side preview, live indicator, and stats trio" },
+      { type: "fixed",    text: "Italic gradient text descender clipping across all headings" },
+    ],
+  },
+  {
+    version: "1.3.0",
+    date: "2026-03-11",
+    title: "SEO + shared components",
+    changes: [
+      { type: "new",      text: "JSON-LD schema (JobPosting, Organization, Article, Person, Breadcrumb)" },
+      { type: "new",      text: "Sitemap, RSS feed, robots.txt, and OG-image support" },
+      { type: "new",      text: "Reusable Modal, Table, DashboardCard, LoadingState, EmptyState" },
+      { type: "improved", text: "Dashboard pages gain messages, interviews, offers, notifications, analytics" },
+    ],
+  },
+  {
+    version: "1.2.0",
+    date: "2026-01-30",
+    title: "Employer dashboard",
+    changes: [
+      { type: "new",      text: "10-page employer dashboard: overview, jobs, applicants, talent, analytics, billing, and more" },
+      { type: "new",      text: "Public candidate profile with response-rate badge and match signal" },
+      { type: "improved", text: "Header mega menu widened, section spacing added, better section counts" },
+    ],
+  },
+  {
+    version: "1.1.0",
+    date: "2025-12-04",
+    title: "Candidate dashboard",
+    changes: [
+      { type: "new",      text: "8-page candidate dashboard: overview, applications, saved, resume, profile, alerts, settings" },
+      { type: "improved", text: "Home 1 sections re-numbered and tightened for a smoother reading flow" },
+    ],
+  },
+  {
+    version: "1.0.0",
+    date: "2025-10-01",
+    title: "Public launch",
+    changes: [
+      { type: "new",      text: "First public release — 60+ pages covering discovery, application, and hiring flows" },
+      { type: "new",      text: "Two homepages, Categories, Companies, Candidates, Jobs, Blog, About, Contact, Pricing" },
+    ],
+  },
+];
+
+const typeMeta: Record<ChangeType, { label: string; chip: string; dot: string }> = {
+  new:      { label: "New",      chip: "bg-brand-50 text-brand-700 dark:!bg-brand-500/12 dark:!text-brand-400",     dot: "bg-brand-500" },
+  improved: { label: "Improved", chip: "bg-sky-50 text-sky-700 dark:!bg-sky-500/12 dark:!text-sky-400",             dot: "bg-sky-500" },
+  fixed:    { label: "Fixed",    chip: "bg-emerald-50 text-emerald-700 dark:!bg-emerald-500/12 dark:!text-emerald-400", dot: "bg-emerald-500" },
+  breaking: { label: "Breaking", chip: "bg-rose-50 text-rose-700 dark:!bg-rose-500/12 dark:!text-rose-400",         dot: "bg-rose-500" },
+};
+
+const stats = [
+  { value: releases.length.toString(),                     label: "Releases" },
+  { value: releases.reduce((a, r) => a + r.changes.length, 0).toString(), label: "Total changes" },
+  { value: releases[0].date,                                                label: "Latest ship" },
+];
+---
+<BaseLayout
+  title={`Changelog · ${site.name}`}
+  description="Every notable change shipped to the Joblo template — new features, improvements, and bug fixes, most recent first."
+>
+  <!-- Hero -->
+  <section class="relative isolate pt-14 pb-10 sm:pt-20 sm:pb-14">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-25 mask-radial"></div>
+      <div class="absolute -top-40 right-0 h-[520px] w-[820px] rounded-full bg-gradient-to-bl from-brand-200/40 via-accent-200/25 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="font-medium text-ink-800">Changelog</span>
+      </nav>
+      <div class="mt-6 max-w-3xl">
+        <SectionEyebrow number="01" label="Release notes" />
+        <h1 class="mt-4 text-[30px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl md:text-5xl lg:text-6xl">
+          What's new, <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">shipped weekly</span>.
+        </h1>
+        <p class="mt-4 max-w-xl text-[15.5px] leading-relaxed text-ink-600 sm:text-[16px]">
+          Every meaningful improvement to Joblo — from new pages and dashboard tools to bug fixes. Newest at the top.
+        </p>
+      </div>
+
+      <!-- Stats -->
+      <dl class="mt-8 grid grid-cols-3 gap-2 sm:gap-3">
+        {stats.map((s) => (
+          <div class="rounded-2xl border border-ink-200/70 bg-white p-4 text-center dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:text-left">
+            <dt class="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-500">{s.label}</dt>
+            <dd class="mt-1 text-[18px] font-semibold text-ink-900 tabular-nums sm:text-[22px]">{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <!-- Filter chips -->
+      <div class="mt-6 flex flex-wrap items-center gap-1.5">
+        <span class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">Filter</span>
+        {(["all", "new", "improved", "fixed"] as (ChangeType | "all")[]).map((t, i) => (
+          <button
+            type="button"
+            data-changelog-filter={t}
+            data-active={i === 0 ? "true" : "false"}
+            class="changelog-filter inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 transition-colors hover:border-ink-400 hover:bg-ink-50 data-[active=true]:!border-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 dark:!border-white/10 dark:!bg-white/[0.04]"
+          >
+            {t === "all" ? "All" : typeMeta[t].label}
+          </button>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Timeline -->
+  <section class="pb-24 sm:pb-32">
+    <Container size="xl">
+      <ol class="relative space-y-8">
+        <span class="pointer-events-none absolute left-4 top-3 bottom-3 hidden w-px bg-gradient-to-b from-ink-200 via-ink-200/50 to-transparent md:block dark:!from-white/10 dark:!via-white/5" aria-hidden="true"></span>
+
+        {releases.map((r, idx) => (
+          <li class="relative md:pl-14">
+            <span
+              class="absolute left-0 top-3 z-10 hidden h-8 w-8 items-center justify-center rounded-full bg-white text-[11px] font-bold text-ink-900 ring-4 ring-white md:flex dark:!bg-ink-900 dark:!text-ink-50 dark:!ring-ink-100"
+              style={idx === 0 ? "background:#0c0a09;color:#fff" : ""}
+            >
+              {idx === 0 ? <Icon name="sparkles" size={12} strokeWidth={2} /> : String(releases.length - idx).padStart(2, "0")}
+            </span>
+
+            <article class="release-card rounded-3xl border border-ink-200/70 bg-white p-5 transition-colors dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:p-7">
+              <header class="flex flex-wrap items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-ink-900 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-ink-50 tabular-nums dark:!bg-brand-500 dark:!text-white">
+                  v{r.version}
+                </span>
+                {idx === 0 && (
+                  <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-widest text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400">
+                    <span class="relative flex h-1.5 w-1.5">
+                      <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    </span>
+                    Latest
+                  </span>
+                )}
+                <span class="text-[12px] text-ink-500 tabular-nums">{r.date}</span>
+              </header>
+
+              <h2 class="mt-3 text-[20px] font-semibold leading-snug tracking-tight text-ink-900 sm:text-[24px]">
+                {r.title}
+              </h2>
+
+              <ul class="mt-5 space-y-2.5">
+                {r.changes.map((c) => (
+                  <li class="change-item flex flex-wrap items-start gap-2.5" data-change-type={c.type}>
+                    <span class={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${typeMeta[c.type].chip}`}>
+                      <span class={`h-1.5 w-1.5 rounded-full ${typeMeta[c.type].dot}`}></span>
+                      {typeMeta[c.type].label}
+                    </span>
+                    <p class="min-w-0 flex-1 text-[13.5px] leading-relaxed text-ink-700 sm:text-[14px]">{c.text}</p>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </li>
+        ))}
+      </ol>
+
+      <!-- Subscribe CTA -->
+      <div class="mt-14 overflow-hidden rounded-3xl border border-ink-200/70 bg-ink-900 p-6 text-ink-50 sm:p-8 dark:!border-white/[0.08] dark:!bg-[#0c0a09]">
+        <div class="grid gap-5 md:grid-cols-5 md:items-center">
+          <div class="md:col-span-3">
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-brand-300 dark:!text-brand-400">Stay in the loop</p>
+            <h2 class="mt-2 text-[20px] font-semibold leading-tight tracking-tight sm:text-[22px] lg:text-[24px]">
+              Get an email <span class="font-display italic font-normal">when we ship</span>
+            </h2>
+            <p class="mt-2 text-[13.5px] leading-relaxed text-white/70">One short email per release. No noise. Unsubscribe with one click.</p>
+          </div>
+          <form class="flex flex-col gap-2 md:col-span-2 sm:flex-row">
+            <input type="email" placeholder="you@work.com" class="h-11 flex-1 rounded-full border border-white/20 bg-white/[0.06] px-4 text-[13.5px] text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none" />
+            <button type="submit" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-white px-5 text-[13.5px] font-semibold text-ink-900 transition-colors hover:bg-brand-500 hover:!text-white">
+              Subscribe
+              <Icon name="arrowRight" size={13} />
+            </button>
+          </form>
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
+
+<script>
+  const filters = document.querySelectorAll<HTMLButtonElement>(".changelog-filter");
+  const items   = document.querySelectorAll<HTMLElement>(".change-item");
+  const cards   = document.querySelectorAll<HTMLElement>(".release-card");
+
+  filters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      filters.forEach((b) => (b.dataset.active = String(b === btn)));
+      const t = btn.dataset.changelogFilter;
+      items.forEach((it) => {
+        it.hidden = !(t === "all" || it.dataset.changeType === t);
+      });
+      // Hide release cards that have no visible items
+      cards.forEach((card) => {
+        const visible = card.querySelectorAll<HTMLElement>(".change-item:not([hidden])").length;
+        (card.closest("li") as HTMLElement).hidden = visible === 0;
+      });
+    });
+  });
+</script>

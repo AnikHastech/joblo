@@ -1,0 +1,263 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Dark mode — variant + auto-inverting ink scale
+   Add `.dark` on <html> to activate. Ink tokens flip so any
+   utility like `bg-ink-50` / `text-ink-900` auto-adapts.
+   ============================================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+.dark {
+  --color-ink-50:  #0c0a09;
+  --color-ink-100: #1c1917;
+  --color-ink-200: #292524;
+  --color-ink-300: #44403c;
+  --color-ink-400: #57534e;
+  --color-ink-500: #78716c;
+  --color-ink-600: #a8a29e;
+  --color-ink-700: #d6d3d1;
+  --color-ink-800: #e7e5e4;
+  --color-ink-900: #f5f5f4;
+  --color-ink-950: #fafaf9;
+  color-scheme: dark;
+}
+
+/* White surface auto-adaptation (utilities that use literal white) */
+.dark .bg-white          { background-color: var(--color-ink-100); }
+.dark .bg-white\/98      { background-color: color-mix(in oklab, var(--color-ink-100) 98%, transparent); }
+.dark .bg-white\/95      { background-color: color-mix(in oklab, var(--color-ink-100) 95%, transparent); }
+.dark .bg-white\/90      { background-color: color-mix(in oklab, var(--color-ink-100) 90%, transparent); }
+.dark .bg-white\/85      { background-color: color-mix(in oklab, var(--color-ink-100) 85%, transparent); }
+.dark .bg-white\/80      { background-color: color-mix(in oklab, var(--color-ink-100) 80%, transparent); }
+.dark .bg-white\/75      { background-color: color-mix(in oklab, var(--color-ink-100) 75%, transparent); }
+.dark .bg-white\/70      { background-color: color-mix(in oklab, var(--color-ink-100) 70%, transparent); }
+.dark .bg-white\/60      { background-color: color-mix(in oklab, var(--color-ink-100) 60%, transparent); }
+.dark .bg-white\/50      { background-color: color-mix(in oklab, var(--color-ink-100) 50%, transparent); }
+.dark .bg-white\/40      { background-color: color-mix(in oklab, var(--color-ink-100) 40%, transparent); }
+.dark .bg-white\/30      { background-color: color-mix(in oklab, var(--color-ink-100) 30%, transparent); }
+.dark .bg-white\/20      { background-color: color-mix(in oklab, var(--color-ink-100) 20%, transparent); }
+.dark .bg-white\/10      { background-color: color-mix(in oklab, var(--color-ink-100) 10%, transparent); }
+.dark .from-white        { --tw-gradient-from: var(--color-ink-100); }
+.dark .via-white         { --tw-gradient-via:  var(--color-ink-100); }
+.dark .to-white          { --tw-gradient-to:   var(--color-ink-100); }
+.dark .ring-white        { --tw-ring-color:    var(--color-ink-100); }
+
+/* Smooth transitions when toggling theme */
+html, body { transition: background-color .35s ease, color .35s ease; }
+
+/* Theme toggle — active-state marker (auto-inverts via ink tokens) */
+html:not(.dark) .theme-btn[data-theme="light"],
+html.dark        .theme-btn[data-theme="dark"] {
+  background: var(--color-ink-900);
+  color: var(--color-ink-50);
+}
+
+
+/* ============================================================
+   JOBLO — Design System (2026)
+   Modern SaaS + Job Marketplace
+   ============================================================ */
+
+@theme {
+  /* — Font families — */
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Instrument Serif", "Times New Roman", serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* — Brand: warm indigo → violet — */
+  --color-brand-50:  #f0f1ff;
+  --color-brand-100: #e0e2ff;
+  --color-brand-200: #c6cbff;
+  --color-brand-300: #a4aaff;
+  --color-brand-400: #7c7fff;
+  --color-brand-500: #5b58f5;
+  --color-brand-600: #4a3fe6;
+  --color-brand-700: #3f31c9;
+  --color-brand-800: #342ba1;
+  --color-brand-900: #2e2a80;
+  --color-brand-950: #1c1849;
+
+  /* — Accent: warm coral for CTAs & highlights — */
+  --color-accent-50:  #fff4ed;
+  --color-accent-100: #ffe6d5;
+  --color-accent-200: #ffc8aa;
+  --color-accent-300: #ffa073;
+  --color-accent-400: #ff7043;
+  --color-accent-500: #ff4d17;
+  --color-accent-600: #f0350d;
+  --color-accent-700: #c7280e;
+  --color-accent-800: #9e2214;
+  --color-accent-900: #7f2014;
+
+  /* — Success/Info/Warning — */
+  --color-success-500: #10b981;
+  --color-success-100: #d1fae5;
+  --color-info-500:    #0ea5e9;
+  --color-info-100:    #e0f2fe;
+  --color-warning-500: #f59e0b;
+  --color-warning-100: #fef3c7;
+
+  /* — Ink (warm neutral scale) — */
+  --color-ink-50:  #fafaf9;
+  --color-ink-100: #f5f5f4;
+  --color-ink-200: #e7e5e4;
+  --color-ink-300: #d6d3d1;
+  --color-ink-400: #a8a29e;
+  --color-ink-500: #78716c;
+  --color-ink-600: #57534e;
+  --color-ink-700: #44403c;
+  --color-ink-800: #292524;
+  --color-ink-900: #1c1917;
+  --color-ink-950: #0c0a09;
+
+  /* — Radii (tight 2026 scale, 4–14px) — */
+  --radius-xs: 4px;
+  --radius-sm: 5px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-3xl: 14px;
+
+  /* — Shadows (soft, layered) — */
+  --shadow-xs: 0 1px 2px 0 rgb(28 25 23 / 0.04);
+  --shadow-sm: 0 1px 3px 0 rgb(28 25 23 / 0.06), 0 1px 2px -1px rgb(28 25 23 / 0.04);
+  --shadow-md: 0 4px 12px -2px rgb(28 25 23 / 0.06), 0 2px 6px -2px rgb(28 25 23 / 0.05);
+  --shadow-lg: 0 12px 32px -8px rgb(28 25 23 / 0.10), 0 6px 12px -4px rgb(28 25 23 / 0.05);
+  --shadow-xl: 0 24px 56px -12px rgb(28 25 23 / 0.15), 0 12px 24px -8px rgb(28 25 23 / 0.08);
+  --shadow-brand: 0 12px 32px -8px rgb(74 63 230 / 0.35);
+
+  /* — Container — */
+  --breakpoint-3xl: 1720px;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-ink-900);
+    background: var(--color-ink-50);
+    font-feature-settings: "cv11", "ss01", "ss03";
+    overflow-x: clip; /* prevent horizontal scroll without creating a scroll context (sticky-safe) */
+  }
+  ::selection {
+    background: var(--color-brand-200);
+    color: var(--color-brand-900);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  /* Ensure all interactive elements show a pointer cursor */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  summary,
+  label[for],
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+@layer utilities {
+  .font-display { font-family: var(--font-display); font-feature-settings: "ss01"; }
+
+  /* ── Italic gradient text descender fix ─────────────────────────
+     Instrument Serif italic characters (h, k, p, y, g, j, f, and italic
+     tails on l/d) overshoot the line-box. Combined with `bg-clip-text
+     text-transparent`, tight `leading-*`, and `tracking-tight` on
+     headlines, these tails get clipped mid-glyph. This gives every
+     italic .font-display span with a gradient text-clip enough vertical
+     breathing room to render fully.
+     ─────────────────────────────────────────────────────────────── */
+  .font-display.italic,
+  span.font-display.italic {
+    /* Push the descender clip window down + widen the render box */
+    padding-bottom: 0.14em;
+    line-height: 1.18;
+    display: inline-block;
+    vertical-align: baseline;
+  }
+  /* When the italic display is inside a headline with tight leading,
+     also give the parent enough room so the taller line doesn't push
+     the following line up awkwardly. */
+  h1 .font-display.italic,
+  h2 .font-display.italic,
+  h3 .font-display.italic,
+  .font-display.italic.leading-none {
+    padding-bottom: 0.12em;
+    margin-bottom: -0.05em; /* neutralise the extra visual space */
+  }
+
+  /* Editorial grain / noise texture */
+  .noise {
+    position: relative;
+    isolation: isolate;
+  }
+  .noise::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+    z-index: 1;
+  }
+
+  /* Marquee for logo strips */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+
+  /* Subtle rise on load */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-rise { animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+  /* Grid background pattern */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(28 25 23 / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(28 25 23 / 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Radial fade mask */
+  .mask-radial {
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+  }
+}

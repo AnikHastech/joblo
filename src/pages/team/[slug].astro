@@ -1,0 +1,332 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import Badge from "@components/ui/Badge.astro";
+import { team, getRelatedTeam } from "@data/team";
+import { site } from "@data/site";
+
+export function getStaticPaths() {
+  return team.map((member) => ({ params: { slug: member.slug }, props: { member } }));
+}
+
+const { member } = Astro.props;
+const related = getRelatedTeam(member.slug, 3);
+const memberIndex = team.findIndex((t) => t.slug === member.slug);
+
+const socialIconMap: Record<string, string> = {
+  linkedin: "linkedin",
+  twitter:  "twitter",
+  github:   "github",
+  dribbble: "dribbble",
+  website:  "globe",
+  email:    "send",
+};
+---
+<BaseLayout
+  title={`${member.name} — ${member.role} · ${site.name}`}
+  description={`${member.name} is ${member.role} at ${site.name}, based in ${member.location}. ${member.headline}`}
+>
+  <!-- ═══ HERO — Portrait + intro ═══ -->
+  <section class="section-team-hero relative isolate overflow-hidden pt-14 pb-16 sm:pt-20 sm:pb-20">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-30 mask-radial"></div>
+      <div class={`absolute -top-40 right-0 h-[600px] w-[900px] rounded-full bg-gradient-to-bl ${member.gradient} opacity-40 blur-3xl dark:!opacity-25`}></div>
+    </div>
+
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <a href="/about" class="hover:text-ink-900 transition-colors">About</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <a href="/about#team" class="hover:text-ink-900 transition-colors">Team</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="line-clamp-1 font-medium text-ink-800">{member.name}</span>
+      </nav>
+
+      <div class="mt-8 grid gap-10 lg:grid-cols-12 lg:gap-14 lg:items-center">
+        <!-- Left: portrait card -->
+        <div class="lg:col-span-5">
+          <figure class="relative mx-auto max-w-md">
+            <div class={`relative aspect-[4/5] overflow-hidden rounded-3xl border border-ink-200/70 bg-gradient-to-br ${member.gradient} shadow-xl dark:!border-white/[0.08]`}>
+              <div class="absolute inset-0 bg-grid opacity-25 mix-blend-overlay"></div>
+              <img src={member.avatar} alt={member.name} class="relative z-10 h-full w-full object-contain" />
+              <!-- Floating chips -->
+              <span class="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-ink-900 backdrop-blur">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                {member.joined}
+              </span>
+              <span class="absolute right-5 top-5 rounded-full bg-white/20 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-widest text-white backdrop-blur">
+                {String(memberIndex + 1).padStart(2, "0")} / {String(team.length).padStart(2, "0")}
+              </span>
+            </div>
+
+            <!-- Under-portrait meta card -->
+            <div class="mt-4 flex items-center justify-between rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+              <div class="flex items-center gap-3">
+                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400">
+                  <Icon name="mapPin" size={14} />
+                </span>
+                <div>
+                  <p class="text-[13px] font-semibold text-ink-900">{member.location}</p>
+                  <p class="mt-0.5 text-[11.5px] text-ink-500">{member.timezone}</p>
+                </div>
+              </div>
+              <span class="rounded-full bg-ink-100 px-2.5 py-1 text-[10.5px] font-semibold text-ink-700 dark:!bg-white/[0.06] dark:!text-ink-800">
+                {member.from}
+              </span>
+            </div>
+          </figure>
+        </div>
+
+        <!-- Right: intro text -->
+        <div class="lg:col-span-7">
+          <SectionEyebrow number="01" label={`Team · ${member.department}`} />
+          <h1 class="mt-5 text-[30px] font-semibold leading-[1.02] tracking-tight text-ink-900 sm:text-[42px] md:text-[56px] lg:text-[64px]">
+            {member.name.split(" ")[0]}
+            {" "}
+            <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">{member.name.split(" ").slice(1).join(" ")}</span>
+          </h1>
+          <p class="mt-4 text-[17px] text-ink-700">{member.role}</p>
+
+          <p class="mt-6 max-w-2xl font-display text-[22px] italic leading-snug text-ink-800 sm:text-[26px]">
+            "{member.headline}"
+          </p>
+
+          <!-- Contact / social rail -->
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            {Object.entries(member.links).map(([key, url]) => url && (
+              <a
+                href={key === "email" ? `mailto:${url}` : url}
+                target={key === "email" ? undefined : "_blank"}
+                rel={key === "email" ? undefined : "noreferrer"}
+                class="group inline-flex h-11 items-center gap-2 rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 transition-all hover:-translate-y-0.5 hover:border-ink-400 hover:shadow-sm dark:!border-white/10 dark:!bg-white/[0.04]"
+                aria-label={key}
+              >
+                <Icon name={socialIconMap[key] as any} size={13} />
+                <span class="capitalize">{key === "email" ? "Email" : key}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═══ BODY GRID ═══ -->
+  <section class="pb-24 sm:pb-32">
+    <Container size="xl">
+      <div class="grid gap-8 lg:grid-cols-12 lg:gap-12">
+        <!-- LEFT: bio + experience + writings -->
+        <div class="lg:col-span-8 space-y-14">
+          <!-- Bio -->
+          <section>
+            <SectionEyebrow number="02" label="About" />
+            <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-[36px]">
+              A little more <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">about {member.name.split(" ")[0]}</span>
+            </h2>
+            <div class="mt-6 space-y-5 text-[16.5px] leading-[1.75] text-ink-700">
+              {member.bio.map((p, i) => (
+                i === 0 ? (
+                  <p class="text-[18px] leading-[1.65] text-ink-800 first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:font-display first-letter:text-[64px] first-letter:leading-[0.9] first-letter:text-brand-700 dark:first-letter:!text-brand-400">
+                    {p}
+                  </p>
+                ) : (
+                  <p>{p}</p>
+                )
+              ))}
+            </div>
+
+            <!-- Pull quote -->
+            <figure class="mt-10 relative rounded-3xl border-l-2 border-accent-500 bg-accent-50/40 p-6 pl-8 sm:p-8 sm:pl-10 dark:!bg-accent-500/10">
+              <span class="absolute -top-3 left-6 rounded-full bg-white px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-widest text-ink-500 ring-1 ring-ink-200 dark:!bg-ink-100 dark:!ring-white/10">Philosophy</span>
+              <blockquote class="font-display text-[22px] italic leading-snug text-ink-900 sm:text-[26px]">
+                {member.quote}
+              </blockquote>
+            </figure>
+          </section>
+
+          <!-- Current focus -->
+          <section class="rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-6 sm:p-8 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+            <div class="flex items-center gap-2 text-brand-700 dark:!text-brand-400">
+              <Icon name="sparkles" size={14} />
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em]">Currently working on</p>
+            </div>
+            <p class="mt-4 text-[19px] font-semibold leading-snug text-ink-900 sm:text-[22px]">{member.currentFocus}</p>
+          </section>
+
+          <!-- Experience -->
+          <section>
+            <SectionEyebrow number="03" label="Career" />
+            <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-[36px]">
+              Where {member.name.split(" ")[0]} has <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">been</span>
+            </h2>
+            <ol class="relative mt-8 space-y-6">
+              <span aria-hidden="true" class="absolute left-[19px] top-2 bottom-2 w-px bg-ink-200 dark:!bg-white/10"></span>
+              {member.experience.map((e) => (
+                <li class="relative flex gap-4 pl-1">
+                  <span class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-[13px] font-bold text-ink-50 ring-4 ring-white dark:!ring-ink-100">
+                    {e.company[0]}
+                  </span>
+                  <div class="min-w-0 flex-1 pt-0.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <p class="text-[15px] font-semibold text-ink-900">{e.role}</p>
+                      <p class="text-[12px] tabular-nums text-ink-500">{e.period}</p>
+                    </div>
+                    <p class="mt-0.5 text-[13px] text-ink-700">{e.company}</p>
+                    {e.note && <p class="mt-2 text-[12.5px] italic text-ink-500">— {e.note}</p>}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <!-- Writings -->
+          {member.writings && member.writings.length > 0 && (
+            <section>
+              <SectionEyebrow number="04" label="Selected work" />
+              <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-[36px]">
+                Writing & talks
+              </h2>
+              <ul class="mt-6 space-y-3">
+                {member.writings.map((w) => (
+                  <li>
+                    <a href={w.href} class="group flex items-start gap-4 rounded-2xl border border-ink-200/70 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+                      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-100 text-ink-700 dark:!bg-white/[0.06]">
+                        <Icon name="quote" size={14} />
+                      </span>
+                      <div class="min-w-0 flex-1">
+                        <p class="text-[14.5px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{w.title}</p>
+                        <p class="mt-0.5 text-[12px] text-ink-500">{w.outlet}</p>
+                      </div>
+                      <Icon name="arrowUpRight" size={13} class="text-ink-400 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+
+        <!-- RIGHT: sticky details sidebar -->
+        <aside class="lg:col-span-4 space-y-5 lg:sticky lg:top-28 lg:h-fit">
+          <!-- Quick facts -->
+          <div class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Quick facts</p>
+            <dl class="mt-4 space-y-3.5 text-[13.5px]">
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="briefcase" size={13} /> Role</dt>
+                <dd class="text-right font-medium text-ink-900">{member.role}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="users" size={13} /> Department</dt>
+                <dd class="text-right font-medium text-ink-900">{member.department}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="mapPin" size={13} /> Based in</dt>
+                <dd class="text-right font-medium text-ink-900">{member.location}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="clock" size={13} /> Timezone</dt>
+                <dd class="text-right font-medium text-ink-900 tabular-nums">{member.timezone}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="sparkles" size={13} /> Joined</dt>
+                <dd class="text-right font-medium text-ink-900">{member.joined}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Expertise -->
+          <div class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Expertise</p>
+            <div class="mt-4 flex flex-wrap gap-1.5">
+              {member.expertise.map((s) => (
+                <span class="rounded-full border border-ink-200 bg-white px-3 py-1 text-[12.5px] text-ink-700 dark:!border-white/10 dark:!bg-white/[0.03]">{s}</span>
+              ))}
+            </div>
+          </div>
+
+          <!-- Languages -->
+          <div class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Languages</p>
+            <ul class="mt-4 space-y-2 text-[13.5px] text-ink-700">
+              {member.languages.map((l) => (
+                <li class="flex items-center gap-2"><Icon name="globe" size={12} class="text-ink-500" />{l}</li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Off the clock -->
+          <div class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Off the clock</p>
+            <ul class="mt-4 space-y-2 text-[13.5px] text-ink-700">
+              {member.hobbies.map((h) => (
+                <li class="flex items-center gap-2"><Icon name="star" size={11} class="text-amber-500" />{h}</li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- CTA card -->
+          <div class="rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-700 dark:!text-brand-400">Work with {member.name.split(" ")[0]}</p>
+            <p class="mt-3 text-[13.5px] leading-relaxed text-ink-700">
+              We're hiring on the {member.department.toLowerCase()} team. If {member.name.split(" ")[0]}'s approach resonates, you'd probably fit.
+            </p>
+            <a href="/jobs" class="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-ink-900 px-4 py-2.5 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+              See open roles <Icon name="arrowRight" size={12} />
+            </a>
+          </div>
+        </aside>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═══ RELATED TEAM ═══ -->
+  {related.length > 0 && (
+    <section class="pb-24 sm:pb-32">
+      <Container size="xl">
+        <div class="border-t border-ink-200 pt-14 dark:!border-white/10">
+          <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <SectionEyebrow number="05" label="More of the team" />
+              <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-4xl">
+                Meet {member.name.split(" ")[0]}'s <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">colleagues</span>
+              </h2>
+            </div>
+            <a href="/about#team" class="group inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 py-2 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+              See full team
+              <Icon name="arrowRight" size={13} class="transition-transform group-hover:translate-x-0.5" />
+            </a>
+          </div>
+
+          <div class="mt-10 grid gap-4 md:grid-cols-3">
+            {related.map((r) => (
+              <a href={`/team/${r.slug}`} class="group flex flex-col overflow-hidden rounded-3xl border border-ink-200/70 bg-white transition-all hover:-translate-y-1 hover:border-ink-300 hover:shadow-lg dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+                <div class={`relative aspect-square overflow-hidden bg-gradient-to-br ${r.gradient}`}>
+                  <div class="absolute inset-0 bg-grid opacity-25 mix-blend-overlay"></div>
+                  <img src={r.avatar} alt={r.name} class="relative z-10 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105" />
+                </div>
+                <div class="p-5">
+                  <p class="text-[15px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{r.name}</p>
+                  <p class="mt-0.5 text-[12.5px] text-ink-500">{r.role}</p>
+                  <div class="mt-3 flex flex-wrap items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-0.5 text-[10.5px] font-medium text-ink-700 dark:!bg-white/[0.06] dark:!text-ink-800">
+                      <Icon name="mapPin" size={9} />
+                      {r.location}
+                    </span>
+                    <span class="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[10.5px] font-medium text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400">
+                      {r.from}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </section>
+  )}
+</BaseLayout>

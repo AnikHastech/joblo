@@ -1,0 +1,202 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+
+type FAQCategory = "General" | "Candidates" | "Employers" | "Features";
+
+interface FAQ { q: string; a: string; category: FAQCategory }
+
+const faqs: FAQ[] = [
+  { category: "Candidates", q: "Is Joblo free for job seekers?",         a: "Yes — completely, forever. Create a profile, get AI-matched to roles, apply, and message hiring managers without paying a cent." },
+  { category: "General",    q: "How is Joblo different from LinkedIn?",  a: "Every company is verified. Every listing has real salary bands. Every application reaches a real human — no black holes." },
+  { category: "Features",   q: "How does AI matching work?",             a: "Our model learns your skills, experience trajectory, comp expectations, and preferences — then surfaces roles with an 85%+ match score so you skip the noise." },
+  { category: "Employers",  q: "What does it cost to post a job?",       a: "The first listing is free. Beyond that, plans start at $99/month for unlimited posts and access to talent search." },
+  { category: "Candidates", q: "How can I make my profile stand out?",   a: "Add portfolio links, quantified impact bullets, and a short intro video. Verified profiles get 3× more views on average." },
+  { category: "Employers",  q: "Can I hire internationally?",            a: "Absolutely. Roles from 120+ countries, multi-currency salary ranges, and partner EORs handle payroll where you don't have entities." },
+  { category: "Features",   q: "Do you integrate with my ATS?",          a: "Yes — Greenhouse, Ashby, Lever, Workable and 20+ more. Applications sync in real-time. Custom integrations available on enterprise plans." },
+  { category: "Candidates", q: "Can I stay anonymous while browsing?",   a: "Yes. Enable 'stealth mode' from settings — your current employer will never see your activity or profile in search." },
+  { category: "Employers",  q: "How do I get my company verified?",      a: "Verification takes about 48 hours. We check domain ownership, funding history, and reputation signals. Verified companies get 3× more qualified applicants." },
+  { category: "Employers",  q: "Is there a free trial?",                 a: "The first job post is free forever. Team plans include a 14-day trial with full access to talent search and shortlist tools." },
+];
+---
+<section class="section-faq-2 pb-20 sm:pb-28 bg-white dark:!bg-white/[0.02]">
+  <Container size="xl">
+    <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <!-- Left: Sticky sidebar with title + contact + category filters -->
+      <aside class="lg:col-span-5 lg:sticky lg:top-28 lg:h-fit">
+        <SectionEyebrow number={14} label="Frequently asked" />
+        <h2 class="mt-3 text-[28px] font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+          Everything you
+          <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">might wonder</span>.
+        </h2>
+        <p class="mt-4 text-[14.5px] leading-relaxed text-ink-600">
+          <span class="font-semibold text-ink-900 tabular-nums">{faqs.length}</span> quick answers below. Can't find yours? A real person replies within a business day.
+        </p>
+
+        <!-- Category filter chips -->
+        <div class="mt-6 flex flex-wrap gap-1.5">
+          {(() => {
+            const cats = ["All", ...Array.from(new Set(faqs.map((f) => f.category)))];
+            return cats.map((c, i) => (
+              <button
+                type="button"
+                data-home2-faq-cat={c}
+                data-active={i === 0 ? "true" : "false"}
+                class="home2-faq-cat inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 transition-all hover:border-ink-400 data-[active=true]:!border-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 dark:!border-white/10 dark:!bg-white/[0.04]"
+              >
+                {c}
+                <span class="text-[10.5px] tabular-nums opacity-60">
+                  {c === "All" ? faqs.length : faqs.filter((f) => f.category === c).length}
+                </span>
+              </button>
+            ));
+          })()}
+        </div>
+
+        <!-- Contact card -->
+        <div class="mt-8 rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 p-5 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+          <div class="flex items-center gap-2 text-brand-700 dark:!text-brand-400">
+            <Icon name="send" size={13} />
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.22em]">Still stuck?</p>
+          </div>
+          <p class="mt-3 text-[13.5px] leading-relaxed text-ink-700">
+            Send us a message — median reply time is under 4 hours during business hours.
+          </p>
+          <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+            <a
+              href="/contact"
+              class="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-ink-900 px-4 text-[12.5px] font-semibold text-ink-50 shadow-sm hover:bg-brand-600"
+            >
+              Contact support
+              <Icon name="arrowRight" size={12} />
+            </a>
+            <a
+              href="/contact"
+              class="inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 text-[12.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]"
+            >
+              Help center
+              <Icon name="arrowUpRight" size={11} />
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right: FAQ items -->
+      <div class="lg:col-span-7">
+        <ul id="home2-faq-list" class="space-y-3">
+          {faqs.map((f, i) => (
+            <li class="home2-faq-item" data-cat={f.category}>
+              <details
+                open={i === 0}
+                class="home2-faq-details group relative rounded-2xl border border-ink-200/70 bg-white transition-[border-color,box-shadow] duration-300 open:border-ink-900 open:shadow-md hover:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.035] dark:open:!border-brand-500/40"
+              >
+                <summary class="flex cursor-pointer items-start gap-3 list-none p-4 pr-5 select-none sm:gap-4 sm:p-5 sm:pr-6">
+                  <!-- Number badge -->
+                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-ink-100 text-[11.5px] font-bold tabular-nums text-ink-700 transition-colors duration-300 group-open:!bg-ink-900 group-open:!text-ink-50 dark:!bg-white/[0.06] dark:group-open:!bg-brand-500 dark:group-open:!text-white sm:h-9 sm:w-9 sm:text-[12px]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+
+                  <div class="min-w-0 flex-1 pt-1 sm:pt-1.5">
+                    <!-- Category tag -->
+                    <span class={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-widest sm:text-[10px] ${
+                      f.category === "General"    ? "bg-brand-50 text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400" :
+                      f.category === "Candidates" ? "bg-emerald-50 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400" :
+                      f.category === "Employers"  ? "bg-violet-50 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400" :
+                                                    "bg-amber-50 text-amber-700 dark:!bg-amber-500/15 dark:!text-amber-400"
+                    }`}>{f.category}</span>
+                    <p class="mt-1.5 text-[14px] font-semibold text-ink-900 leading-snug sm:text-[15px]">{f.q}</p>
+                  </div>
+
+                  <!-- Toggle chevron -->
+                  <span class="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-all duration-300 group-hover:border-ink-400 group-open:!bg-ink-900 group-open:!border-ink-900 group-open:!text-ink-50 dark:!border-white/10 dark:group-open:!bg-brand-500 dark:group-open:!border-brand-500 dark:group-open:!text-white sm:h-8 sm:w-8">
+                    <Icon name="chevronDown" size={12} class="transition-transform duration-300 group-open:rotate-180" />
+                  </span>
+                </summary>
+
+                <!-- Animated content wrapper -->
+                <div class="home2-faq-body grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
+                  <div class="overflow-hidden">
+                    <div class="px-4 pb-4 pl-[3.5rem] sm:px-5 sm:pb-5 sm:pl-[4.75rem]">
+                      <p class="text-[13.5px] leading-[1.7] text-ink-600 border-l-2 border-ink-200 pl-3 dark:!border-white/10 sm:text-[14px] sm:pl-4">{f.a}</p>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </li>
+          ))}
+        </ul>
+
+        <!-- Empty state -->
+        <div id="home2-faq-empty" hidden class="mt-6 rounded-2xl border border-dashed border-ink-200 bg-ink-50/40 p-8 text-center dark:!border-white/10 dark:!bg-white/[0.02]">
+          <p class="text-[13.5px] text-ink-500">No questions in this category yet.</p>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>
+
+<script>
+  const catBtns = document.querySelectorAll<HTMLButtonElement>(".home2-faq-cat");
+  const items   = document.querySelectorAll<HTMLElement>(".home2-faq-item");
+  const empty   = document.getElementById("home2-faq-empty");
+
+  // Category filter
+  catBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      catBtns.forEach((b) => (b.dataset.active = String(b === btn)));
+      const cat = btn.dataset.home2FaqCat;
+      let visible = 0;
+      items.forEach((it) => {
+        const show = cat === "All" || it.dataset.cat === cat;
+        it.hidden = !show;
+        if (show) visible++;
+      });
+      if (empty) empty.hidden = visible > 0;
+    });
+  });
+
+  // ── Smooth accordion (grid-template-rows animation + single-open behavior) ──
+  const allDetails = document.querySelectorAll<HTMLDetailsElement>("#home2-faq-list details");
+
+  // Set initial state for the default-open item
+  allDetails.forEach((d) => {
+    const body = d.querySelector<HTMLElement>(".home2-faq-body");
+    if (d.open && body) body.style.gridTemplateRows = "1fr";
+  });
+
+  const openDetails = (d: HTMLDetailsElement) => {
+    const body = d.querySelector<HTMLElement>(".home2-faq-body");
+    if (!body) return;
+    d.open = true;
+    requestAnimationFrame(() => {
+      body.style.gridTemplateRows = "1fr";
+    });
+  };
+
+  const closeDetails = (d: HTMLDetailsElement) => {
+    const body = d.querySelector<HTMLElement>(".home2-faq-body");
+    if (!body) return;
+    body.style.gridTemplateRows = "0fr";
+    body.addEventListener("transitionend", function once(e) {
+      if (e.propertyName !== "grid-template-rows") return;
+      body.removeEventListener("transitionend", once);
+      d.open = false;
+    });
+  };
+
+  allDetails.forEach((d) => {
+    const summary = d.querySelector<HTMLElement>("summary");
+    summary?.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (d.open) {
+        closeDetails(d);
+      } else {
+        allDetails.forEach((other) => {
+          if (other !== d && other.open) closeDetails(other);
+        });
+        openDetails(d);
+      }
+    });
+  });
+</script>

@@ -1,0 +1,78 @@
+---
+import AuthLayout from "@layouts/AuthLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+---
+<AuthLayout
+  title="Log in"
+  eyebrow="Welcome back"
+  heading="Log in to your account"
+  subheading="Pick up where you left off — new matches, applications, and messages await."
+>
+  <!-- Role toggle -->
+  <div class="mb-6 inline-flex w-full rounded-full border border-ink-200 bg-white p-0.5 dark:!border-white/10 dark:!bg-white/[0.04]">
+    <button type="button" data-active="true"  class="auth-role flex-1 rounded-full py-2 text-[13px] font-medium text-ink-700 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">I'm a candidate</button>
+    <button type="button" data-active="false" class="auth-role flex-1 rounded-full py-2 text-[13px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">I'm an employer</button>
+  </div>
+
+  <!-- Social providers -->
+  <div class="grid gap-2 sm:grid-cols-2">
+    <button type="button" class="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-ink-200 bg-white text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+      <span class="flex h-4 w-4 items-center justify-center text-[11px] font-bold text-white bg-black rounded-sm">G</span>
+      Continue with Google
+    </button>
+    <button type="button" class="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-ink-200 bg-white text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+      <Icon name="linkedin" size={13} />
+      Continue with LinkedIn
+    </button>
+  </div>
+
+  <!-- Divider -->
+  <div class="my-6 flex items-center gap-3 text-[11.5px] uppercase tracking-widest text-ink-400">
+    <span class="h-px flex-1 bg-ink-200 dark:!bg-white/10"></span>
+    or use email
+    <span class="h-px flex-1 bg-ink-200 dark:!bg-white/10"></span>
+  </div>
+
+  <!-- Email form -->
+  <form class="space-y-4">
+    <label class="block">
+      <span class="text-[12.5px] font-medium text-ink-700">Email</span>
+      <input type="email" required autocomplete="email" placeholder="you@work.com" class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+    </label>
+    <label class="block">
+      <span class="flex items-center justify-between text-[12.5px] font-medium text-ink-700">
+        Password
+        <a href="/forgot-password" class="text-[11.5px] font-normal text-brand-700 hover:underline">Forgot?</a>
+      </span>
+      <div class="mt-1.5 relative">
+        <input type="password" required autocomplete="current-password" placeholder="••••••••" class="h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 pr-11 text-[14px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-700" aria-label="Show password">
+          <Icon name="search" size={13} />
+        </button>
+      </div>
+    </label>
+    <label class="flex items-center gap-2 text-[12.5px] text-ink-600">
+      <input type="checkbox" class="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+      Keep me signed in for 30 days
+    </label>
+    <button type="submit" class="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink-900 px-6 text-[14.5px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md">
+      Sign in
+      <Icon name="arrowRight" size={13} class="transition-transform group-hover:translate-x-0.5" />
+    </button>
+  </form>
+
+  <p class="mt-6 text-center text-[13px] text-ink-500">
+    New here? <a href="/register" class="font-semibold text-brand-700 hover:underline">Create an account</a>
+  </p>
+
+  <p class="mt-6 text-center text-[11px] text-ink-400">
+    Protected by industry-standard encryption · SOC 2 Type II · GDPR compliant
+  </p>
+</AuthLayout>
+
+<script>
+  const roleBtns = document.querySelectorAll<HTMLButtonElement>(".auth-role");
+  roleBtns.forEach((b) => b.addEventListener("click", () => {
+    roleBtns.forEach((x) => (x.dataset.active = String(x === b)));
+  }));
+</script>

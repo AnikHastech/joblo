@@ -1,0 +1,171 @@
+---
+import Container from "@components/ui/Container.astro";
+import SearchBar from "@components/jobs/SearchBar.astro";
+import Badge from "@components/ui/Badge.astro";
+import BrandLogo from "@components/common/BrandLogo.astro";
+import Icon from "@components/ui/Icon.astro";
+import { site } from "@data/site";
+import { liveHireAvatars } from "@data/testimonials";
+
+const popular = ["Product Designer", "Frontend Engineer", "Data Scientist", "Growth Lead", "iOS Developer"];
+
+const matches = [
+  { role: "Sr. Product Designer",  company: "Linear", slug: "linear",  match: 98, salary: "$180K", tag: "Remote" },
+  { role: "Staff Engineer",        company: "Vercel", slug: "vercel",  match: 94, salary: "$250K", tag: "Remote" },
+  { role: "Growth Marketing Lead", company: "Notion", slug: "notion",  match: 91, salary: "$175K", tag: "NYC"    },
+  { role: "Brand Designer",        company: "Figma",  slug: "figma",   match: 88, salary: "$155K", tag: "SF"     },
+];
+
+const heroAvatars = [
+  liveHireAvatars.Maya,
+  liveHireAvatars.Devon,
+  liveHireAvatars.Priya,
+  liveHireAvatars.Kenji,
+];
+---
+<section class="section-hero relative isolate overflow-hidden pt-14 pb-24 sm:pt-20 sm:pb-32">
+  <!-- Layered backdrop -->
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-60 mask-radial dark:opacity-25"></div>
+  <div class="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[640px] w-[960px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-200/50 via-accent-200/30 to-transparent blur-3xl dark:from-brand-500/15 dark:via-accent-500/10"></div>
+  <div class="pointer-events-none absolute top-24 -right-40 -z-10 h-[420px] w-[420px] rounded-full bg-accent-300/25 blur-3xl dark:bg-accent-500/10"></div>
+  <div class="pointer-events-none absolute bottom-20 -left-32 -z-10 h-[380px] w-[380px] rounded-full bg-brand-300/20 blur-3xl dark:bg-brand-500/10"></div>
+
+  <Container size="xl">
+    <div class="grid gap-16 lg:grid-cols-12 lg:items-center">
+      <!-- Copy -->
+      <div class="lg:col-span-7 animate-rise">
+        <Badge variant="outline" size="md" class="border-ink-200 bg-white/70 backdrop-blur shadow-xs">
+          <span class="relative flex h-1.5 w-1.5">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-400 opacity-75"></span>
+            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent-500"></span>
+          </span>
+          <span class="text-ink-700">New — AI-matched roles now live</span>
+          <Icon name="arrowRight" size={12} class="text-ink-400" />
+        </Badge>
+
+        <h1 class="mt-6 text-[40px] font-semibold leading-[1.02] tracking-[-0.03em] text-ink-900 sm:text-6xl lg:text-[80px]">
+          The <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 via-brand-500 to-accent-500 bg-clip-text text-transparent">work</span> you were
+          meant to <span class="relative inline-block">
+            <span class="relative z-10">do.</span>
+            <svg class="absolute -bottom-1 left-0 z-0 w-full text-accent-400" viewBox="0 0 200 12" fill="none" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M2 8c40-5 80-5 120-3s60 5 76 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </h1>
+
+        <p class="mt-7 max-w-xl text-lg leading-relaxed text-ink-600 sm:text-xl">
+          Joblo is where the world's most ambitious people find their next chapter — curated roles from verified teams, matched to what you actually care about.
+        </p>
+
+        <div class="mt-10">
+          <SearchBar />
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span class="text-[13px] text-ink-500">Trending:</span>
+          {popular.map((p) => (
+            <a href={`/jobs?q=${encodeURIComponent(p)}`} class="rounded-full border border-ink-200 bg-white/60 px-3 py-1 text-[13px] text-ink-700 backdrop-blur transition-all hover:border-ink-900 hover:bg-ink-900 hover:text-ink-50">
+              {p}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Visual: bento with proof cards -->
+      <div class="lg:col-span-5 animate-rise" style="animation-delay:120ms">
+        <div class="relative mx-auto max-w-md lg:max-w-none">
+          <!-- Main card -->
+          <div class="relative rounded-3xl border border-ink-200 bg-white/95 p-6 shadow-xl shadow-ink-900/[0.08] backdrop-blur-xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                </span>
+                <span class="text-[13px] font-medium text-ink-700">Live matches for you</span>
+              </div>
+              <span class="text-[12px] text-ink-400">Updated 2m ago</span>
+            </div>
+
+            <div class="mt-5 space-y-3">
+              {matches.map((r) => (
+                <a
+                  href={`/jobs?q=${encodeURIComponent(r.role)}&company=${r.slug}`}
+                  class="group flex items-center gap-4 rounded-2xl border border-ink-100 bg-gradient-to-br from-ink-50/60 to-white p-3 transition-all hover:border-brand-200 hover:shadow-md"
+                >
+                  <BrandLogo slug={r.slug} size="sm" />
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-[14.5px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{r.role}</p>
+                    <p class="truncate text-[13px] text-ink-500">{r.company} · {r.tag} · {r.salary}</p>
+                  </div>
+                  <div class="flex flex-col items-end">
+                    <span class="text-[10px] uppercase tracking-wider text-ink-400">Match</span>
+                    <span class="text-[15px] font-semibold text-transparent bg-clip-text bg-gradient-to-br from-brand-600 to-accent-500">{r.match}%</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            <div class="mt-5 flex items-center justify-between border-t border-ink-100 pt-4">
+              <span class="text-[13px] text-ink-500">128 more roles matched</span>
+              <a href="/jobs" class="inline-flex items-center gap-1 text-[13px] font-medium text-brand-700 hover:gap-2 transition-all">
+                View all
+                <Icon name="arrowRight" size={12} />
+              </a>
+            </div>
+          </div>
+
+          <!-- Floating stat pill (top) -->
+          <div class="absolute -top-5 -right-6 hidden rounded-2xl border border-ink-200 bg-white/95 backdrop-blur px-4 py-3 shadow-lg sm:block">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 ring-1 ring-emerald-200/50">
+                <Icon name="trending" size={16} strokeWidth={2} />
+              </span>
+              <div>
+                <p class="text-[10px] uppercase tracking-wider text-ink-500">Hires this week</p>
+                <p class="text-lg font-semibold tracking-tight text-ink-900 tabular-nums">1,284</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating avatars card (bottom) -->
+          <div class="absolute -bottom-8 -left-6 hidden rounded-2xl border border-ink-200 bg-white/95 backdrop-blur p-4 shadow-lg sm:block">
+            <div class="flex items-center gap-3">
+              <div class="flex -space-x-2">
+                {heroAvatars.map((src) => (
+                  <img
+                    src={src}
+                    alt=""
+                    width="36"
+                    height="36"
+                    loading="lazy"
+                    class="h-9 w-9 rounded-full ring-2 ring-white bg-ink-100"
+                  />
+                ))}
+              </div>
+              <div>
+                <p class="text-[14px] font-semibold text-ink-900">Join {site.stats.candidates}</p>
+                <p class="text-[12px] text-ink-500">candidates already on Joblo</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="mt-24 grid grid-cols-2 gap-y-8 border-y border-ink-200 py-10 sm:grid-cols-4">
+      {[
+        { k: site.stats.jobs,       v: "Open positions" },
+        { k: site.stats.companies,  v: "Hiring companies" },
+        { k: site.stats.candidates, v: "Active candidates" },
+        { k: site.stats.hires,      v: "Successful hires" },
+      ].map((s) => (
+        <div class="text-center sm:border-l sm:border-ink-200 sm:first:border-l-0 dark:!border-white/10">
+          <p class="text-3xl font-semibold tracking-tight text-ink-900 sm:text-4xl tabular-nums">{s.k}</p>
+          <p class="mt-1 text-sm text-ink-500">{s.v}</p>
+        </div>
+      ))}
+    </div>
+  </Container>
+</section>

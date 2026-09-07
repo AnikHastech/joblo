@@ -1,0 +1,266 @@
+---
+import Icon from "@components/ui/Icon.astro";
+import { categories } from "@data/categories";
+import { locations } from "@data/locations";
+import { jobs } from "@data/jobs";
+import { companies, getCompany } from "@data/companies";
+
+// Compute real counts from actual job data
+const countBy = <K extends string>(key: (j: typeof jobs[number]) => K) => {
+  const m: Record<string, number> = {};
+  jobs.forEach((j) => { const k = key(j); m[k] = (m[k] ?? 0) + 1; });
+  return m;
+};
+
+const categoryCounts   = countBy((j) => j.categorySlug);
+const typeCounts       = countBy((j) => j.type.toLowerCase());
+const experienceCounts = countBy((j) => j.experience.toLowerCase());
+const industryCounts   = (() => {
+  const m: Record<string, number> = {};
+  jobs.forEach((j) => {
+    const ind = getCompany(j.companyId).industry;
+    m[ind] = (m[ind] ?? 0) + 1;
+  });
+  return m;
+})();
+
+const locationCounts = (() => {
+  const m: Record<string, number> = { remote: 0 };
+  jobs.forEach((j) => {
+    if (j.remote) m.remote++;
+    const loc = j.location;
+    if (loc.includes("San Francisco")) m["san-francisco"] = (m["san-francisco"] ?? 0) + 1;
+    else if (loc.includes("New York"))  m["new-york"]     = (m["new-york"] ?? 0) + 1;
+    else if (loc.includes("London"))    m["london"]       = (m["london"] ?? 0) + 1;
+    else if (loc.includes("Berlin"))    m["berlin"]       = (m["berlin"] ?? 0) + 1;
+    else if (loc.includes("Tokyo"))     m["tokyo"]        = (m["tokyo"] ?? 0) + 1;
+    else if (loc.includes("Singapore")) m["singapore"]    = (m["singapore"] ?? 0) + 1;
+    else if (loc.includes("Dublin"))    m["dublin"]       = (m["dublin"] ?? 0) + 1;
+  });
+  return m;
+})();
+
+const salaryCounts = (() => {
+  const ranges: Record<string, [number, number]> = {
+    "0-80":     [0,      80000],
+    "80-120":   [80000,  120000],
+    "120-160":  [120000, 160000],
+    "160-220":  [160000, 220000],
+    "220-plus": [220000, Infinity],
+  };
+  const m: Record<string, number> = {};
+  for (const [k, [min, max]] of Object.entries(ranges)) {
+    m[k] = jobs.filter((j) => !(j.salaryMax < min || j.salaryMin > max)).length;
+  }
+  return m;
+})();
+
+const jobTypes = [
+  { value: "full-time",  label: "Full-time",  count: typeCounts["full-time"]  ?? 0 },
+  { value: "part-time",  label: "Part-time",  count: typeCounts["part-time"]  ?? 0 },
+  { value: "contract",   label: "Contract",   count: typeCounts["contract"]   ?? 0 },
+  { value: "freelance",  label: "Freelance",  count: typeCounts["freelance"]  ?? 0 },
+  { value: "internship", label: "Internship", count: typeCounts["internship"] ?? 0 },
+];
+
+const experience = [
+  { value: "entry",     label: "Entry",     count: experienceCounts["entry"]     ?? 0 },
+  { value: "mid",       label: "Mid",       count: experienceCounts["mid"]       ?? 0 },
+  { value: "senior",    label: "Senior",    count: experienceCounts["senior"]    ?? 0 },
+  { value: "lead",      label: "Lead",      count: experienceCounts["lead"]      ?? 0 },
+  { value: "executive", label: "Executive", count: experienceCounts["executive"] ?? 0 },
+];
+
+const salaryRanges = [
+  { value: "0-80",     label: "$0 – $80K",     count: salaryCounts["0-80"] },
+  { value: "80-120",   label: "$80K – $120K",  count: salaryCounts["80-120"] },
+  { value: "120-160",  label: "$120K – $160K", count: salaryCounts["120-160"] },
+  { value: "160-220",  label: "$160K – $220K", count: salaryCounts["160-220"] },
+  { value: "220-plus", label: "$220K+",        count: salaryCounts["220-plus"] },
+];
+
+const datePosted = [
+  { value: "today", label: "Today" },
+  { value: "3d",    label: "Past 3 days" },
+  { value: "week",  label: "Past week" },
+  { value: "month", label: "Past month" },
+  { value: "any",   label: "Any time" },
+];
+
+// Only show industries with jobs, sorted by count
+const industries = Object.entries(industryCounts)
+  .sort((a, b) => b[1] - a[1])
+  .map(([label, count]) => ({ label, count, value: label.toLowerCase() }));
+---
+<aside class="job-filters space-y-3">
+  <!-- Header with clear -->
+  <div class="flex items-center justify-between rounded-xl border border-ink-200/70 bg-white p-4 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+    <div class="flex items-center gap-2">
+      <Icon name="filter" size={16} class="text-ink-700" />
+      <p class="text-[14px] font-semibold text-ink-900">Filters</p>
+      <span id="filter-active-count" class="rounded-full bg-brand-100 px-2 py-0.5 text-[10.5px] font-semibold text-brand-700 aria-hidden:hidden" aria-hidden="true">0 active</span>
+    </div>
+    <button type="button" id="filter-clear-all" class="text-[12.5px] font-medium text-ink-500 hover:text-ink-900 transition-colors">
+      Clear all
+    </button>
+  </div>
+
+  <!-- Categories -->
+  <details open class="filter-group group/f rounded-xl border border-ink-200/70 bg-white p-4 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+    <summary class="flex cursor-pointer items-center justify-between list-none">
+      <span class="text-[13px] font-bold uppercase tracking-widest text-ink-800">Category</span>
+      <Icon name="chevronDown" size={12} class="text-ink-500 transition-transform group-open/f:rotate-180" />
+    </summary>
+    <ul class="mt-4 space-y-2">
+      {categories.filter((c) => (categoryCounts[c.slug] ?? 0) > 0).map((c) => (
+        <li>
+          <label class="flex items-center justify-between gap-2 rounded-md p-1.5 hover:bg-ink-50 dark:hover:!bg-white/[0.04]">
+            <span class="flex items-center gap-2.5">
+              <input type="checkbox" name="category" value={c.slug} class="h-4 w-4 shrink-0 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+              <span class="text-[13.5px] text-ink-800">{c.name}</span>
+            </span>
+            <span class="text-[11.5px] tabular-nums text-ink-400">{categoryCounts[c.slug]}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+  </details>
+
+  <!-- Location -->
+  <details open class="filter-group group/f rounded-xl border border-ink-200/70 bg-white p-4 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+    <summary class="flex cursor-pointer items-center justify-between list-none">
+      <span class="text-[13px] font-bold uppercase tracking-widest text-ink-800">Location</span>
+      <Icon name="chevronDown" size={12} class="text-ink-500 transition-transform group-open/f:rotate-180" />
+    </summary>
+    <div class="mt-4 space-y-3">
+      <!-- Remote toggle -->
+      <label class="flex items-center justify-between gap-2 rounded-lg border border-brand-200 bg-brand-50/60 p-3 dark:border-brand-500/30 dark:!bg-brand-500/10">
+        <span class="flex items-center gap-2.5">
+          <Icon name="globe" size={14} class="text-brand-600" />
+          <span class="text-[13.5px] font-semibold text-ink-900">Remote only</span>
+        </span>
+        <input type="checkbox" name="remote" class="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+      </label>
+
+      <!-- City list -->
+      <div class="relative">
+        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400">
+          <Icon name="search" size={13} />
+        </span>
+        <input type="search" placeholder="Search cities…" class="h-9 w-full rounded-md border border-ink-200 bg-white pl-8 pr-3 text-[12.5px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:border-white/10 dark:!bg-white/[0.04]" />
+      </div>
+
+      <ul class="space-y-2">
+        {locations.slice(1).filter((l) => (locationCounts[l.slug] ?? 0) > 0).map((l) => (
+          <li>
+            <label class="flex items-center justify-between gap-2 rounded-md p-1.5 hover:bg-ink-50 dark:hover:!bg-white/[0.04]">
+              <span class="flex items-center gap-2.5">
+                <input type="checkbox" name="location" value={l.slug} class="h-4 w-4 shrink-0 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+                <span class="text-[13.5px] text-ink-800">{l.city}</span>
+              </span>
+              <span class="text-[11.5px] tabular-nums text-ink-400">{locationCounts[l.slug]}</span>
+            </label>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </details>
+
+  <!-- Job type -->
+  <details open class="filter-group group/f rounded-xl border border-ink-200/70 bg-white p-4 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+    <summary class="flex cursor-pointer items-center justify-between list-none">
+      <span class="text-[13px] font-bold uppercase tracking-widest text-ink-800">Job type</span>
+      <Icon name="chevronDown" size={12} class="text-ink-500 transition-transform group-open/f:rotate-180" />
+    </summary>
+    <ul class="mt-4 space-y-2">
+      {jobTypes.filter((t) => t.count > 0).map((t) => (
+        <li>
+          <label class="flex items-center justify-between gap-2 rounded-md p-1.5 hover:bg-ink-50 dark:hover:!bg-white/[0.04]">
+            <span class="flex items-center gap-2.5">
+              <input type="checkbox" name="type" value={t.value} class="h-4 w-4 shrink-0 rounded border-ink-300 text-brand-600 focus:ring-brand-500" />
+              <span class="text-[13.5px] text-ink-800">{t.label}</span>
+            </span>
+            <span class="text-[11.5px] tabular-nums text-ink-400">{t.count}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+  </details>
+
+  <!-- Experience -->
+  <details open class="filter-group group/f rounded-xl border border-ink-200/70 bg-white p-4 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+    <summary class="flex cursor-pointer items-center justify-between list-none">
+      <span class="text-[13px] font-bold uppercase tracking-widest text-ink-800">Experience</span>
+      <Icon name="chevronDown" size={12} class="text-ink-500 transition-transform group-open/f:rotate-180" />
+    </summary>
+    <div class="mt-4 flex flex-wrap gap-1.5">
+      {experience.filter((e) => e.count > 0).map((e) => (
+        <label class="cursor-pointer">
+          <input type="checkbox" name="experience" value={e.value} class="peer sr-only" />
+          <span class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] text-ink-700 transition-all hover:border-ink-400 peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-700 dark:border-white/10 dark:!bg-white/[0.03] dark:peer-checked:!bg-brand-500/15">
+            {e.label}
+            <span class="text-[10.5px] tabular-nums text-ink-400 peer-checked:text-brand-500">{e.count}</span>
+          </span>
+        </label>
+      ))}
+    </div>
+  </details>
+
+  <!-- Salary -->
+  <details open class="filter-group group/f rounded-xl border border-ink-200/70 bg-white p-4 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+    <summary class="flex cursor-pointer items-center justify-between list-none">
+      <span class="text-[13px] font-bold uppercase tracking-widest text-ink-800">Salary</span>
+      <Icon name="chevronDown" size={12} class="text-ink-500 transition-transform group-open/f:rotate-180" />
+    </summary>
+    <ul class="mt-4 space-y-2">
+      {salaryRanges.map((s) => (
+        <li>
+          <label class="flex items-center justify-between gap-2 rounded-md p-1.5 hover:bg-ink-50 dark:hover:!bg-white/[0.04]">
+            <span class="flex items-center gap-2.5">
+              <input type="radio" name="salary" value={s.value} class="h-4 w-4 shrink-0 border-ink-300 text-brand-600 focus:ring-brand-500" />
+              <span class="text-[13.5px] text-ink-800">{s.label}</span>
+            </span>
+            <span class="text-[11.5px] tabular-nums text-ink-400">{s.count}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+  </details>
+
+  <!-- Date posted -->
+  <details class="filter-group group/f rounded-xl border border-ink-200/70 bg-white p-4 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+    <summary class="flex cursor-pointer items-center justify-between list-none">
+      <span class="text-[13px] font-bold uppercase tracking-widest text-ink-800">Date posted</span>
+      <Icon name="chevronDown" size={12} class="text-ink-500 transition-transform group-open/f:rotate-180" />
+    </summary>
+    <ul class="mt-4 space-y-2">
+      {datePosted.map((d) => (
+        <li>
+          <label class="flex items-center gap-2.5 rounded-md p-1.5 hover:bg-ink-50 dark:hover:!bg-white/[0.04]">
+            <input type="radio" name="date" value={d.value} class="h-4 w-4 shrink-0 border-ink-300 text-brand-600 focus:ring-brand-500" />
+            <span class="text-[13.5px] text-ink-800">{d.label}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+  </details>
+
+  <!-- Industry -->
+  <details class="filter-group group/f rounded-xl border border-ink-200/70 bg-white p-4 dark:border-white/[0.08] dark:!bg-white/[0.035]">
+    <summary class="flex cursor-pointer items-center justify-between list-none">
+      <span class="text-[13px] font-bold uppercase tracking-widest text-ink-800">Industry</span>
+      <Icon name="chevronDown" size={12} class="text-ink-500 transition-transform group-open/f:rotate-180" />
+    </summary>
+    <div class="mt-4 flex flex-wrap gap-1.5">
+      {industries.map((ind) => (
+        <label class="cursor-pointer">
+          <input type="checkbox" name="industry" value={ind.value} class="peer sr-only" />
+          <span class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] text-ink-700 transition-all hover:border-ink-400 peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-700 dark:border-white/10 dark:!bg-white/[0.03] dark:peer-checked:!bg-brand-500/15">
+            {ind.label}
+            <span class="text-[10.5px] tabular-nums text-ink-400 peer-checked:text-brand-500">{ind.count}</span>
+          </span>
+        </label>
+      ))}
+    </div>
+  </details>
+</aside>

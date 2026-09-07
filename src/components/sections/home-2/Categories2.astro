@@ -1,0 +1,52 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { categories } from "@data/categories";
+---
+<section class="section-categories-2 py-20 sm:py-28 bg-white dark:!bg-white/[0.02]">
+  <Container size="xl">
+    <div class="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-20">
+      <!-- Sticky left header -->
+      <div class="lg:col-span-5 lg:sticky lg:top-28">
+        <SectionEyebrow number={1} label="Categories" />
+        <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+          Find work in the <span class="font-display italic font-normal text-brand-600">field</span> you love.
+        </h2>
+        <p class="mt-4 text-[15.5px] leading-relaxed text-ink-600">
+          From first-hire founders to Fortune 500 teams — we've got the specialist you're after.
+        </p>
+
+        <a
+          href="/categories"
+          class="group mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-ink-900 px-5 text-[14.5px] font-semibold text-ink-50 transition-all hover:bg-brand-600 hover:shadow-[0_10px_30px_-8px_rgb(74_63_230/0.4)]"
+        >
+          All categories
+          <Icon name="arrowRight" size={14} strokeWidth={2} class="transition-transform group-hover:translate-x-0.5" />
+        </a>
+      </div>
+
+      <!-- Right: category list rows -->
+      <ul class="divide-y divide-ink-100 dark:divide-white/[0.06] lg:col-span-7">
+        {categories.map((c) => (
+          <li>
+            <a href={`/categories/${c.slug}`} class="group flex items-center gap-4 py-5 transition-all sm:gap-6">
+              <span
+                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl text-white shadow-sm ring-1 ring-black/5 transition-transform group-hover:scale-105 group-hover:-rotate-3 sm:h-14 sm:w-14 sm:text-2xl"
+                style={`background:${c.gradient}`}
+                aria-hidden="true"
+              >{c.icon}</span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[17px] font-semibold tracking-tight text-ink-900 transition-colors group-hover:text-brand-700 sm:text-lg">{c.name}</p>
+                <p class="text-[13px] text-ink-500 tabular-nums">{c.openings.toLocaleString()} open positions</p>
+              </div>
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-all group-hover:border-ink-900 group-hover:bg-ink-900 group-hover:text-ink-50 dark:border-white/15">
+                <Icon name="arrowUpRight" size={13} strokeWidth={2} />
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Container>
+</section>

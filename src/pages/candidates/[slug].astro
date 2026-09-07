@@ -1,0 +1,762 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import Icon from "@components/ui/Icon.astro";
+import Badge from "@components/ui/Badge.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import { candidates } from "@data/candidates";
+import { getCompany } from "@data/companies";
+import { site } from "@data/site";
+import { personSchema, breadcrumbSchema } from "@lib/schema";
+
+export function getStaticPaths() {
+  return candidates.map((c) => ({ params: { slug: c.slug }, props: { candidate: c } }));
+}
+
+const { candidate } = Astro.props;
+const workedAt = candidate.workedAtSlug ? getCompany(`c${["linear","vercel","stripe","figma","notion","supabase","arc","rippling","airbnb","shopify","anthropic","cloudflare"].indexOf(candidate.workedAtSlug) + 1}`) : null;
+const similar = candidates.filter((c) => c.slug !== candidate.slug).slice(0, 3);
+
+// Fabricated public-view sections (recruiters see this)
+const bio = `${candidate.name.split(" ")[0]} is a ${candidate.role.toLowerCase()} with ${candidate.experienceYears} years of experience shipping product surfaces at high-growth software companies. Currently ${candidate.availability.toLowerCase()} — open to full-time and contract roles in ${candidate.location.split(",")[0]} or remote.`;
+
+const schema = [
+  personSchema(candidate, bio),
+  breadcrumbSchema([
+    { name: "Home",       url: "/" },
+    { name: "Candidates", url: "/candidates" },
+    { name: candidate.name, url: `/candidates/${candidate.slug}` },
+  ]),
+];
+
+const experience = [
+  { company: candidate.workedAtName ?? "Recent employer", role: candidate.role, period: "2022 — Present", summary: `Owns core product surfaces end-to-end. Partners with engineering leads on architecture decisions and mentors mid-level ${candidate.role.toLowerCase().split(" ")[0]}s across the team.` },
+  { company: "Prior company",  role: `Mid-level ${candidate.role.split(" ").slice(-1)}`, period: "2019 — 2022",  summary: "Grew product depth on core surfaces, launched a redesigned onboarding flow, and helped set up the design systems team." },
+  { company: "Early company",  role: `Junior ${candidate.role.split(" ").slice(-1)}`, period: "2016 — 2019",  summary: "First product hire. Contributed across product, brand, and marketing surfaces in a small team." },
+];
+
+// Additional editorial content
+const impact = [
+  { value: "12+", label: "Products shipped",       tone: "brand"   },
+  { value: "3.4M", label: "Users reached",          tone: "emerald" },
+  { value: "42%",  label: "Avg. activation lift",   tone: "violet"  },
+];
+
+const education = [
+  { school: "Rhode Island School of Design", degree: "BFA, Graphic Design",     period: "2012 — 2016", detail: "Graduated with honors. Thesis on adaptive typography systems." },
+  { school: "Interaction Design Foundation", degree: "Certificate, UX Research", period: "2018",        detail: "Advanced coursework on qualitative research and usability testing." },
+];
+
+const preferences = [
+  { icon: "briefcase", label: "Role type",     value: "Full-time · Contract" },
+  { icon: "globe",     label: "Work style",    value: "Remote-first · Hybrid OK" },
+  { icon: "sparkles",  label: "Team size",     value: "Series A–C, 20–200 people" },
+  { icon: "trending",  label: "Comp range",    value: `${candidate.rate}/yr + equity` },
+  { icon: "clock",     label: "Notice period", value: "2 weeks" },
+  { icon: "mapPin",    label: "Relocation",    value: "Open to NYC, Berlin, Lisbon" },
+];
+
+const portfolio = [
+  {
+    title: "Ledger — banking that respects you",
+    role: "Lead Designer",
+    year: "2024",
+    tag: "Fintech",
+    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1400&auto=format&fit=crop&q=75",
+    client: "Ledger Financial",
+    duration: "9 months",
+    team: "Design lead + 2 designers, 6 engineers, 1 PM",
+    summary: "Rebuilt the retail banking experience end-to-end. Replaced a 6-year-old codebase and reset the visual system while migrating 800k users without downtime.",
+    contributions: [
+      "Led product design across web, iOS, and Android from discovery to shipping",
+      "Established the tokenized design system now used by 4 sibling products",
+      "Ran weekly customer research and translated findings into shipped changes",
+      "Partnered with engineering to define API contracts before pixel work started",
+    ],
+    outcomes: [
+      { value: "+42%", label: "Activation lift" },
+      { value: "-31%", label: "Support tickets" },
+      { value: "4.8★", label: "App store rating" },
+    ],
+    tools: ["Figma", "FigJam", "Framer", "Notion", "Linear"],
+    link: "https://example.com/ledger",
+  },
+  {
+    title: "Kinetic — motion for design systems",
+    role: "Systems Designer",
+    year: "2023",
+    tag: "Design system",
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&auto=format&fit=crop&q=75",
+    client: "Kinetic (internal)",
+    duration: "6 months",
+    team: "Solo IC + 1 motion engineer",
+    summary: "Authored a motion language for a 400-component design system. Wrote the specs, built the reference app, and shipped tokens teams could drop into any product.",
+    contributions: [
+      "Defined easing curves, durations, and choreography rules for the entire library",
+      "Built a live playground so PMs and engineers could test motion in-context",
+      "Wrote onboarding docs adopted by 60+ engineers across the org",
+    ],
+    outcomes: [
+      { value: "60+", label: "Teams adopted" },
+      { value: "12",  label: "Motion tokens" },
+      { value: "94%", label: "Consistency score" },
+    ],
+    tools: ["Figma", "Rive", "After Effects", "Storybook"],
+    link: "https://example.com/kinetic",
+  },
+  {
+    title: "Halo — onboarding for creators",
+    role: "Product Designer",
+    year: "2022",
+    tag: "Growth",
+    image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1400&auto=format&fit=crop&q=75",
+    client: "Halo Studios",
+    duration: "4 months",
+    team: "2 designers, 3 engineers, 1 PM, 1 researcher",
+    summary: "Reimagined the first-run experience for a creator platform. A tightly-scoped growth project that meaningfully moved the activation needle in one quarter.",
+    contributions: [
+      "Ran 14 usability sessions and 3 diary studies to map the true drop-off",
+      "Prototyped 6 onboarding variants, launched A/B/C tests on top 3",
+      "Shipped the winner in 4 weeks — beat control by 38%",
+    ],
+    outcomes: [
+      { value: "+38%", label: "D7 retention" },
+      { value: "+52%", label: "Activation rate" },
+      { value: "2m",  label: "Time-to-first-value" },
+    ],
+    tools: ["Figma", "Maze", "Amplitude", "Notion"],
+    link: "https://example.com/halo",
+  },
+];
+
+const testimonial = {
+  quote: `Working with ${candidate.name.split(" ")[0]} raised the bar for everyone. Rare mix of taste, systems thinking, and a bias for shipping. Would hire again in a heartbeat.`,
+  author: "Priya Ramanathan",
+  role: `VP Design, ${candidate.workedAtName ?? "previous employer"}`,
+};
+
+const languages = [
+  { name: "English",   level: "Native"        },
+  { name: "Spanish",   level: "Professional"  },
+  { name: "Portuguese",level: "Conversational"},
+];
+
+const availabilityStyle: Record<string, string> = {
+  "Open to offers":       "bg-emerald-100 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400",
+  "Available in 2 weeks": "bg-amber-100 text-amber-800 dark:!bg-amber-500/15 dark:!text-amber-400",
+  "Interviewing":         "bg-violet-100 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400",
+};
+
+const heroFacts = [
+  { label: "Location",   value: candidate.location.split(",")[0],       icon: "mapPin",    tone: "brand"   },
+  { label: "Experience", value: `${candidate.experienceYears} years`,   icon: "briefcase", tone: "violet"  },
+  { label: "Rate",       value: candidate.rate,                          icon: "wallet",    tone: "emerald" },
+  { label: "Response",   value: "92% · 1 day",                           icon: "send",      tone: "amber"   },
+];
+
+const factTone: Record<string, string> = {
+  brand:   "bg-brand-50 text-brand-700 ring-brand-100/60 dark:!bg-brand-500/12 dark:text-brand-400 dark:ring-brand-500/20",
+  emerald: "bg-emerald-50 text-emerald-700 ring-emerald-100/60 dark:!bg-emerald-500/12 dark:text-emerald-400 dark:ring-emerald-500/20",
+  amber:   "bg-amber-50 text-amber-700 ring-amber-100/60 dark:!bg-amber-500/12 dark:text-amber-400 dark:ring-amber-500/20",
+  violet:  "bg-violet-50 text-violet-700 ring-violet-100/60 dark:!bg-violet-500/12 dark:text-violet-400 dark:ring-violet-500/20",
+};
+---
+<BaseLayout
+  title={`${candidate.name} — ${candidate.role} · ${site.name}`}
+  description={`${candidate.name} is a ${candidate.role} based in ${candidate.location} with ${candidate.experienceYears} years of experience. Currently ${candidate.availability.toLowerCase()}.`}
+  schema={schema}
+>
+  <!-- Hero -->
+  <section class="relative isolate pt-14 pb-8 sm:pt-20">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-25 mask-radial"></div>
+      <div class="absolute -top-40 right-0 h-[520px] w-[820px] rounded-full bg-gradient-to-bl from-brand-200/40 via-accent-200/25 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <a href="/candidates" class="hover:text-ink-900 transition-colors">Candidates</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="line-clamp-1 font-medium text-ink-800">{candidate.name}</span>
+      </nav>
+
+      <div class="relative mt-8 overflow-hidden rounded-3xl border border-ink-200/70 bg-white/85 p-6 backdrop-blur-md shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.04] sm:p-10">
+        <!-- Brand accent bar -->
+        <span class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-brand-400 to-accent-500" aria-hidden="true"></span>
+        <!-- Corner ambient glow -->
+        <div class="pointer-events-none absolute -top-32 -right-24 h-72 w-72 rounded-full bg-gradient-to-br from-brand-300/30 via-accent-300/20 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10" aria-hidden="true"></div>
+
+        <div class="relative grid gap-8 lg:grid-cols-12 lg:items-start lg:gap-10">
+          <!-- Identity -->
+          <div class="lg:col-span-8">
+            <div class="flex items-start gap-5 sm:gap-6">
+              <div class="relative shrink-0">
+                <span class="absolute -inset-2 rounded-3xl bg-gradient-to-br from-brand-400/30 to-accent-400/30 blur opacity-60 dark:opacity-40" aria-hidden="true"></span>
+                <img
+                  src={candidate.avatar}
+                  alt={candidate.name}
+                  width="112"
+                  height="112"
+                  class="relative h-24 w-24 rounded-2xl bg-ink-100 ring-1 ring-ink-200 sm:h-28 sm:w-28 dark:ring-white/10"
+                />
+                {candidate.verified && (
+                  <span class="absolute -bottom-1.5 -right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white ring-2 ring-white dark:!ring-ink-100" title="Verified" aria-label="Verified">
+                    <Icon name="checkCircle" size={13} strokeWidth={2.5} />
+                  </span>
+                )}
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${availabilityStyle[candidate.availability]}`}>
+                    <span class="relative flex h-1.5 w-1.5">
+                      <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-current opacity-75"></span>
+                      <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-current"></span>
+                    </span>
+                    {candidate.availability}
+                  </span>
+                  {candidate.verified && <Badge variant="success" size="sm" dot>Verified</Badge>}
+                </div>
+
+                <h1 class="mt-3 text-[30px] font-semibold leading-[1.03] tracking-[-0.02em] text-ink-900 sm:text-[42px] lg:text-[46px]">
+                  {candidate.name}
+                </h1>
+                <p class="mt-2 max-w-xl text-[15.5px] font-display italic text-ink-600 sm:text-[17px]">
+                  {candidate.role}
+                </p>
+
+                <!-- Trust bar -->
+                <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12.5px] text-ink-600">
+                  <span class="inline-flex items-center gap-1">
+                    <Icon name="star" size={11} class="text-amber-500" />
+                    <span class="font-semibold tabular-nums text-ink-900">4.9</span>
+                    <span class="text-ink-500">rating</span>
+                  </span>
+                  <span class="h-1 w-1 rounded-full bg-ink-300"></span>
+                  <span class="inline-flex items-center gap-1">
+                    <Icon name="checkCircle" size={11} class="text-emerald-500" />
+                    <span class="font-semibold tabular-nums text-ink-900">92%</span>
+                    <span class="text-ink-500">response rate</span>
+                  </span>
+                  <span class="h-1 w-1 rounded-full bg-ink-300"></span>
+                  <span class="inline-flex items-center gap-1">
+                    <Icon name="clock" size={11} class="text-ink-500" />
+                    <span class="text-ink-500">Replies within</span>
+                    <span class="font-semibold tabular-nums text-ink-900">1 day</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Facts grid -->
+            <dl class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {heroFacts.map((f) => (
+                <div class="flex items-start gap-3 rounded-2xl border border-ink-200/60 bg-white/70 p-3.5 dark:!border-white/[0.06] dark:!bg-white/[0.02]">
+                  <span class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ${factTone[f.tone]}`}>
+                    <Icon name={f.icon as any} size={15} strokeWidth={2} />
+                  </span>
+                  <div class="min-w-0">
+                    <dt class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">{f.label}</dt>
+                    <dd class="mt-0.5 truncate text-[13.5px] font-semibold text-ink-900 tabular-nums">{f.value}</dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <!-- CTA cluster -->
+          <div class="lg:col-span-4">
+            <div class="rounded-2xl border border-ink-200/70 bg-white/80 p-5 backdrop-blur-md dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+              <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-ink-500">Hire this person</p>
+              <p class="mt-2 text-[13.5px] leading-relaxed text-ink-700">
+                Send an intro or add {candidate.name.split(" ")[0]} to a shortlist to revisit later.
+              </p>
+
+              <div class="mt-4 flex flex-col gap-2.5">
+                <button type="button" class="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink-900 px-5 text-[14px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md">
+                  <Icon name="send" size={13} /> Reach out
+                  <Icon name="arrowRight" size={13} class="transition-transform group-hover:translate-x-0.5" />
+                </button>
+                <div class="grid grid-cols-2 gap-2">
+                  <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 text-[13px] font-medium text-ink-800 hover:border-ink-400 hover:bg-ink-50 dark:!border-white/10 dark:!bg-white/[0.03] dark:hover:!bg-white/[0.06]">
+                    <Icon name="bookmark" size={13} /> Save
+                  </button>
+                  <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 text-[13px] font-medium text-ink-800 hover:border-ink-400 hover:bg-ink-50 dark:!border-white/10 dark:!bg-white/[0.03] dark:hover:!bg-white/[0.06]">
+                    <Icon name="plus" size={13} /> Shortlist
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 flex items-center gap-3 rounded-2xl border border-emerald-200/60 bg-emerald-50/60 p-4 dark:!border-emerald-500/20 dark:!bg-emerald-500/[0.08]">
+              <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-emerald-600 ring-1 ring-emerald-200/60 dark:!bg-emerald-500/15 dark:ring-emerald-500/20 dark:!text-emerald-400">
+                <Icon name="shield" size={16} strokeWidth={2} />
+              </span>
+              <div>
+                <p class="text-[12.5px] font-semibold text-ink-900">Reference-checked</p>
+                <p class="text-[11.5px] text-ink-600">Employment history verified</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Body -->
+  <section class="pt-8 pb-24 sm:pb-32">
+    <Container size="xl">
+      <div class="grid gap-8 lg:grid-cols-12 lg:gap-12">
+        <!-- Left -->
+        <div class="lg:col-span-8 space-y-10">
+          <!-- About -->
+          <section>
+            <SectionEyebrow number="02" label="About" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">Summary</h2>
+            <div class="mt-5 rounded-2xl border-l-2 border-brand-500/60 bg-gradient-to-br from-brand-50/50 via-white to-accent-50/30 p-5 dark:!border-brand-400/60 dark:!from-brand-500/[0.06] dark:!via-white/[0.02] dark:!to-accent-500/[0.05]">
+              <p class="text-[16px] leading-[1.75] text-ink-800">{bio}</p>
+            </div>
+          </section>
+
+          <!-- Impact -->
+          <section>
+            <SectionEyebrow number="03" label="Impact" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">Numbers that matter</h2>
+            <p class="mt-3 text-[14px] leading-relaxed text-ink-600">A snapshot of what {candidate.name.split(" ")[0]} has moved the needle on across recent roles.</p>
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              {impact.map((s) => (
+                <div class={`relative overflow-hidden rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]`}>
+                  <span class={`absolute inset-x-0 top-0 h-0.5 ${factTone[s.tone].split(" ")[0]}`} aria-hidden="true"></span>
+                  <p class={`text-[32px] font-semibold leading-none tracking-tight tabular-nums ${
+                    s.tone === "brand"   ? "text-brand-700 dark:!text-brand-400"   :
+                    s.tone === "emerald" ? "text-emerald-700 dark:!text-emerald-400" :
+                                            "text-violet-700 dark:!text-violet-400"
+                  }`}>{s.value}</p>
+                  <p class="mt-2 text-[12.5px] font-medium text-ink-600">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <!-- Experience -->
+          <section>
+            <SectionEyebrow number="04" label="Experience" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">Career highlights</h2>
+            <ol class="relative mt-6 space-y-4">
+              <span class="absolute left-5 top-3 bottom-3 w-px bg-gradient-to-b from-ink-200 via-ink-200/60 to-transparent dark:!from-white/10 dark:!via-white/5" aria-hidden="true"></span>
+              {experience.map((e, i) => (
+                <li class="relative flex gap-4">
+                  <span class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-[13px] font-bold text-ink-50 ring-4 ring-white dark:!bg-brand-500 dark:!ring-ink-100">{e.company[0]}</span>
+                  <div class="min-w-0 flex-1 rounded-2xl border border-ink-200/70 bg-white p-4 transition-colors hover:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <div class="min-w-0">
+                        <p class="text-[14.5px] font-semibold text-ink-900">{e.role}</p>
+                        <p class="mt-0.5 text-[12.5px] text-ink-600">{e.company}</p>
+                      </div>
+                      <span class="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2.5 py-0.5 text-[11px] font-medium text-ink-700 tabular-nums dark:!bg-white/[0.06] dark:!text-ink-800">
+                        {i === 0 && <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>}
+                        {e.period}
+                      </span>
+                    </div>
+                    <p class="mt-3 text-[13.5px] leading-relaxed text-ink-600">{e.summary}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <!-- Portfolio -->
+          <section>
+            <SectionEyebrow number="05" label="Portfolio" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">Selected work</h2>
+            <p class="mt-3 text-[14px] leading-relaxed text-ink-600">Recent projects shipped end-to-end. Case studies available on request.</p>
+            <div class="mt-6 grid gap-4 sm:grid-cols-3">
+              {portfolio.map((p, i) => (
+                <button
+                  type="button"
+                  data-portfolio-open={i}
+                  class="group relative flex flex-col overflow-hidden rounded-2xl border border-ink-200/70 bg-white text-left transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.03]"
+                >
+                  <div class="relative aspect-[4/3] overflow-hidden bg-ink-100 dark:!bg-white/[0.04]">
+                    <img
+                      src={p.image}
+                      alt={p.title}
+                      loading="lazy"
+                      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <span class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" aria-hidden="true"></span>
+                    <span class="absolute left-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-[10.5px] font-semibold text-ink-900 backdrop-blur">
+                      {p.tag}
+                    </span>
+                    <span class="absolute right-3 bottom-3 text-[11px] font-semibold text-white tabular-nums drop-shadow">{p.year}</span>
+                    <span class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                      <span class="flex h-10 items-center gap-1.5 rounded-full bg-white/95 px-3.5 text-[12px] font-semibold text-ink-900 shadow-lg backdrop-blur">
+                        View case study <Icon name="arrowRight" size={12} />
+                      </span>
+                    </span>
+                  </div>
+                  <div class="p-4">
+                    <h3 class="text-[14px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors line-clamp-2">{p.title}</h3>
+                    <p class="mt-1.5 text-[12px] text-ink-500">{p.role}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <!-- Skills -->
+          <section>
+            <SectionEyebrow number="06" label="Skills & tools" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">What they work with</h2>
+            <div class="mt-5 rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+              <div class="flex flex-wrap gap-1.5">
+                {candidate.skills.map((s, i) => (
+                  <span class={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors ${
+                    i < 3
+                      ? "border-brand-200 bg-brand-50 text-brand-800 dark:!border-brand-500/20 dark:!bg-brand-500/10 dark:!text-brand-400"
+                      : "border-ink-200 bg-ink-50/60 text-ink-800 dark:!border-white/10 dark:!bg-white/[0.04] dark:!text-ink-800"
+                  }`}>
+                    {i < 3 && <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>}
+                    {s}
+                  </span>
+                ))}
+              </div>
+              <p class="mt-4 text-[11.5px] text-ink-500">
+                <span class="inline-flex items-center gap-1"><span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span> Core strengths</span>
+              </p>
+            </div>
+          </section>
+
+          <!-- Education -->
+          <section>
+            <SectionEyebrow number="07" label="Education" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">Where they studied</h2>
+            <ul class="mt-6 space-y-3">
+              {education.map((e) => (
+                <li class="flex items-start gap-4 rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:p-5">
+                  <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 text-brand-700 ring-1 ring-brand-100/60 dark:!from-brand-500/12 dark:!to-accent-500/12 dark:!text-brand-400 dark:ring-brand-500/20">
+                    <Icon name="award" size={18} strokeWidth={1.8} />
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                      <p class="text-[14.5px] font-semibold text-ink-900">{e.school}</p>
+                      <span class="text-[11.5px] tabular-nums text-ink-500">{e.period}</span>
+                    </div>
+                    <p class="mt-0.5 text-[13px] text-ink-700">{e.degree}</p>
+                    <p class="mt-2 text-[13px] leading-relaxed text-ink-600">{e.detail}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <!-- Preferences / Looking for -->
+          <section>
+            <SectionEyebrow number="08" label="Looking for" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">Ideal next role</h2>
+            <dl class="mt-6 grid gap-2.5 sm:grid-cols-2">
+              {preferences.map((p) => (
+                <div class="flex items-start gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+                  <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-700 dark:!bg-white/[0.06] dark:!text-ink-800">
+                    <Icon name={p.icon as any} size={13} />
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <dt class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">{p.label}</dt>
+                    <dd class="mt-0.5 text-[13.5px] font-semibold text-ink-900">{p.value}</dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <!-- Recommendation -->
+          <section>
+            <SectionEyebrow number="09" label="Recommendation" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">What colleagues say</h2>
+            <figure class="relative mt-6 overflow-hidden rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/50 via-white to-accent-50/40 p-6 sm:p-8 dark:!border-white/[0.08] dark:!from-brand-500/[0.06] dark:!via-white/[0.02] dark:!to-accent-500/[0.05]">
+              <span aria-hidden="true" class="absolute -top-2 left-6 font-display text-[80px] leading-none text-brand-400/30 select-none dark:!text-brand-400/25">"</span>
+              <blockquote class="relative text-[16px] font-display italic leading-[1.6] text-ink-900 sm:text-[18px]">
+                {testimonial.quote}
+              </blockquote>
+              <figcaption class="mt-6 flex items-center gap-3">
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-ink-900 text-[13px] font-bold text-ink-50 dark:!bg-brand-500 dark:text-white">
+                  {testimonial.author.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                </span>
+                <div>
+                  <p class="text-[13.5px] font-semibold text-ink-900">{testimonial.author}</p>
+                  <p class="text-[12px] text-ink-600">{testimonial.role}</p>
+                </div>
+              </figcaption>
+            </figure>
+          </section>
+
+          <!-- Languages -->
+          <section>
+            <SectionEyebrow number="10" label="Languages" />
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-[26px]">Speaks</h2>
+            <ul class="mt-6 grid gap-2.5 sm:grid-cols-3">
+              {languages.map((l) => (
+                <li class="flex items-center justify-between rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+                  <div>
+                    <p class="text-[13.5px] font-semibold text-ink-900">{l.name}</p>
+                    <p class="mt-0.5 text-[11.5px] text-ink-500">{l.level}</p>
+                  </div>
+                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-ink-100 text-ink-600 dark:!bg-white/[0.06] dark:!text-ink-800">
+                    <Icon name="globe" size={13} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+
+        <!-- Right sidebar -->
+        <aside class="lg:col-span-4 space-y-5 lg:sticky lg:top-28 lg:h-fit">
+          <div class="rounded-2xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">At a glance</p>
+            <dl class="mt-4 space-y-3.5 text-[13.5px]">
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="briefcase" size={13} /> Role</dt>
+                <dd class="text-right font-medium text-ink-900">{candidate.role}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="mapPin" size={13} /> Location</dt>
+                <dd class="text-right font-medium text-ink-900">{candidate.location}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="clock" size={13} /> Experience</dt>
+                <dd class="text-right font-medium text-ink-900 tabular-nums">{candidate.experienceYears} years</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="wallet" size={13} /> Rate</dt>
+                <dd class="text-right font-medium text-ink-900 tabular-nums">{candidate.rate}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="globe" size={13} /> Remote</dt>
+                <dd class="text-right font-medium text-ink-900">Open</dd>
+              </div>
+              {workedAt && (
+                <div class="flex items-start justify-between gap-4">
+                  <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="building" size={13} /> Previously</dt>
+                  <dd class="text-right"><a href={`/companies/${workedAt.slug}`} class="font-medium text-brand-700 hover:underline">{workedAt.name}</a></dd>
+                </div>
+              )}
+            </dl>
+          </div>
+
+          <div class="rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+            <div class="flex items-center gap-2 text-brand-700 dark:text-brand-400">
+              <Icon name="sparkles" size={13} />
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em]">Match signal</p>
+            </div>
+            <p class="mt-3 text-[13.5px] leading-relaxed text-ink-800">
+              {candidate.name.split(" ")[0]}'s profile matches <span class="font-semibold text-ink-900">3 of your open roles</span>. Reach out before someone else does.
+            </p>
+            <button type="button" class="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-ink-900 px-4 py-2.5 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+              Send introduction <Icon name="send" size={12} />
+            </button>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Similar -->
+      <div class="mt-16 border-t border-ink-200 pt-14 dark:!border-white/10">
+        <SectionEyebrow number="11" label="Similar people" />
+        <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">You might also like</h2>
+        <div class="mt-8 grid gap-4 md:grid-cols-3">
+          {similar.map((c) => (
+            <a href={`/candidates/${c.slug}`} class="group flex items-center gap-4 rounded-2xl border border-ink-200/70 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+              <img src={c.avatar} alt={c.name} class="h-12 w-12 shrink-0 rounded-xl bg-ink-100" />
+              <div class="min-w-0">
+                <p class="line-clamp-1 text-[14px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{c.name}</p>
+                <p class="mt-0.5 line-clamp-1 text-[12px] text-ink-500">{c.role}</p>
+              </div>
+              <Icon name="arrowUpRight" size={13} class="ml-auto shrink-0 text-ink-400 transition-transform group-hover:translate-x-0.5" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Portfolio Modal -->
+  <div
+    id="portfolio-modal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-ink-950/85 p-4 backdrop-blur-sm sm:p-8"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Case study"
+  >
+    <div class="relative flex max-h-full w-full max-w-4xl flex-col overflow-y-auto rounded-3xl border border-ink-200/70 bg-white shadow-2xl shadow-ink-900/20 dark:!border-white/[0.08] dark:!bg-ink-100">
+      <!-- Cover -->
+      <div class="relative aspect-[3/2] shrink-0 overflow-hidden rounded-t-3xl bg-ink-100 sm:aspect-[16/10] dark:!bg-white/[0.04]">
+        <img id="pm-image" src="" alt="" class="h-full w-full object-cover" />
+        <span class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" aria-hidden="true"></span>
+        <button
+          type="button"
+          data-portfolio-close
+          class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-ink-900 shadow-lg backdrop-blur transition-transform hover:scale-105"
+          aria-label="Close"
+        >
+          <Icon name="close" size={14} />
+        </button>
+        <div class="absolute left-5 bottom-5 right-5 flex items-end justify-between gap-3">
+          <div class="min-w-0">
+            <span id="pm-tag" class="inline-flex rounded-full bg-white/95 px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-widest text-ink-900 backdrop-blur">TAG</span>
+            <h2 id="pm-title" class="mt-2 text-[22px] font-semibold leading-[1.1] tracking-tight text-white sm:text-[28px]">Title</h2>
+          </div>
+          <span id="pm-year" class="shrink-0 rounded-full bg-white/20 px-3 py-1 text-[12px] font-semibold text-white tabular-nums backdrop-blur">2024</span>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 sm:p-8">
+        <!-- Meta strip -->
+        <dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div class="rounded-xl border border-ink-200/70 bg-white p-3 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <dt class="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-500">Role</dt>
+            <dd id="pm-role" class="mt-0.5 text-[13px] font-semibold text-ink-900">—</dd>
+          </div>
+          <div class="rounded-xl border border-ink-200/70 bg-white p-3 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <dt class="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-500">Client</dt>
+            <dd id="pm-client" class="mt-0.5 text-[13px] font-semibold text-ink-900">—</dd>
+          </div>
+          <div class="rounded-xl border border-ink-200/70 bg-white p-3 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <dt class="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-500">Duration</dt>
+            <dd id="pm-duration" class="mt-0.5 text-[13px] font-semibold text-ink-900 tabular-nums">—</dd>
+          </div>
+          <div class="rounded-xl border border-ink-200/70 bg-white p-3 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <dt class="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-500">Team</dt>
+            <dd id="pm-team" class="mt-0.5 text-[12.5px] font-medium text-ink-900">—</dd>
+          </div>
+        </dl>
+
+        <!-- Summary -->
+        <div class="mt-6">
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-ink-500">Overview</p>
+          <p id="pm-summary" class="mt-2 text-[14.5px] leading-[1.7] text-ink-800">—</p>
+        </div>
+
+        <!-- Contributions -->
+        <div class="mt-6">
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-ink-500">Contributions</p>
+          <ul id="pm-contributions" class="mt-3 space-y-2"></ul>
+        </div>
+
+        <!-- Outcomes -->
+        <div class="mt-6">
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-ink-500">Outcomes</p>
+          <dl id="pm-outcomes" class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3"></dl>
+        </div>
+
+        <!-- Tools -->
+        <div class="mt-6">
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-ink-500">Tools</p>
+          <div id="pm-tools" class="mt-3 flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 flex flex-wrap items-center justify-end gap-2 border-t border-ink-200 pt-6 dark:!border-white/[0.08]">
+          <button
+            type="button"
+            data-portfolio-close
+            class="inline-flex h-10 items-center rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]"
+          >
+            Close
+          </button>
+          <a
+            id="pm-link"
+            href="#"
+            target="_blank"
+            rel="noreferrer"
+            class="inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-5 text-[13px] font-semibold text-ink-50 hover:bg-brand-600"
+          >
+            Visit case study
+            <Icon name="arrowUpRight" size={12} />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ portfolio }}>
+    (function () {
+      const modal = document.getElementById("portfolio-modal");
+      if (!modal) return;
+      const q = (id) => document.getElementById(id);
+      const setText = (id, v) => { const el = q(id); if (el) el.textContent = v; };
+
+      const open = (idx) => {
+        const p = portfolio[idx];
+        if (!p) return;
+        const img = q("pm-image");
+        if (img) { img.src = p.image; img.alt = p.title; }
+        setText("pm-tag", p.tag);
+        setText("pm-title", p.title);
+        setText("pm-year", p.year);
+        setText("pm-role", p.role);
+        setText("pm-client", p.client);
+        setText("pm-duration", p.duration);
+        setText("pm-team", p.team);
+        setText("pm-summary", p.summary);
+
+        const list = q("pm-contributions");
+        if (list) {
+          list.innerHTML = "";
+          p.contributions.forEach((c) => {
+            const li = document.createElement("li");
+            li.className = "flex items-start gap-2.5 text-[14px] leading-relaxed text-ink-700";
+            li.innerHTML =
+              '<span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink-900 text-ink-50 dark:!bg-brand-500"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span></span>';
+            li.querySelector("span:last-child").textContent = c;
+            list.appendChild(li);
+          });
+        }
+        const outs = q("pm-outcomes");
+        if (outs) {
+          outs.innerHTML = "";
+          p.outcomes.forEach((o) => {
+            const cell = document.createElement("div");
+            cell.className = "rounded-xl border border-ink-200/70 bg-gradient-to-br from-brand-50/50 via-white to-accent-50/30 p-3 text-center dark:!border-white/[0.08] dark:!from-brand-500/[0.06] dark:!via-white/[0.02] dark:!to-accent-500/[0.05]";
+            cell.innerHTML =
+              '<p class="text-[20px] font-semibold tracking-tight tabular-nums text-brand-700 dark:!text-brand-400"></p>' +
+              '<p class="mt-1 text-[11px] text-ink-600"></p>';
+            cell.children[0].textContent = o.value;
+            cell.children[1].textContent = o.label;
+            outs.appendChild(cell);
+          });
+        }
+        const tools = q("pm-tools");
+        if (tools) {
+          tools.innerHTML = "";
+          p.tools.forEach((t) => {
+            const chip = document.createElement("span");
+            chip.className = "inline-flex items-center rounded-full border border-ink-200 bg-ink-50/60 px-3 py-1 text-[12.5px] font-medium text-ink-800 dark:!border-white/10 dark:!bg-white/[0.04] dark:!text-ink-800";
+            chip.textContent = t;
+            tools.appendChild(chip);
+          });
+        }
+        const link = q("pm-link");
+        if (link) link.setAttribute("href", p.link || "#");
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.body.style.overflow = "hidden";
+      };
+      const close = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        document.body.style.overflow = "";
+      };
+
+      document.querySelectorAll("[data-portfolio-open]").forEach((btn) => {
+        btn.addEventListener("click", () => open(parseInt(btn.getAttribute("data-portfolio-open") || "0", 10)));
+      });
+      modal.querySelectorAll("[data-portfolio-close]").forEach((el) => el.addEventListener("click", close));
+      modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.classList.contains("hidden")) close(); });
+    })();
+  </script>
+</BaseLayout>

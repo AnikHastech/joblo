@@ -1,0 +1,160 @@
+---
+import Icon from "@components/ui/Icon.astro";
+
+interface Props {
+  total: number;
+  showing?: number;
+}
+const { total, showing = 24 } = Astro.props;
+
+const sortOptions = [
+  { value: "recent",  label: "Most recent"    },
+  { value: "match",   label: "Best match"     },
+  { value: "salary",  label: "Highest paying" },
+  { value: "applied", label: "Most applied"   },
+  { value: "az",      label: "Company A–Z"    },
+];
+---
+<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+    <p class="text-[14.5px] text-ink-800">
+      <span id="jobs-visible-count" class="font-semibold tabular-nums text-ink-900">{showing.toLocaleString()}</span>
+      <span class="text-ink-500"> of </span>
+      <span class="font-semibold tabular-nums text-ink-900">{total.toLocaleString()}</span>
+      <span class="text-ink-500"> roles</span>
+    </p>
+    <span class="hidden h-4 w-px bg-ink-200 sm:block dark:!bg-white/10"></span>
+    <button type="button" id="toolbar-mobile-filters" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 transition-colors hover:border-ink-400 lg:hidden dark:border-white/10 dark:!bg-white/[0.04]">
+      <Icon name="filter" size={13} />
+      Filters
+      <span class="rounded-full bg-brand-500 px-1.5 text-[10px] font-bold text-white">3</span>
+    </button>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <!-- View toggle -->
+    <div id="view-toggle" class="inline-flex rounded-full border border-ink-200 bg-white p-0.5 dark:border-white/10 dark:!bg-white/[0.04]" role="group">
+      <button
+        type="button"
+        data-view="grid"
+        data-active="true"
+        class="view-btn flex h-8 w-8 items-center justify-center rounded-full text-ink-500 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 hover:text-ink-900"
+        aria-label="Grid view"
+      >
+        <Icon name="grid" size={12} />
+      </button>
+      <button
+        type="button"
+        data-view="list"
+        data-active="false"
+        class="view-btn flex h-8 w-8 items-center justify-center rounded-full text-ink-500 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 hover:text-ink-900"
+        aria-label="List view"
+      >
+        <Icon name="menu" size={13} />
+      </button>
+    </div>
+
+    <!-- Sort dropdown -->
+    <div class="relative" id="sort-dropdown">
+      <button
+        type="button"
+        id="sort-trigger"
+        class="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3.5 py-2 text-[13px] font-medium text-ink-800 transition-colors hover:border-ink-400 dark:border-white/10 dark:!bg-white/[0.04]"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+      >
+        <span class="text-ink-500">Sort:</span>
+        <span id="sort-label">Most recent</span>
+        <Icon name="chevronDown" size={11} class="sort-chevron text-ink-400 transition-transform" />
+      </button>
+      <ul
+        id="sort-menu"
+        hidden
+        role="listbox"
+        class="absolute right-0 top-full z-30 mt-2 min-w-[200px] rounded-xl border border-ink-200/70 bg-white p-1.5 shadow-2xl shadow-ink-900/15 dark:border-white/10 dark:!bg-ink-100"
+      >
+        {sortOptions.map((s, i) => (
+          <li>
+            <button
+              type="button"
+              role="option"
+              data-value={s.value}
+              class="sort-option flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[13px] text-ink-800 transition-colors hover:bg-ink-50 aria-selected:!bg-brand-50 aria-selected:!font-semibold aria-selected:!text-brand-700 dark:hover:!bg-white/[0.04] dark:aria-selected:!bg-brand-500/15"
+              aria-selected={i === 0 ? "true" : "false"}
+            >
+              {s.label}
+              <Icon name="check" size={12} strokeWidth={2.2} class="sort-check hidden text-brand-600" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── View toggle (grid/list) ─────────────────────────────────────
+  const viewButtons = document.querySelectorAll<HTMLButtonElement>("#view-toggle .view-btn");
+  const jobsGrid = document.getElementById("jobs-grid");
+
+  viewButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const view = btn.dataset.view;
+      viewButtons.forEach((b) => b.dataset.active = String(b === btn));
+      if (jobsGrid) {
+        if (view === "grid") {
+          jobsGrid.className = "mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3";
+        } else {
+          jobsGrid.className = "mt-6 grid gap-3";
+        }
+      }
+    });
+  });
+
+  // ── Sort dropdown ───────────────────────────────────────────────
+  const sortTrigger = document.getElementById("sort-trigger");
+  const sortMenu    = document.getElementById("sort-menu");
+  const sortLabel   = document.getElementById("sort-label");
+  const sortChevron = sortTrigger?.querySelector(".sort-chevron");
+  const sortOpts    = sortMenu?.querySelectorAll<HTMLButtonElement>(".sort-option");
+
+  const openSort = () => {
+    sortMenu?.removeAttribute("hidden");
+    sortTrigger?.setAttribute("aria-expanded", "true");
+    sortChevron?.classList.add("rotate-180");
+  };
+  const closeSort = () => {
+    sortMenu?.setAttribute("hidden", "");
+    sortTrigger?.setAttribute("aria-expanded", "false");
+    sortChevron?.classList.remove("rotate-180");
+  };
+
+  sortTrigger?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sortMenu?.hasAttribute("hidden") ? openSort() : closeSort();
+  });
+
+  sortOpts?.forEach((opt) => {
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sortOpts.forEach((o) => {
+        o.setAttribute("aria-selected", String(o === opt));
+        o.querySelector(".sort-check")?.classList.toggle("hidden", o !== opt);
+      });
+      // Extract only the first text node (label), skip icon SVG
+      const label = Array.from(opt.childNodes)
+        .filter((n) => n.nodeType === Node.TEXT_NODE)
+        .map((n) => n.textContent?.trim())
+        .filter(Boolean)
+        .join(" ") || opt.textContent?.trim() || "";
+      if (sortLabel) sortLabel.textContent = label;
+      closeSort();
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest("#sort-dropdown")) closeSort();
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSort(); });
+</script>

@@ -1,0 +1,106 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import { talentPool, applicantPool } from "@data/employer";
+
+const tags = ["Future role", "Passive interest", "Talent network", "Referred"] as const;
+const tagStyle: Record<typeof tags[number], string> = {
+  "Future role":       "bg-brand-100 text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400",
+  "Passive interest":  "bg-amber-100 text-amber-800 dark:!bg-amber-500/15 dark:!text-amber-400",
+  "Talent network":    "bg-violet-100 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400",
+  "Referred":          "bg-emerald-100 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400",
+};
+const countByTag = (t: typeof tags[number]) => talentPool.filter((p) => p.tag === t).length;
+
+const enriched = talentPool.map((p) => ({
+  entry: p,
+  candidate: applicantPool.find((c) => c.id === p.candidateId),
+}));
+---
+<EmployerLayout
+  title="Talent pool"
+  subtitle={`${talentPool.length} candidates saved for future roles or long-term interest.`}
+  active="pool"
+>
+  <!-- Diff callout -->
+  <div class="mb-6 rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-4 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+    <div class="flex items-start gap-3">
+      <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/70 text-brand-700 dark:!bg-white/[0.08] dark:!text-brand-400"><Icon name="sparkles" size={15} /></span>
+      <div class="flex-1">
+        <p class="text-[13.5px] font-semibold text-ink-900">Talent pool ≠ Shortlist</p>
+        <p class="mt-0.5 text-[12.5px] text-ink-600">Shortlist tracks candidates for a specific open role. The pool is for people you want to circle back to later — even without an opening yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div class="inline-flex flex-wrap gap-1 rounded-full border border-ink-200 bg-white p-0.5 dark:!border-white/10 dark:!bg-white/[0.04]" role="group">
+      <button type="button" data-tag="all" data-active="true" class="pool-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">All ({talentPool.length})</button>
+      {tags.map((t) => (
+        <button type="button" data-tag={t} data-active="false" class="pool-filter rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">{t} ({countByTag(t)})</button>
+      ))}
+    </div>
+    <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+      <Icon name="plus" size={12} strokeWidth={2.2} /> Add to pool
+    </button>
+  </div>
+
+  {talentPool.length === 0 ? (
+    <EmptyState icon="users" title="No one in your pool yet" body="From a candidate's profile, click 'Add to talent pool' to save them for future roles." ctaLabel="Search candidates" ctaHref="/employer/talent" />
+  ) : (
+    <div id="pool-grid" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {enriched.map(({ entry, candidate }) => candidate && (
+        <article class="pool-item group relative flex flex-col rounded-3xl border border-ink-200/70 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.035]" data-tag={entry.tag}>
+          <header class="flex items-start gap-4">
+            <img src={candidate.avatar} alt={candidate.name} class="h-14 w-14 shrink-0 rounded-2xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+            <div class="min-w-0 flex-1">
+              <a href={`/candidates/${candidate.slug}`} class="line-clamp-1 text-[15.5px] font-semibold text-ink-900 hover:text-brand-700 transition-colors">{candidate.name}</a>
+              <p class="mt-0.5 line-clamp-1 text-[12px] text-ink-500">{candidate.role}</p>
+              <span class={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${tagStyle[entry.tag]}`}>
+                {entry.tag}
+              </span>
+            </div>
+          </header>
+
+          <p class="mt-4 text-[12.5px] leading-relaxed text-ink-600 line-clamp-3">{entry.notes}</p>
+
+          <dl class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] text-ink-500">
+            <div class="inline-flex items-center gap-1"><Icon name="mapPin" size={11} />{candidate.location.split(",")[0]}</div>
+            <div class="inline-flex items-center gap-1"><Icon name="briefcase" size={11} />{candidate.experienceYears}y</div>
+            <div class="inline-flex items-center gap-1 text-emerald-700 dark:!text-emerald-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>{candidate.availability}</div>
+          </dl>
+
+          <footer class="mt-5 flex items-center justify-between border-t border-ink-100 pt-4 dark:!border-white/[0.06]">
+            <p class="text-[10.5px] text-ink-400">
+              Added by {entry.addedBy}<br />
+              <span class="tabular-nums">{entry.addedOn}</span>
+            </p>
+            <div class="flex items-center gap-1.5">
+              <a href={`/candidates/${candidate.slug}`} class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400 hover:text-ink-900 dark:!border-white/10" aria-label="View"><Icon name="arrowUpRight" size={12} /></a>
+              <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400 hover:text-ink-900 dark:!border-white/10" aria-label="Message"><Icon name="send" size={12} /></button>
+              <button type="button" class="inline-flex h-9 items-center gap-1 rounded-full bg-ink-900 px-3 text-[12px] font-semibold text-ink-50 hover:bg-brand-600">
+                <Icon name="plus" size={11} /> Invite to apply
+              </button>
+            </div>
+          </footer>
+        </article>
+      ))}
+    </div>
+  )}
+</EmployerLayout>
+
+<script>
+  const btns = document.querySelectorAll<HTMLButtonElement>(".pool-filter");
+  const items = document.querySelectorAll<HTMLElement>(".pool-item");
+  btns.forEach((b) => {
+    b.addEventListener("click", () => {
+      btns.forEach((x) => (x.dataset.active = String(x === b)));
+      const t = b.dataset.tag;
+      items.forEach((el) => {
+        el.hidden = t !== "all" && el.dataset.tag !== t;
+      });
+    });
+  });
+</script>

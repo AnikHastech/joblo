@@ -1,0 +1,201 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import { currentCandidate, experience, education } from "@data/dashboard";
+
+const steps = [
+  { key: "basics",   label: "Basics",     icon: "user" },
+  { key: "work",     label: "Work",       icon: "briefcase" },
+  { key: "education",label: "Education",  icon: "award" },
+  { key: "skills",   label: "Skills",     icon: "sparkles" },
+  { key: "links",    label: "Links",      icon: "globe" },
+];
+---
+<DashboardLayout
+  title="Edit profile"
+  subtitle="Complete your profile to unlock recruiter matching."
+  active="profile"
+>
+  <div class="grid gap-6 lg:grid-cols-12">
+    <!-- Steps nav -->
+    <aside class="lg:col-span-3">
+      <div class="rounded-3xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.035] lg:sticky lg:top-24">
+        <p class="px-2 pt-2 text-[11px] font-semibold uppercase tracking-widest text-ink-500">Sections</p>
+        <nav class="mt-2 space-y-0.5">
+          {steps.map((s, i) => (
+            <a
+              href={`#step-${s.key}`}
+              class={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium ${i === 0 ? "bg-ink-100 text-ink-900 dark:!bg-white/[0.08]" : "text-ink-700 hover:bg-ink-100 dark:hover:!bg-white/[0.06]"}`}
+            >
+              <span class="flex h-6 w-6 items-center justify-center rounded-md bg-white text-[10.5px] font-bold tabular-nums text-ink-700 shadow-sm ring-1 ring-ink-200 dark:!bg-white/[0.08] dark:!ring-white/10">{i + 1}</span>
+              <span class="flex-1">{s.label}</span>
+              <Icon name={s.icon as any} size={12} class="text-ink-400" />
+            </a>
+          ))}
+        </nav>
+
+        <div class="mt-6 rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-4 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+          <p class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-400">
+            <Icon name="sparkles" size={11} />
+            {currentCandidate.profileCompletion}% complete
+          </p>
+          <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-white/70 dark:!bg-white/10">
+            <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500" style={`width:${currentCandidate.profileCompletion}%`}></div>
+          </div>
+          <p class="mt-2 text-[11.5px] text-ink-500">Add 2 more sections to hit 100%.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Form -->
+    <form class="lg:col-span-9 space-y-6">
+      <!-- Basics -->
+      <section id="step-basics" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">01 · Basics</p>
+            <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Personal info</h2>
+          </div>
+          <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:!bg-emerald-500/15 dark:text-emerald-400">
+            <Icon name="check" size={10} strokeWidth={2.5} />
+            Complete
+          </span>
+        </header>
+
+        <div class="mt-6 flex items-center gap-4">
+          <img src={currentCandidate.avatar} alt="" class="h-16 w-16 rounded-2xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+          <div>
+            <button type="button" class="inline-flex items-center gap-1.5 rounded-full bg-ink-900 px-3 py-1.5 text-[12px] font-semibold text-ink-50 hover:bg-brand-600">
+              <Icon name="plus" size={11} /> Upload new photo
+            </button>
+            <p class="mt-1.5 text-[11.5px] text-ink-500">JPG or PNG, max 4 MB.</p>
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-5 sm:grid-cols-2">
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Full name</span>
+            <input type="text" value={currentCandidate.name} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Headline</span>
+            <input type="text" value={currentCandidate.role} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Location</span>
+            <input type="text" value={currentCandidate.location} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="block">
+            <span class="text-[12.5px] font-medium text-ink-700">Timezone</span>
+            <input type="text" value={currentCandidate.timezone} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+          </label>
+          <label class="sm:col-span-2 block">
+            <span class="text-[12.5px] font-medium text-ink-700">Bio</span>
+            <textarea rows="4" class="mt-1.5 w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]">{currentCandidate.bio}</textarea>
+          </label>
+        </div>
+      </section>
+
+      <!-- Work -->
+      <section id="step-work" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">02 · Work</p>
+            <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Experience</h2>
+          </div>
+          <button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+            <Icon name="plus" size={11} /> Add role
+          </button>
+        </header>
+        <ul class="mt-5 divide-y divide-ink-100 dark:!divide-white/[0.06]">
+          {experience.map((e) => (
+            <li class="flex items-start justify-between gap-4 py-4">
+              <div class="min-w-0">
+                <p class="text-[14px] font-semibold text-ink-900">{e.role}</p>
+                <p class="mt-0.5 text-[12.5px] text-ink-500">{e.company} · {e.start} — {e.end}</p>
+              </div>
+              <div class="flex gap-2">
+                <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400" aria-label="Edit"><Icon name="filter" size={11} /></button>
+                <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-rose-400 hover:text-rose-600" aria-label="Delete"><Icon name="close" size={11} /></button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Education -->
+      <section id="step-education" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">03 · Education</p>
+            <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Studies</h2>
+          </div>
+          <button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+            <Icon name="plus" size={11} /> Add school
+          </button>
+        </header>
+        <ul class="mt-5 divide-y divide-ink-100 dark:!divide-white/[0.06]">
+          {education.map((e) => (
+            <li class="flex items-start justify-between gap-4 py-4">
+              <div>
+                <p class="text-[14px] font-semibold text-ink-900">{e.school}</p>
+                <p class="mt-0.5 text-[12.5px] text-ink-500">{e.degree} · {e.start} — {e.end}</p>
+              </div>
+              <div class="flex gap-2">
+                <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400" aria-label="Edit"><Icon name="filter" size={11} /></button>
+                <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-rose-400 hover:text-rose-600" aria-label="Delete"><Icon name="close" size={11} /></button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Skills -->
+      <section id="step-skills" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">04 · Skills</p>
+          <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Tags & tools</h2>
+        </header>
+        <div class="mt-5 rounded-2xl border border-ink-200 bg-ink-50/40 p-3 dark:!border-white/10 dark:!bg-white/[0.02]">
+          <div class="flex flex-wrap gap-1.5">
+            {currentCandidate.skills.map((s) => (
+              <span class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-[12.5px] text-ink-800 ring-1 ring-ink-200 dark:!bg-white/[0.05] dark:!ring-white/10">
+                {s}
+                <button type="button" class="text-ink-400 hover:text-rose-600" aria-label={`Remove ${s}`}><Icon name="close" size={10} /></button>
+              </span>
+            ))}
+            <input type="text" placeholder="Add a skill…" class="min-w-[120px] flex-1 border-0 bg-transparent px-2 text-[13px] text-ink-900 placeholder:text-ink-400 focus:outline-none" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Links -->
+      <section id="step-links" class="scroll-mt-24 rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <header>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">05 · Links</p>
+          <h2 class="mt-1 text-[20px] font-semibold tracking-tight text-ink-900">Presence</h2>
+        </header>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+          {(["website","linkedin","github","dribbble"] as const).map((k) => (
+            <label class="block">
+              <span class="text-[12.5px] font-medium text-ink-700 capitalize">{k}</span>
+              <input type="url" value={currentCandidate.links[k]} class="mt-1.5 h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-[13.5px] text-ink-900 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <!-- Save bar -->
+      <div class="sticky bottom-4 z-20 flex items-center justify-between gap-3 rounded-full border border-ink-200/70 bg-white/90 px-4 py-2.5 shadow-lg backdrop-blur dark:!border-white/10 dark:!bg-ink-100/90">
+        <p class="text-[12.5px] text-ink-500 hidden sm:block">Changes are saved automatically as you type.</p>
+        <div class="flex flex-1 items-center justify-end gap-2">
+          <a href="/dashboard/profile" class="inline-flex h-10 items-center rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">Discard</a>
+          <button type="submit" class="inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+            Save & publish
+            <Icon name="check" size={12} strokeWidth={2.5} />
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</DashboardLayout>

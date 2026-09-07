@@ -1,0 +1,373 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { site } from "@data/site";
+
+type Category = "Framework" | "Fonts" | "Icons" | "Images" | "Avatars" | "Illustrations" | "Tools";
+
+interface Asset {
+  name: string;
+  provider: string;
+  license: string;
+  usage: string;
+  url: string;
+  category: Category;
+  icon: string;
+  tone: "brand" | "accent" | "emerald" | "amber" | "violet" | "sky";
+  logo?: string; // letter or short code
+}
+
+const assets: Asset[] = [
+  // Framework & tooling
+  {
+    name: "Astro",
+    provider: "The Astro Team",
+    license: "MIT",
+    usage: "Framework — powers every page, routing, and static build",
+    url: "https://astro.build",
+    category: "Framework", icon: "sparkles", tone: "brand", logo: "A",
+  },
+  {
+    name: "Tailwind CSS",
+    provider: "Tailwind Labs",
+    license: "MIT",
+    usage: "Utility-first styling engine used across every component",
+    url: "https://tailwindcss.com",
+    category: "Framework", icon: "grid", tone: "sky", logo: "T",
+  },
+  {
+    name: "TypeScript",
+    provider: "Microsoft",
+    license: "Apache 2.0",
+    usage: "Strict type checking across the codebase",
+    url: "https://www.typescriptlang.org",
+    category: "Framework", icon: "briefcase", tone: "sky", logo: "TS",
+  },
+
+  // Fonts
+  {
+    name: "Inter",
+    provider: "Rasmus Andersson",
+    license: "SIL Open Font License 1.1",
+    usage: "Primary UI typeface — body, headings, and controls",
+    url: "https://rsms.me/inter/",
+    category: "Fonts", icon: "quote", tone: "brand", logo: "Aa",
+  },
+  {
+    name: "Instrument Serif",
+    provider: "Instrument",
+    license: "SIL Open Font License 1.1",
+    usage: "Editorial italic accents ('the work you were meant to do')",
+    url: "https://fonts.google.com/specimen/Instrument+Serif",
+    category: "Fonts", icon: "quote", tone: "accent", logo: "Aa",
+  },
+
+  // Icons
+  {
+    name: "Lucide Icons",
+    provider: "Lucide",
+    license: "ISC",
+    usage: "The 27-icon stroke set used across UI (home, users, briefcase, etc.)",
+    url: "https://lucide.dev",
+    category: "Icons", icon: "star", tone: "violet", logo: "L",
+  },
+
+  // Imagery
+  {
+    name: "Unsplash",
+    provider: "Unsplash photographers",
+    license: "Unsplash License",
+    usage: "Editorial cover imagery on blog, categories, city cards, and company gallery",
+    url: "https://unsplash.com/license",
+    category: "Images", icon: "sparkles", tone: "emerald", logo: "U",
+  },
+
+  // Avatars
+  {
+    name: "DiceBear (Notionists)",
+    provider: "DiceBear",
+    license: "MIT (library) · CC0 1.0 (Notionists art)",
+    usage: "Deterministic avatar SVGs for candidates, team, and testimonials",
+    url: "https://www.dicebear.com/styles/notionists/",
+    category: "Avatars", icon: "users", tone: "amber", logo: "D",
+  },
+
+  // Illustration + brand marks
+  {
+    name: "Brand marks & logos",
+    provider: "Respective owners",
+    license: "Trademarks of their owners",
+    usage: "Company logos shown for demo purposes (Linear, Vercel, Figma, etc.) — replace before shipping to production",
+    url: "/companies",
+    category: "Illustrations", icon: "building", tone: "brand", logo: "™",
+  },
+
+  // Optional tooling
+  {
+    name: "PostCSS",
+    provider: "Andrey Sitnik",
+    license: "MIT",
+    usage: "CSS pipeline used by Tailwind and Astro",
+    url: "https://postcss.org",
+    category: "Tools", icon: "shield", tone: "sky", logo: "P",
+  },
+  {
+    name: "Vite",
+    provider: "Evan You + contributors",
+    license: "MIT",
+    usage: "Dev server and production bundler under Astro",
+    url: "https://vitejs.dev",
+    category: "Tools", icon: "trending", tone: "accent", logo: "V",
+  },
+  {
+    name: "Sharp",
+    provider: "Lovell Fuller",
+    license: "Apache 2.0",
+    usage: "Image optimization pipeline for build-time transforms",
+    url: "https://sharp.pixelplumbing.com",
+    category: "Tools", icon: "sparkles", tone: "emerald", logo: "S",
+  },
+];
+
+const toneMap: Record<Asset["tone"], string> = {
+  brand:   "bg-brand-50 text-brand-700 ring-brand-100/60 dark:!bg-brand-500/12 dark:!text-brand-400 dark:ring-brand-500/20",
+  accent:  "bg-accent-50 text-accent-700 ring-accent-100/60 dark:!bg-accent-500/12 dark:!text-accent-400 dark:ring-accent-500/20",
+  emerald: "bg-emerald-50 text-emerald-700 ring-emerald-100/60 dark:!bg-emerald-500/12 dark:!text-emerald-400 dark:ring-emerald-500/20",
+  amber:   "bg-amber-50 text-amber-700 ring-amber-100/60 dark:!bg-amber-500/12 dark:!text-amber-400 dark:ring-amber-500/20",
+  violet:  "bg-violet-50 text-violet-700 ring-violet-100/60 dark:!bg-violet-500/12 dark:!text-violet-400 dark:ring-violet-500/20",
+  sky:     "bg-sky-50 text-sky-700 ring-sky-100/60 dark:!bg-sky-500/12 dark:!text-sky-400 dark:ring-sky-500/20",
+};
+
+const categories: Category[] = ["Framework", "Fonts", "Icons", "Images", "Avatars", "Illustrations", "Tools"];
+
+const summary = [
+  { value: assets.length.toString(),                                                                                              label: "Assets used" },
+  { value: new Set(assets.map((a) => a.license)).size.toString(),                                                                 label: "License types" },
+  { value: assets.filter((a) => a.license.includes("MIT") || a.license.includes("OFL") || a.license.includes("ISC") || a.license.includes("CC0") || a.license.includes("Apache")).length.toString(), label: "Free to use" },
+];
+
+const notes = [
+  { icon: "check", tone: "emerald", title: "Included with your purchase", body: `Everything above (except third-party brand marks) is licensed for use in your ${site.name} template purchase — no additional attribution required in most cases.` },
+  { icon: "shield", tone: "brand",  title: "Attribution where required",   body: "SIL OFL fonts and Unsplash images don't require attribution in production, but crediting authors on a colophon page is appreciated." },
+  { icon: "close", tone: "amber",   title: "Replace before you ship",       body: "The demo uses real company names and logos (Linear, Vercel, Figma…) for illustration only. Swap these out before shipping your production site." },
+];
+
+const noteToneMap: Record<string, string> = toneMap;
+---
+<BaseLayout
+  title={`Licenses · ${site.name}`}
+  description="Everything used in the Joblo template — frameworks, fonts, icons, imagery, and tools — with the license each ships under."
+>
+  <!-- Hero -->
+  <section class="relative isolate pt-14 pb-10 sm:pt-20 sm:pb-14">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-25 mask-radial"></div>
+      <div class="absolute -top-40 right-0 h-[520px] w-[820px] rounded-full bg-gradient-to-bl from-brand-200/40 via-accent-200/25 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="font-medium text-ink-800">Licenses</span>
+      </nav>
+      <div class="mt-6 max-w-3xl">
+        <SectionEyebrow number="01" label="Credits & licenses" />
+        <h1 class="mt-4 text-[30px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl md:text-5xl lg:text-6xl">
+          Everything under the <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">hood</span>.
+        </h1>
+        <p class="mt-4 max-w-xl text-[15.5px] leading-relaxed text-ink-600 sm:text-[16px]">
+          A complete list of every framework, font, icon set, image source, and tool used to build {site.name} — plus the license each ships under.
+        </p>
+      </div>
+
+      <!-- Summary -->
+      <dl class="mt-8 grid grid-cols-3 gap-2 sm:gap-3">
+        {summary.map((s) => (
+          <div class="rounded-2xl border border-ink-200/70 bg-white p-4 text-center dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:text-left">
+            <dt class="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-500">{s.label}</dt>
+            <dd class="mt-1 text-[20px] font-semibold text-ink-900 tabular-nums sm:text-[24px]">{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <!-- Filter chips -->
+      <div class="mt-6 flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          data-license-filter="all"
+          data-active="true"
+          class="license-filter inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 transition-colors hover:border-ink-400 hover:bg-ink-50 data-[active=true]:!border-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 dark:!border-white/10 dark:!bg-white/[0.04]"
+        >
+          All
+          <span class="text-[10.5px] tabular-nums opacity-60">{assets.length}</span>
+        </button>
+        {categories.map((c) => (
+          <button
+            type="button"
+            data-license-filter={c}
+            data-active="false"
+            class="license-filter inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 transition-colors hover:border-ink-400 hover:bg-ink-50 data-[active=true]:!border-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 dark:!border-white/10 dark:!bg-white/[0.04]"
+          >
+            {c}
+            <span class="text-[10.5px] tabular-nums opacity-60">{assets.filter((a) => a.category === c).length}</span>
+          </button>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Notes -->
+  <section class="pb-10 sm:pb-14">
+    <Container size="xl">
+      <div class="grid gap-3 md:grid-cols-3">
+        {notes.map((n) => (
+          <div class="flex items-start gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:p-5">
+            <span class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ${noteToneMap[n.tone]}`}>
+              <Icon name={n.icon as any} size={14} strokeWidth={2.5} />
+            </span>
+            <div class="min-w-0">
+              <p class="text-[13.5px] font-semibold text-ink-900">{n.title}</p>
+              <p class="mt-1 text-[12.5px] leading-relaxed text-ink-600">{n.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Grid list -->
+  <section class="pb-14 sm:pb-20">
+    <Container size="xl">
+      <SectionEyebrow number="02" label="Full list" />
+      <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+        Assets &amp; <span class="font-display italic font-normal">licenses</span>
+      </h2>
+
+      <div id="license-grid" class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {assets.map((a) => (
+          <a
+            href={a.url}
+            target={a.url.startsWith("http") ? "_blank" : undefined}
+            rel={a.url.startsWith("http") ? "noreferrer" : undefined}
+            class="license-item group flex flex-col rounded-2xl border border-ink-200/70 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.03]"
+            data-category={a.category}
+          >
+            <header class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[13px] font-bold ring-1 ${toneMap[a.tone]}`}>
+                  {a.logo ?? <Icon name={a.icon as any} size={16} />}
+                </span>
+                <div class="min-w-0">
+                  <p class="truncate text-[14.5px] font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{a.name}</p>
+                  <p class="truncate text-[11.5px] text-ink-500">by {a.provider}</p>
+                </div>
+              </div>
+              <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-ink-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-ink-700 dark:!bg-white/[0.06] dark:!text-ink-800">
+                {a.category}
+              </span>
+            </header>
+
+            <p class="mt-4 text-[13px] leading-relaxed text-ink-700">{a.usage}</p>
+
+            <footer class="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-ink-100 pt-4 dark:!border-white/[0.06]">
+              <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-800">
+                <Icon name="shield" size={11} class="text-ink-400" />
+                {a.license}
+              </span>
+              <span class="inline-flex items-center gap-1 text-[12px] font-medium text-brand-700 group-hover:underline dark:!text-brand-400">
+                Visit source
+                <Icon name="arrowUpRight" size={11} class="transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </footer>
+          </a>
+        ))}
+      </div>
+
+      <div id="license-empty" hidden class="mt-6 rounded-2xl border border-dashed border-ink-200 bg-ink-50/40 p-8 text-center dark:!border-white/10 dark:!bg-white/[0.02]">
+        <p class="text-[13.5px] text-ink-500">No assets in this category.</p>
+      </div>
+    </Container>
+  </section>
+
+  <!-- License types explained -->
+  <section class="pb-14 sm:pb-20 bg-white dark:!bg-white/[0.02]">
+    <Container size="xl">
+      <div class="pt-14 sm:pt-20">
+        <SectionEyebrow number="03" label="Reference" />
+        <h2 class="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl md:text-[36px]">
+          License types, <span class="font-display italic font-normal">explained</span>
+        </h2>
+        <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { name: "MIT",                     body: "Permissive. Use, modify, distribute — just include the original copyright notice.",                     tone: "emerald" },
+            { name: "Apache 2.0",              body: "Permissive with an explicit patent grant. Attribution required, no trademark rights granted.",           tone: "emerald" },
+            { name: "ISC",                     body: "Functionally identical to MIT, with slightly shorter text. Same freedoms and same requirements.",         tone: "emerald" },
+            { name: "SIL Open Font License 1.1", body: "For type. Free use, modify, redistribute — cannot sell the font on its own or rename derivatives loosely.", tone: "brand"   },
+            { name: "CC0 1.0",                  body: "Public-domain dedication. No rights reserved — use however you like.",                                    tone: "sky"     },
+            { name: "Unsplash License",         body: "Free for commercial and non-commercial use. Cannot sell photos as-is or use for competing photo services.",  tone: "amber"   },
+          ].map((t) => (
+            <div class="rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+              <div class="flex items-center gap-2.5">
+                <span class={`flex h-8 w-8 items-center justify-center rounded-lg ring-1 ${toneMap[t.tone as Asset["tone"]]}`}>
+                  <Icon name="shield" size={13} />
+                </span>
+                <p class="text-[13.5px] font-semibold text-ink-900">{t.name}</p>
+              </div>
+              <p class="mt-3 text-[12.5px] leading-relaxed text-ink-600">{t.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- CTA -->
+  <section class="pb-24 sm:pb-32">
+    <Container size="xl">
+      <div class="pt-14 sm:pt-20 overflow-hidden rounded-3xl border border-ink-200/70 bg-ink-900 p-6 text-ink-50 sm:p-10 dark:!border-white/[0.08] dark:!bg-[#0c0a09]">
+        <div class="grid gap-5 md:grid-cols-5 md:items-center">
+          <div class="md:col-span-3">
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-brand-300 dark:!text-brand-400">Need clarification?</p>
+            <h2 class="mt-2 text-[22px] font-semibold leading-tight tracking-tight sm:text-[26px] lg:text-[30px]">
+              Have a question about <span class="font-display italic font-normal">an asset</span>?
+            </h2>
+            <p class="mt-2 max-w-lg text-[13.5px] leading-relaxed text-white/70">
+              We're happy to walk through any of the licenses above, or help you swap out demo assets before you ship.
+            </p>
+          </div>
+          <div class="flex flex-col gap-2 md:col-span-2 sm:flex-row md:flex-col">
+            <a href="/contact" class="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-[13.5px] font-semibold text-ink-900 transition-colors hover:bg-brand-500 hover:!text-white">
+              Talk to us
+              <Icon name="arrowRight" size={13} />
+            </a>
+            <a href="/changelog" class="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/25 px-5 text-[13px] font-medium text-white transition-colors hover:border-white/60 hover:bg-white/[0.08]">
+              View changelog
+            </a>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
+
+<script>
+  const filters = document.querySelectorAll<HTMLButtonElement>(".license-filter");
+  const items   = document.querySelectorAll<HTMLElement>(".license-item");
+  const empty   = document.getElementById("license-empty");
+
+  filters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      filters.forEach((b) => (b.dataset.active = String(b === btn)));
+      const c = btn.dataset.licenseFilter;
+      let visible = 0;
+      items.forEach((it) => {
+        const show = c === "all" || it.dataset.category === c;
+        it.hidden = !show;
+        if (show) visible++;
+      });
+      if (empty) empty.hidden = visible > 0;
+    });
+  });
+</script>

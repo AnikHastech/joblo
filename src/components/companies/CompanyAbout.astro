@@ -1,0 +1,391 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import type { Company } from "@types/index";
+import type { CompanyContent } from "@data/companyContent";
+
+interface Props {
+  company: Company;
+  content: CompanyContent;
+}
+const { company, content } = Astro.props;
+
+// Derived editorial content
+const foundedYear = parseInt(content.founded, 10) || 2015;
+
+const milestones = [
+  { year: `${foundedYear}`,          title: `${company.name} is founded`,       body: `Started in ${content.headquarters.split(",")[0]} with a bet on ${company.industry.toLowerCase()}.`, style: "background:#0c0a09" },
+  { year: `${foundedYear + 2}`,      title: `First 1,000 customers`,             body: "Product–market fit on the core surface, first international customers on board.", style: "background:#0c0a09" },
+  { year: `${foundedYear + 4}`,      title: `Series B — ${content.funding.split(" ·")[0]}`, body: "Scaled the team to 100+, opened a second office, launched the platform tier.", style: "background:#0c0a09" },
+  { year: `${foundedYear + 6}`,      title: `Trusted by 10k+ teams`,             body: "Reached the milestone of ten thousand paying teams across 60+ countries.", style: "background:#0c0a09" },
+  { year: "Today",                    title: `${company.size} employees`,         body: "Global, remote-first, still shipping the same weekly rhythm as day one.", style: `background:${company.brandColor}` },
+];
+
+const leaders = [
+  { name: "Alex Morgan",     role: "Co-founder & CEO",  avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Alex&backgroundColor=fef3c7" },
+  { name: "Priya Ramanathan",role: "Head of Product",   avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Priya&backgroundColor=dbeafe" },
+  { name: "Sam Okafor",       role: "VP Engineering",    avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Sam&backgroundColor=dcfce7" },
+];
+
+const lifeCards = [
+  { icon: "globe",     title: "Remote-first",     body: "Async by default. Meetings only when a meeting is actually the answer." },
+  { icon: "sparkles",  title: "Real ownership",   body: "You lead your surface end-to-end. No shadow reviewers, no committee design." },
+  { icon: "award",     title: "Deep learning",    body: "$2,000/yr stipend, 4 books-club sessions a quarter, and a paid conference." },
+  { icon: "users",     title: "Twice-yearly offsite", body: "One warm, one cold. Company covers travel + lodging. Bring your partner if you like." },
+];
+
+const techStack = [
+  { label: "Product",     items: ["Figma", "Linear", "Notion", "Loom"] },
+  { label: "Engineering", items: ["TypeScript", "React", "Go", "PostgreSQL", "Redis"] },
+  { label: "Ops",         items: ["Slack", "Vercel", "Sentry", "Datadog"] },
+];
+
+const gallery = [
+  { src: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&auto=format&fit=crop&q=75", thumb: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=70", caption: "The main workspace in HQ" },
+  { src: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1400&auto=format&fit=crop&q=75", thumb: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&auto=format&fit=crop&q=70", caption: "Weekly all-hands" },
+  { src: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1400&auto=format&fit=crop&q=75", thumb: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&auto=format&fit=crop&q=70", caption: "Team design critique" },
+  { src: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1400&auto=format&fit=crop&q=75", thumb: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&auto=format&fit=crop&q=70", caption: "Cross-functional planning" },
+  { src: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1400&auto=format&fit=crop&q=75", thumb: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&auto=format&fit=crop&q=70", caption: "Lounge & focus areas" },
+  { src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1400&auto=format&fit=crop&q=75", thumb: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=70", caption: "Offsite in the mountains" },
+];
+---
+<section class="section-company-about pb-8">
+  <Container size="xl">
+    <div class="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-14">
+      <!-- Story -->
+      <div class="lg:col-span-7">
+        <SectionEyebrow number="02" label="About" />
+        <h2 class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-[38px]">
+          The story of <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">{company.name}</span>
+        </h2>
+        <div class="mt-5 space-y-4 text-[16px] leading-[1.75] text-ink-700">
+          {content.about.map((p) => <p>{p}</p>)}
+        </div>
+
+        <!-- Mission -->
+        <figure class="mt-8 relative rounded-3xl border-l-2 bg-ink-50/60 p-6 pl-8 sm:p-8 sm:pl-10 dark:!bg-white/[0.03]" style={`border-color:${company.brandColor}`}>
+          <span class="absolute -top-3 left-6 rounded-full bg-white px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-widest text-ink-500 ring-1 ring-ink-200 dark:!bg-ink-100 dark:ring-white/10">Our mission</span>
+          <blockquote class="font-display text-[22px] italic leading-snug text-ink-900 sm:text-[26px]">
+            {content.mission}
+          </blockquote>
+        </figure>
+
+        <!-- Press -->
+        <div class="mt-10">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Press & recognition</p>
+          <ul class="mt-4 space-y-3">
+            {content.press.map((p) => (
+              <li class="flex items-start gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-900 text-[11px] font-bold text-ink-50 dark:!bg-white/[0.08]">
+                  {p.outlet[0]}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="text-[13px] font-semibold text-ink-900">{p.outlet}</p>
+                  <p class="mt-0.5 text-[13.5px] leading-relaxed text-ink-600">{p.quote}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Milestones -->
+        <div class="mt-12">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Milestones</p>
+          <h3 class="mt-2 text-[22px] font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+            The road to <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">here</span>
+          </h3>
+          <ol class="relative mt-6 space-y-3">
+            <span class="absolute left-[54px] top-3 bottom-3 w-px bg-gradient-to-b from-ink-200 via-ink-200/50 to-transparent dark:!from-white/10 dark:!via-white/5" aria-hidden="true"></span>
+            {milestones.map((m) => (
+              <li class="relative flex items-start gap-4">
+                <span
+                  class="relative z-10 inline-flex h-9 min-w-[68px] shrink-0 items-center justify-center rounded-full px-2.5 text-[11.5px] font-semibold tabular-nums text-white ring-4 ring-white dark:!ring-ink-100"
+                  style={m.style}
+                >
+                  {m.year}
+                </span>
+                <div class="min-w-0 flex-1 rounded-2xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+                  <p class="text-[14px] font-semibold text-ink-900">{m.title}</p>
+                  <p class="mt-1 text-[13.5px] leading-relaxed text-ink-600">{m.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <!-- Leadership -->
+        <div class="mt-12">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Leadership</p>
+          <h3 class="mt-2 text-[22px] font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+            The people setting direction
+          </h3>
+          <div class="mt-6 grid gap-3 sm:grid-cols-3">
+            {leaders.map((l) => (
+              <div class="flex flex-col items-center rounded-2xl border border-ink-200/70 bg-white p-5 text-center dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+                <div class="relative">
+                  <span class="absolute -inset-1.5 rounded-2xl bg-gradient-to-br from-brand-400/30 to-accent-400/30 blur opacity-60 dark:!opacity-30" aria-hidden="true"></span>
+                  <img
+                    src={l.avatar}
+                    alt={l.name}
+                    width="72"
+                    height="72"
+                    loading="lazy"
+                    class="relative h-16 w-16 rounded-2xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10"
+                  />
+                </div>
+                <p class="mt-3 text-[14px] font-semibold text-ink-900">{l.name}</p>
+                <p class="mt-0.5 text-[12px] text-ink-600">{l.role}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Life here -->
+        <div class="mt-12">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Life at {company.name}</p>
+          <h3 class="mt-2 text-[22px] font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+            How the days actually feel
+          </h3>
+          <div class="mt-6 grid gap-3 sm:grid-cols-2">
+            {lifeCards.map((c) => (
+              <div class="flex items-start gap-3 rounded-2xl border border-ink-200/70 bg-white p-4 transition-colors hover:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.03] sm:p-5">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 text-brand-700 ring-1 ring-brand-100/60 dark:!from-brand-500/10 dark:!to-accent-500/10 dark:!text-brand-400 dark:ring-brand-500/20">
+                  <Icon name={c.icon as any} size={17} strokeWidth={1.8} />
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="text-[14px] font-semibold text-ink-900">{c.title}</p>
+                  <p class="mt-1 text-[13px] leading-relaxed text-ink-600">{c.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Gallery -->
+        <div class="mt-12">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Gallery</p>
+          <div class="mt-2 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-end">
+            <h3 class="text-[22px] font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+              A peek inside
+            </h3>
+            <p class="text-[12.5px] text-ink-500">Click any photo to view full-size</p>
+          </div>
+          <div id="company-gallery" class="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
+            {gallery.map((g, i) => (
+              <button
+                type="button"
+                data-gallery-open={i}
+                class="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-ink-200/70 bg-ink-100 transition-all hover:-translate-y-0.5 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.04]"
+                aria-label={`Open image: ${g.caption}`}
+              >
+                <img
+                  src={g.thumb}
+                  alt={g.caption}
+                  loading="lazy"
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <span class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true"></span>
+                <span class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-ink-900 shadow-lg backdrop-blur">
+                    <Icon name="search" size={16} />
+                  </span>
+                </span>
+                <span class="pointer-events-none absolute bottom-2 left-2 right-2 truncate text-left text-[11.5px] font-medium text-white opacity-0 drop-shadow transition-opacity group-hover:opacity-100">
+                  {g.caption}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- Tech stack -->
+        <div class="mt-12">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Tech stack</p>
+          <h3 class="mt-2 text-[22px] font-semibold tracking-tight text-ink-900 sm:text-[26px]">
+            What we build with
+          </h3>
+          <div class="mt-6 rounded-2xl border border-ink-200/70 bg-white p-5 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <div class="space-y-4">
+              {techStack.map((g) => (
+                <div>
+                  <p class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">{g.label}</p>
+                  <div class="mt-2 flex flex-wrap gap-1.5">
+                    {g.items.map((it) => (
+                      <span class="inline-flex items-center gap-1 rounded-full border border-ink-200 bg-ink-50/60 px-3 py-1 text-[12.5px] font-medium text-ink-800 dark:!border-white/10 dark:!bg-white/[0.04] dark:!text-ink-800">
+                        {it}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar: at-a-glance + perks -->
+      <div class="lg:sticky lg:top-24 lg:col-span-5">
+        <div class="rounded-3xl border border-ink-200/70 bg-white p-6 shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Company at a glance</p>
+          <dl class="mt-5 space-y-4 text-[13.5px]">
+            <div class="flex items-start justify-between gap-4">
+              <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="mapPin" size={13} /> Headquarters</dt>
+              <dd class="text-right font-medium text-ink-900">{content.headquarters}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="users" size={13} /> Team size</dt>
+              <dd class="text-right font-medium text-ink-900">{company.size} employees</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="clock" size={13} /> Founded</dt>
+              <dd class="text-right font-medium text-ink-900 tabular-nums">{content.founded}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="trending" size={13} /> Funding</dt>
+              <dd class="text-right font-medium text-ink-900">{content.funding}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="briefcase" size={13} /> Industry</dt>
+              <dd class="text-right font-medium text-ink-900">{company.industry}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="inline-flex items-center gap-2 text-ink-500"><Icon name="globe" size={13} /> Website</dt>
+              <dd class="text-right">
+                <a href={content.website} target="_blank" rel="noreferrer" class="inline-flex items-center gap-1 font-medium text-brand-700 hover:underline">
+                  {content.website.replace(/^https?:\/\//, "")}
+                  <Icon name="arrowUpRight" size={11} />
+                </a>
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Perks -->
+        <div class="mt-6 rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-700 dark:text-brand-400">Perks & benefits</p>
+          <ul class="mt-4 grid grid-cols-2 gap-2.5">
+            {content.perks.map((p) => (
+              <li class="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2.5 text-[13px] text-ink-800 backdrop-blur-sm dark:!bg-white/[0.04]">
+                <Icon name={p.icon as any} size={13} class="text-brand-600 dark:text-brand-400" />
+                {p.label}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Values grid (full width below) -->
+    <div class="mt-16">
+      <SectionEyebrow number="03" label="How we work" />
+      <div class="mt-3 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+        <h2 class="text-3xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-[36px]">
+          What we <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">believe</span>
+        </h2>
+        <p class="max-w-md text-[14.5px] text-ink-600">The four values that shape how decisions get made here.</p>
+      </div>
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {content.values.map((v, i) => (
+          <article class="group relative flex flex-col rounded-2xl border border-ink-200/70 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+            <div class="flex items-center justify-between">
+              <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 text-brand-700 ring-1 ring-brand-100/50 dark:!from-brand-500/10 dark:!to-accent-500/10 dark:ring-white/10 dark:text-brand-400">
+                <Icon name={v.icon as any} size={18} />
+              </span>
+              <span class="text-[10.5px] font-semibold tabular-nums text-ink-400">{String(i + 1).padStart(2, "0")}</span>
+            </div>
+            <h3 class="mt-4 text-[16px] font-semibold text-ink-900">{v.title}</h3>
+            <p class="mt-2 text-[13.5px] leading-relaxed text-ink-600">{v.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </Container>
+</section>
+
+<!-- Gallery Lightbox -->
+<div
+  id="company-gallery-lightbox"
+  class="fixed inset-0 z-[100] hidden items-center justify-center bg-ink-950/85 p-4 backdrop-blur-sm sm:p-8"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Photo gallery"
+>
+  <button
+    type="button"
+    data-gallery-close
+    class="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-ink-900 shadow-lg backdrop-blur transition-transform hover:scale-105 sm:right-6 sm:top-6"
+    aria-label="Close"
+  >
+    <Icon name="close" size={16} />
+  </button>
+
+  <button
+    type="button"
+    data-gallery-prev
+    class="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-ink-900 shadow-lg backdrop-blur transition-transform hover:scale-105 sm:left-6"
+    aria-label="Previous image"
+  >
+    <Icon name="chevronDown" size={16} class="rotate-90" />
+  </button>
+
+  <button
+    type="button"
+    data-gallery-next
+    class="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-ink-900 shadow-lg backdrop-blur transition-transform hover:scale-105 sm:right-6"
+    aria-label="Next image"
+  >
+    <Icon name="chevronDown" size={16} class="-rotate-90" />
+  </button>
+
+  <figure class="flex max-h-full max-w-5xl flex-col items-center">
+    <img
+      id="company-gallery-image"
+      src=""
+      alt=""
+      class="max-h-[78vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl"
+    />
+    <figcaption class="mt-4 flex items-center gap-3 rounded-full bg-white/90 px-4 py-2 text-[13px] font-medium text-ink-900 backdrop-blur">
+      <span id="company-gallery-caption">Photo</span>
+      <span class="h-1 w-1 rounded-full bg-ink-400"></span>
+      <span id="company-gallery-counter" class="tabular-nums text-ink-600">1 / 1</span>
+    </figcaption>
+  </figure>
+</div>
+
+<script is:inline define:vars={{ gallery }}>
+  (function () {
+    const box  = document.getElementById("company-gallery-lightbox");
+    const img  = document.getElementById("company-gallery-image");
+    const cap  = document.getElementById("company-gallery-caption");
+    const cnt  = document.getElementById("company-gallery-counter");
+    if (!box || !img || !cap || !cnt) return;
+
+    let i = 0;
+    const render = () => {
+      const g = gallery[i];
+      img.src = g.src;
+      img.alt = g.caption;
+      cap.textContent = g.caption;
+      cnt.textContent = (i + 1) + " / " + gallery.length;
+    };
+    const open  = (n) => { i = n; render(); box.classList.remove("hidden"); box.classList.add("flex"); document.body.style.overflow = "hidden"; };
+    const close = ()  => { box.classList.add("hidden"); box.classList.remove("flex"); document.body.style.overflow = ""; };
+    const prev  = ()  => { i = (i - 1 + gallery.length) % gallery.length; render(); };
+    const next  = ()  => { i = (i + 1) % gallery.length; render(); };
+
+    document.querySelectorAll("[data-gallery-open]").forEach((btn) => {
+      btn.addEventListener("click", () => open(parseInt(btn.dataset.galleryOpen || "0", 10)));
+    });
+    box.querySelector("[data-gallery-close]")?.addEventListener("click", close);
+    box.querySelector("[data-gallery-prev]")?.addEventListener("click", prev);
+    box.querySelector("[data-gallery-next]")?.addEventListener("click", next);
+    box.addEventListener("click", (e) => { if (e.target === box) close(); });
+    document.addEventListener("keydown", (e) => {
+      if (box.classList.contains("hidden")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    });
+  })();
+</script>

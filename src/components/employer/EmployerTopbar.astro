@@ -1,0 +1,49 @@
+---
+import Icon from "@components/ui/Icon.astro";
+import { currentEmployer, threads } from "@data/employer";
+
+interface Props { title: string; subtitle?: string; }
+const { title, subtitle } = Astro.props;
+const unread = threads.reduce((s, t) => s + t.unread, 0);
+---
+<header class="employer-topbar sticky top-0 z-30 border-b border-ink-200/70 bg-white/80 backdrop-blur-md dark:!border-white/10 dark:!bg-ink-50/80">
+  <div class="flex flex-wrap items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
+    <button type="button" id="emp-menu" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 lg:hidden dark:!border-white/10 dark:!bg-white/[0.04]" aria-label="Open menu">
+      <Icon name="menu" size={16} />
+    </button>
+
+    <div class="min-w-0 flex-1">
+      <h1 class="text-[18px] font-semibold tracking-tight text-ink-900 sm:text-[22px]">{title}</h1>
+      {subtitle && <p class="mt-0.5 text-[12.5px] text-ink-500">{subtitle}</p>}
+    </div>
+
+    <!-- Quick action: post a job -->
+    <a href="/employer/post-a-job" class="hidden sm:inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600">
+      <Icon name="plus" size={12} strokeWidth={2.2} />
+      Post a job
+    </a>
+
+    <!-- Search -->
+    <form action="/search" method="get" role="search" class="relative order-3 w-full sm:order-none sm:w-64">
+      <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400"><Icon name="search" size={14} /></span>
+      <input name="q" type="search" placeholder="Search applicants, jobs…" aria-label="Search everything" class="h-10 w-full rounded-full border border-ink-200 bg-white pl-10 pr-4 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+    </form>
+
+    <!-- Notifications -->
+    <a href="/employer/notifications" class="relative flex h-10 w-10 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.04]" aria-label="Notifications">
+      <Icon name="bell" size={15} />
+      {unread > 0 && (
+        <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent-500 px-1 text-[9px] font-bold text-white ring-2 ring-white dark:ring-ink-50">{unread}</span>
+      )}
+    </a>
+
+    <a href="/employer/settings" class="flex h-10 w-10 items-center justify-center rounded-full ring-2 ring-transparent transition-all hover:ring-brand-200 dark:hover:!ring-brand-500/30" aria-label="My account">
+      <img src={currentEmployer.avatar} alt={currentEmployer.name} class="h-9 w-9 rounded-full bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+    </a>
+  </div>
+</header>
+<script>
+  document.getElementById("emp-menu")?.addEventListener("click", () => {
+    document.body.dataset.empSidebar = document.body.dataset.empSidebar === "open" ? "closed" : "open";
+  });
+</script>

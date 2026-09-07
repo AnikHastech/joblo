@@ -1,0 +1,166 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import { applications, applicationWithJob } from "@data/dashboard";
+
+// Interviews = applications with "Interview" status. Attach fake schedule details.
+const interviewRows = applications
+  .filter((a) => a.status === "Interview")
+  .map(applicationWithJob)
+  .map((row, i) => ({
+    ...row,
+    slot: ["Thu 3:00 PM PT", "Mon 11:00 AM PT", "Wed 2:30 PM PT"][i] ?? "TBD",
+    duration: ["60 min", "45 min", "90 min"][i] ?? "60 min",
+    round: ["Loop 2 · Portfolio review", "Round 3 · Team meet", "Working session"][i] ?? "Interview",
+    joinUrl: "#",
+    interviewers: [
+      ["Rafael C.", "Sofía Á.", "Diego M."],
+      ["Amara O.", "Kenji N."],
+      ["Priya R.", "Marcus B.", "James O.", "Elena V."],
+    ][i] ?? ["Team member"],
+  }));
+
+const past = 2; // fake past-interview count for the tally
+const upcoming = interviewRows.length;
+---
+<DashboardLayout
+  title="Interviews"
+  subtitle={`${upcoming} upcoming · ${past} completed · median cycle ~7 days`}
+  active="interviews"
+>
+  <!-- Toolbar -->
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div class="inline-flex rounded-full border border-ink-200 bg-white p-0.5 dark:!border-white/10 dark:!bg-white/[0.04]" role="group">
+      <button type="button" data-int-filter="upcoming"  data-active="true"  class="int-tab rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">Upcoming ({upcoming})</button>
+      <button type="button" data-int-filter="past"       data-active="false" class="int-tab rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900">Past ({past})</button>
+      <button type="button" data-int-filter="cancelled"  data-active="false" class="int-tab rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900">Cancelled (0)</button>
+    </div>
+    <a href="/dashboard/applications" class="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]">
+      <Icon name="briefcase" size={12} />
+      Applications
+    </a>
+  </div>
+
+  {upcoming === 0 ? (
+    <EmptyState
+      icon="bell"
+      title="No interviews scheduled"
+      body="When a company invites you to interview, it'll show up here with a countdown and prep tips."
+      ctaLabel="Browse jobs"
+      ctaHref="/jobs"
+    />
+  ) : (
+    <div class="space-y-4">
+      {interviewRows.map(({ application, job, company }, i) => job && company && (
+        <article class="int-card group relative overflow-hidden rounded-3xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.035]" data-status="upcoming">
+          <!-- Left color rail -->
+          <span class="absolute left-0 top-0 bottom-0 w-1" style={`background:${company.brandColor}`}></span>
+
+          <div class="p-6 sm:p-7 pl-8 sm:pl-9 grid gap-6 lg:grid-cols-12">
+            <!-- Left: role + interviewers -->
+            <div class="lg:col-span-8">
+              <div class="flex items-start gap-4">
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[13px] font-bold text-white" style={`background:${company.brandColor}`}>{company.name[0]}</span>
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <p class="text-[11.5px] font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-400">{i === 0 ? "Next up" : `Interview ${i + 1}`}</p>
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-semibold text-violet-700 dark:!bg-violet-500/15 dark:text-violet-400">
+                      <span class="h-1.5 w-1.5 rounded-full bg-violet-500"></span>
+                      Interview
+                    </span>
+                  </div>
+                  <a href={`/jobs/${job.slug}`} class="mt-1.5 block text-[18px] font-semibold tracking-tight text-ink-900 hover:text-brand-700 transition-colors">
+                    {job.title}
+                  </a>
+                  <p class="mt-1 text-[13px] text-ink-500">{company.name} · {job.location}</p>
+                </div>
+              </div>
+
+              <div class="mt-5 rounded-2xl border border-ink-200 bg-ink-50/60 p-4 dark:!border-white/10 dark:!bg-white/[0.02]">
+                <p class="text-[11px] font-bold uppercase tracking-widest text-ink-500">Round · {i + 2} of 4</p>
+                <p class="mt-1 text-[14.5px] font-semibold text-ink-900">{interviewRows[i].round}</p>
+                <p class="mt-1 text-[13px] text-ink-600">{application.nextStep ?? application.lastUpdate}</p>
+              </div>
+
+              <div class="mt-5">
+                <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Interviewers</p>
+                <div class="mt-3 flex flex-wrap items-center gap-2">
+                  {interviewRows[i].interviewers.map((name, idx) => (
+                    <span class="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white pl-1 pr-3 py-1 text-[12.5px] text-ink-800 dark:!border-white/10 dark:!bg-white/[0.03]">
+                      <span class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white" style={`background:hsl(${(idx * 60 + 180) % 360},60%,55%)`}>
+                        {name[0]}
+                      </span>
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: schedule -->
+            <aside class="lg:col-span-4">
+              <div class="rounded-2xl bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-5 dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-700 dark:text-brand-400">When</p>
+                <p class="mt-2 text-[24px] font-semibold tracking-tight text-ink-900">{interviewRows[i].slot}</p>
+                <p class="mt-1 text-[12.5px] text-ink-500">{interviewRows[i].duration} · Video call</p>
+                <div class="mt-4 flex flex-col gap-2">
+                  <a href={interviewRows[i].joinUrl} class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13.5px] font-semibold text-ink-50 hover:bg-brand-600">
+                    <Icon name="arrowUpRight" size={12} />
+                    Join call
+                  </a>
+                  <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+                    <Icon name="clock" size={12} />
+                    Reschedule
+                  </button>
+                </div>
+              </div>
+
+              <!-- Prep tips -->
+              <div class="mt-4 rounded-2xl border border-ink-200 p-4 dark:!border-white/10">
+                <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Prep checklist</p>
+                <ul class="mt-3 space-y-2 text-[12.5px]">
+                  {[
+                    "Review the company's latest launches",
+                    "Prepare 2 walkthroughs from your portfolio",
+                    "Draft 3 questions for the interviewers",
+                  ].map((t, ti) => (
+                    <li class="flex items-start gap-2">
+                      <span class={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${ti === 0 ? "bg-brand-600 text-white" : "border border-ink-300"}`}>
+                        {ti === 0 && <Icon name="check" size={9} strokeWidth={2.5} />}
+                      </span>
+                      <span class="text-ink-700">{t}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </article>
+      ))}
+      <div id="int-empty" hidden class="rounded-3xl border border-dashed border-ink-200 bg-ink-50/40 p-10 text-center dark:!border-white/10 dark:!bg-white/[0.02]">
+        <p class="text-[14px] font-semibold text-ink-900">Nothing here yet</p>
+        <p class="mt-1 text-[12.5px] text-ink-500">Interviews in this tab will show up as they happen.</p>
+      </div>
+    </div>
+  )}
+
+  <script>
+    const tabs = document.querySelectorAll<HTMLButtonElement>(".int-tab");
+    const cards = document.querySelectorAll<HTMLElement>(".int-card");
+    const empty = document.getElementById("int-empty");
+    tabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabs.forEach((b) => (b.dataset.active = String(b === btn)));
+        const f = btn.dataset.intFilter;
+        let visible = 0;
+        cards.forEach((c) => {
+          const show = c.dataset.status === f;
+          c.hidden = !show;
+          if (show) visible++;
+        });
+        if (empty) empty.hidden = visible > 0;
+      });
+    });
+  </script>
+</DashboardLayout>

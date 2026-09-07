@@ -1,0 +1,112 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import Button from "@components/ui/Button.astro";
+
+const steps = [
+  {
+    n: "01",
+    title: "Build a profile in minutes",
+    body: "Upload a résumé or connect LinkedIn. Our AI structures your experience and highlights what stands out.",
+    accent: "brand",
+    icon: "users" as const,
+    proof: { k: "4 min", v: "avg. profile time" },
+  },
+  {
+    n: "02",
+    title: "Get matched to real roles",
+    body: "We pair you with verified openings from teams that fit your skills, values, and salary range — not more spam.",
+    accent: "accent",
+    icon: "sparkles" as const,
+    proof: { k: "94%", v: "match accuracy" },
+  },
+  {
+    n: "03",
+    title: "Apply and hear back — fast",
+    body: "One-click applications, transparent hiring status, and messages straight from hiring managers. No black holes.",
+    accent: "success",
+    icon: "checkCircle" as const,
+    proof: { k: "12d", v: "avg. response" },
+  },
+];
+
+const accents: Record<string, { bg: string; text: string; ring: string; grad: string; proof: string }> = {
+  brand:   { bg: "bg-brand-50",   text: "text-brand-700",   ring: "ring-brand-200",   grad: "from-brand-500 to-brand-700",     proof: "text-brand-700"   },
+  accent:  { bg: "bg-accent-50",  text: "text-accent-700",  ring: "ring-accent-200",  grad: "from-accent-500 to-accent-600",   proof: "text-accent-700"  },
+  success: { bg: "bg-emerald-50", text: "text-emerald-700", ring: "ring-emerald-200", grad: "from-emerald-500 to-emerald-700", proof: "text-emerald-700" },
+};
+---
+<section class="section-how-it-works py-20 sm:py-28">
+  <Container size="xl">
+    <div class="mx-auto max-w-3xl text-center">
+      <SectionEyebrow number={3} label="How it works" class="justify-center" />
+      <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+        Three steps between you and your <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">next role.</span>
+      </h2>
+      <p class="mt-5 text-[16px] leading-relaxed text-ink-600">
+        No résumé black holes. No spammy job feeds. Just a straight line from your skills to the teams that need them.
+      </p>
+    </div>
+
+    <!-- Progress stepper above cards -->
+    <div class="mx-auto mt-14 hidden max-w-2xl items-center md:flex" aria-hidden="true">
+      <div class="flex items-center gap-2.5">
+        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-[13px] font-bold text-white shadow-sm ring-4 ring-brand-100 dark:ring-brand-500/20">1</span>
+        <span class="text-[13.5px] font-semibold text-ink-900">Profile</span>
+      </div>
+      <div class="mx-3 h-px flex-1 bg-gradient-to-r from-brand-400 to-accent-400"></div>
+      <div class="flex items-center gap-2.5">
+        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-accent-500 text-[13px] font-bold text-white shadow-sm ring-4 ring-accent-100 dark:ring-accent-500/20">2</span>
+        <span class="text-[13.5px] font-semibold text-ink-900">Match</span>
+      </div>
+      <div class="mx-3 h-px flex-1 bg-gradient-to-r from-accent-400 to-emerald-400"></div>
+      <div class="flex items-center gap-2.5">
+        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-[13px] font-bold text-white shadow-sm ring-4 ring-emerald-100 dark:ring-emerald-500/20">3</span>
+        <span class="text-[13.5px] font-semibold text-ink-900">Apply</span>
+      </div>
+    </div>
+
+    <div class="relative mt-8 grid gap-6 md:grid-cols-3">
+      {steps.map((s, i) => {
+        const a = accents[s.accent];
+        return (
+          <div class="group relative flex flex-col overflow-hidden rounded-2xl border border-ink-200/70 bg-white p-7 transition-all hover:-translate-y-1 hover:shadow-xl hover:border-ink-300 dark:border-white/[0.08] dark:!bg-white/[0.035] dark:hover:border-white/20 dark:hover:!bg-white/[0.055]">
+            <!-- Corner accent glow on hover -->
+            <div
+              class={`pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40 bg-gradient-to-br ${a.grad}`}
+              aria-hidden="true"
+            ></div>
+
+            <div class="relative flex items-center justify-between gap-2">
+              <span class={`inline-flex h-12 w-12 items-center justify-center rounded-xl ring-4 ${a.bg} ${a.text} ${a.ring}`}>
+                <Icon name={s.icon} size={20} strokeWidth={1.8} />
+              </span>
+              <span class={`font-display text-[48px] italic font-normal leading-[1.15] tracking-tight bg-gradient-to-br bg-clip-text text-transparent pr-1 ${a.grad} opacity-70`}>
+                {s.n}
+              </span>
+            </div>
+
+            <h3 class="relative mt-6 text-[19px] font-semibold tracking-tight text-ink-900">{s.title}</h3>
+            <p class="relative mt-2 flex-1 text-[15px] leading-relaxed text-ink-600">{s.body}</p>
+
+            <!-- Proof mini-strip -->
+            <div class="relative mt-6 flex items-center justify-between rounded-lg border border-ink-100 bg-ink-50/60 px-3 py-2.5 dark:border-white/10 dark:!bg-white/[0.04]">
+              <span class="text-[10.5px] font-semibold uppercase tracking-widest text-ink-500">{s.proof.v}</span>
+              <span class={`text-[15px] font-semibold tabular-nums tracking-tight ${a.proof}`}>{s.proof.k}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    <!-- Bottom dual CTA -->
+    <div class="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <Button href="/register" variant="primary" size="md" icon>Start your profile</Button>
+      <a href="/about" class="inline-flex items-center gap-1.5 text-[14px] font-medium text-ink-700 hover:text-brand-700 transition-colors">
+        <Icon name="play" size={11} strokeWidth={2} class="text-accent-500" />
+        Watch a 90-second demo
+      </a>
+    </div>
+  </Container>
+</section>

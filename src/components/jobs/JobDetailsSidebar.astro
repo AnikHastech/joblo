@@ -1,0 +1,166 @@
+---
+import Icon from "@components/ui/Icon.astro";
+import CompanyMark from "@components/common/CompanyMark.astro";
+import type { Job, Company } from "@types/index";
+
+interface Props {
+  job: Job;
+  company: Company;
+}
+const { job, company } = Astro.props;
+
+const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(0)}k` : `${n}`);
+const sym = job.currency === "USD" ? "$" : job.currency === "EUR" ? "€" : `${job.currency} `;
+const salary = `${sym}${fmt(job.salaryMin)}–${fmt(job.salaryMax)}`;
+
+// Insight numbers (deterministic per job)
+const seed = job.id.charCodeAt(1) || 5;
+const responseRate = 82 + (seed % 15);
+const respondsIn = ((seed % 3) + 1) * 2;
+const shortlistPct = 8 + (seed % 6);
+
+const facts: { icon: any; label: string; value: string }[] = [
+  { icon: "briefcase", label: "Employment", value: job.type },
+  { icon: "award",     label: "Experience", value: job.experience + " level" },
+  { icon: "mapPin",    label: "Location",   value: job.location },
+  { icon: "globe",     label: "Remote",     value: job.remote ? "Yes — worldwide" : "On-site" },
+  { icon: "wallet",    label: "Salary",     value: `${salary} /yr` },
+  { icon: "clock",     label: "Posted",     value: job.postedDaysAgo === 0 ? "Today" : `${job.postedDaysAgo}d ago` },
+];
+---
+<aside class="space-y-5">
+  <!-- Apply CTA card -->
+  <div class="rounded-2xl border border-ink-200/70 bg-white/80 p-5 backdrop-blur-sm shadow-sm dark:!border-white/10 dark:!bg-white/[0.04]">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-[11px] uppercase tracking-widest text-ink-400">Application deadline</p>
+        <p class="mt-1 text-[14px] font-semibold text-ink-900">Rolling · apply soon</p>
+      </div>
+      <span class="relative flex h-2 w-2">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+      </span>
+    </div>
+    <div class="mt-4 flex flex-col gap-2.5">
+      <a
+        href="#apply"
+        class="group inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink-900 px-5 text-[14px] font-semibold text-ink-50 shadow-sm transition-all hover:bg-brand-600 hover:shadow-md dark:!bg-brand-600 dark:hover:!bg-brand-500"
+      >
+        Apply for this role
+        <Icon name="arrowRight" size={15} class="transition-transform group-hover:translate-x-0.5" />
+      </a>
+      <div class="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-2 text-[13px] font-medium text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.03] dark:text-ink-800"
+          aria-label={`Save ${job.title}`}
+        >
+          <Icon name="bookmark" size={14} />
+          Save
+        </button>
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 py-2 text-[13px] font-medium text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.03] dark:text-ink-800"
+          aria-label="Share this role"
+        >
+          <Icon name="send" size={13} />
+          Share
+        </button>
+      </div>
+    </div>
+    <p class="mt-4 text-[12px] leading-relaxed text-ink-500">
+      Takes 2 minutes. Your profile is auto-filled — you can review before submitting.
+    </p>
+  </div>
+
+  <!-- Company card -->
+  <div class="rounded-2xl border border-ink-200/70 bg-white p-6 shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+    <div class="flex items-start gap-3">
+      <CompanyMark slug={company.slug} size="md" />
+      <div class="min-w-0 flex-1">
+        <a href={`/companies/${company.slug}`} class="flex items-center gap-1.5 text-[15px] font-semibold text-ink-900 hover:text-brand-700 transition-colors">
+          {company.name}
+          {company.verified && (
+            <span class="text-brand-500" title="Verified employer" aria-label="Verified">
+              <Icon name="checkCircle" size={13} strokeWidth={2} />
+            </span>
+          )}
+        </a>
+        <p class="mt-0.5 text-[12.5px] text-ink-500">{company.industry} · {company.size}</p>
+      </div>
+    </div>
+
+    {company.description && (
+      <p class="mt-4 text-[13.5px] leading-relaxed text-ink-600">{company.description}</p>
+    )}
+
+    <div class="mt-5 grid grid-cols-2 gap-3 text-center">
+      <div class="rounded-xl bg-ink-50 p-3 dark:!bg-white/[0.04]">
+        <p class="text-[18px] font-semibold text-ink-900 tabular-nums">{company.openings ?? 0}</p>
+        <p class="mt-0.5 text-[10.5px] uppercase tracking-widest text-ink-500">Openings</p>
+      </div>
+      <div class="rounded-xl bg-ink-50 p-3 dark:!bg-white/[0.04]">
+        <p class="text-[18px] font-semibold text-ink-900 tabular-nums">{responseRate}%</p>
+        <p class="mt-0.5 text-[10.5px] uppercase tracking-widest text-ink-500">Response rate</p>
+      </div>
+    </div>
+
+    <a
+      href={`/companies/${company.slug}`}
+      class="mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 py-2.5 text-[13px] font-medium text-ink-800 transition-colors hover:border-ink-400 hover:bg-ink-50 dark:!border-white/10 dark:!bg-white/[0.03] dark:hover:!bg-white/[0.06]"
+    >
+      View company profile
+      <Icon name="arrowUpRight" size={13} />
+    </a>
+  </div>
+
+  <!-- Quick facts -->
+  <div class="rounded-2xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Role at a glance</p>
+    <dl class="mt-4 space-y-3.5">
+      {facts.map((f) => (
+        <div class="flex items-start justify-between gap-4">
+          <dt class="inline-flex items-center gap-2 text-[13px] text-ink-500">
+            <Icon name={f.icon} size={13} />
+            {f.label}
+          </dt>
+          <dd class="text-right text-[13.5px] font-medium text-ink-900">{f.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+
+  <!-- Hiring insights -->
+  <div class="rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+    <div class="flex items-center gap-2 text-brand-700 dark:text-brand-400">
+      <Icon name="sparkles" size={14} />
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em]">Hiring signal</p>
+    </div>
+    <p class="mt-3 text-[14.5px] leading-relaxed text-ink-800">
+      Hiring manager typically responds in <span class="font-semibold text-ink-900">{respondsIn} days</span>. About <span class="font-semibold text-ink-900">{shortlistPct}%</span> of applicants get to a first call.
+    </p>
+    <div class="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/70 dark:!bg-white/10">
+      <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500" style={`width:${responseRate}%`}></div>
+    </div>
+    <p class="mt-2 flex items-center justify-between text-[11.5px] text-ink-500">
+      <span>Response rate</span>
+      <span class="tabular-nums font-medium text-ink-800">{responseRate}%</span>
+    </p>
+  </div>
+
+  <!-- Share -->
+  <div class="rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 p-5 text-center dark:!border-white/10 dark:!bg-white/[0.02]">
+    <p class="text-[12.5px] text-ink-600">Know someone who'd be perfect?</p>
+    <div class="mt-3 flex items-center justify-center gap-2">
+      <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.04]" aria-label="Share on LinkedIn">
+        <Icon name="linkedin" size={14} />
+      </button>
+      <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.04]" aria-label="Share on X">
+        <Icon name="twitter" size={14} />
+      </button>
+      <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900 dark:!border-white/10 dark:!bg-white/[0.04]" aria-label="Copy link">
+        <Icon name="send" size={13} />
+      </button>
+    </div>
+  </div>
+</aside>

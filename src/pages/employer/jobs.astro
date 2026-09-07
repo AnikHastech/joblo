@@ -1,0 +1,97 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import EmptyState from "@components/ui/EmptyState.astro";
+import { companyJobs, jobExtras } from "@data/employer";
+
+const statusStyle = {
+  Live:   { bg: "bg-emerald-100", text: "text-emerald-800", dot: "bg-emerald-500" },
+  Draft:  { bg: "bg-ink-100",     text: "text-ink-700",     dot: "bg-ink-500"     },
+  Paused: { bg: "bg-amber-100",   text: "text-amber-800",   dot: "bg-amber-500"   },
+  Closed: { bg: "bg-rose-100",    text: "text-rose-700",    dot: "bg-rose-500"    },
+};
+---
+<EmployerLayout
+  title="Manage jobs"
+  subtitle={`${companyJobs.length} role${companyJobs.length === 1 ? "" : "s"} live · edit, pause, or repost from here.`}
+  active="jobs"
+>
+  <div class="rounded-3xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-100 p-4 dark:!border-white/[0.06]">
+      <div class="inline-flex rounded-full border border-ink-200 bg-white p-0.5 dark:!border-white/10 dark:!bg-white/[0.04]" role="group">
+        <button type="button" data-job-filter="all"    data-active="true"  class="job-tab rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50">All ({companyJobs.length})</button>
+        <button type="button" data-job-filter="Live"   data-active="false" class="job-tab rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900">Live</button>
+        <button type="button" data-job-filter="Draft"  data-active="false" class="job-tab rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900">Draft</button>
+        <button type="button" data-job-filter="Paused" data-active="false" class="job-tab rounded-full px-3.5 py-1.5 text-[12.5px] font-medium text-ink-500 hover:text-ink-900">Paused</button>
+      </div>
+      <a href="/employer/post-a-job" class="inline-flex items-center gap-1.5 rounded-full bg-ink-900 px-4 py-2 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+        <Icon name="plus" size={12} strokeWidth={2.2} /> New job
+      </a>
+    </div>
+
+    {companyJobs.length === 0 ? (
+      <div class="p-10">
+        <EmptyState icon="briefcase" title="You haven't posted any jobs yet" body="Publish your first role and it'll appear on the marketplace in minutes." ctaLabel="Post your first job" ctaHref="/employer/post-a-job" />
+      </div>
+    ) : (
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[880px] text-left text-[13.5px]">
+          <thead>
+            <tr class="text-[11px] font-bold uppercase tracking-widest text-ink-500">
+              <th class="px-6 py-3.5">Role</th>
+              <th class="px-4 py-3.5">Status</th>
+              <th class="px-4 py-3.5 text-right">Views</th>
+              <th class="px-4 py-3.5 text-right">Applicants</th>
+              <th class="px-4 py-3.5">Posted</th>
+              <th class="px-6 py-3.5 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {companyJobs.map((j) => {
+              const x = jobExtras[j.id] ?? { status: "Live" as const, views: 0, applicantCount: 0 };
+              const s = statusStyle[x.status];
+              return (
+                <tr class="job-row border-t border-ink-100 transition-colors hover:bg-ink-50/40 dark:!border-white/[0.06] dark:hover:!bg-white/[0.02]" data-status={x.status}>
+                  <td class="px-6 py-4">
+                    <a href={`/jobs/${j.slug}`} class="text-[14px] font-semibold text-ink-900 hover:text-brand-700 transition-colors">{j.title}</a>
+                    <p class="mt-0.5 text-[12px] text-ink-500">{j.type} · {j.experience} · {j.location}</p>
+                  </td>
+                  <td class="px-4 py-4">
+                    <span class={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px] font-semibold ${s.bg} ${s.text}`}>
+                      <span class={`h-1.5 w-1.5 rounded-full ${s.dot}`}></span>
+                      {x.status}
+                    </span>
+                  </td>
+                  <td class="px-4 py-4 text-right tabular-nums text-ink-700">{x.views.toLocaleString()}</td>
+                  <td class="px-4 py-4 text-right tabular-nums">
+                    <a href={`/employer/applicants?job=${j.id}`} class="font-semibold text-brand-700 hover:underline">{x.applicantCount}</a>
+                  </td>
+                  <td class="px-4 py-4 text-ink-500 tabular-nums">{j.postedDaysAgo}d ago</td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="inline-flex items-center gap-1">
+                      <a href={`/jobs/${j.slug}`} class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400 hover:text-ink-900 dark:!border-white/10" aria-label="View"><Icon name="arrowUpRight" size={11} /></a>
+                      <a href="/employer/post-a-job" class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400 hover:text-ink-900 dark:!border-white/10" aria-label="Edit"><Icon name="filter" size={11} /></a>
+                      <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-rose-400 hover:text-rose-600 dark:!border-white/10" aria-label="More"><Icon name="close" size={11} /></button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll<HTMLButtonElement>(".job-tab");
+    const rows = document.querySelectorAll<HTMLElement>(".job-row");
+    tabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabs.forEach((b) => (b.dataset.active = String(b === btn)));
+        const f = btn.dataset.jobFilter;
+        rows.forEach((r) => { r.hidden = !(f === "all" || r.dataset.status === f); });
+      });
+    });
+  </script>
+</EmployerLayout>

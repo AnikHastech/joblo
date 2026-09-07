@@ -1,0 +1,96 @@
+---
+import Container from "@components/ui/Container.astro";
+import JobCard from "@components/jobs/JobCard.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { featuredJobs } from "@data/jobs";
+
+const items = featuredJobs.slice(0, 6);
+
+const tabs = [
+  { label: "All",         filter: "all" },
+  { label: "Design",      filter: "design" },
+  { label: "Engineering", filter: "engineering" },
+  { label: "Product",     filter: "product" },
+  { label: "Marketing",   filter: "marketing" },
+  { label: "Remote",      filter: "remote" },
+];
+---
+<section class="section-featured-jobs py-20 sm:py-28 bg-white">
+  <Container size="xl">
+    <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+      <div class="max-w-2xl">
+        <SectionEyebrow number={2} label="Featured this week" />
+        <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+          Roles worth
+          <span class="font-display italic font-normal">saying yes to.</span>
+        </h2>
+      </div>
+      <a href="/jobs" class="inline-flex items-center gap-2 text-[14.5px] font-medium text-brand-700 hover:gap-3 transition-all">
+        Browse all 128,540 jobs
+        <Icon name="arrowRight" size={14} />
+      </a>
+    </div>
+
+    <div class="mt-10 flex flex-wrap gap-2" role="tablist" aria-label="Filter featured jobs" id="featured-tabs">
+      {tabs.map((t, i) => (
+        <button
+          type="button"
+          role="tab"
+          data-filter={t.filter}
+          data-active={i === 0 ? "true" : "false"}
+          aria-selected={i === 0 ? "true" : "false"}
+          class="job-filter-btn rounded-full border px-4 py-2 text-[13.5px] font-medium transition-all
+                 border-ink-200 bg-white text-ink-700 hover:border-ink-400 hover:text-ink-900
+                 data-[active=true]:!border-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50"
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+
+    <div id="featured-grid" class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {items.map((j) => (
+        <div class="job-item transition-opacity duration-200" data-category={j.categorySlug} data-remote={String(j.remote)}>
+          <JobCard job={j} />
+        </div>
+      ))}
+    </div>
+
+    <p id="featured-empty" hidden class="mt-10 rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 p-10 text-center text-[15px] text-ink-500">
+      No featured roles match this filter yet. Try another category.
+    </p>
+  </Container>
+</section>
+
+<script>
+  const tabs = document.querySelectorAll<HTMLButtonElement>("#featured-tabs .job-filter-btn");
+  const items = document.querySelectorAll<HTMLElement>("#featured-grid .job-item");
+  const empty = document.getElementById("featured-empty");
+
+  const applyFilter = (filter: string) => {
+    let visible = 0;
+    items.forEach((item) => {
+      const cat = item.dataset.category ?? "";
+      const remote = item.dataset.remote === "true";
+      const show =
+        filter === "all"      ? true :
+        filter === "remote"   ? remote :
+                                cat === filter;
+      item.hidden = !show;
+      if (show) visible++;
+    });
+    if (empty) empty.hidden = visible !== 0;
+  };
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => {
+        const active = t === tab;
+        t.dataset.active = String(active);
+        t.setAttribute("aria-selected", String(active));
+      });
+      applyFilter(tab.dataset.filter ?? "all");
+    });
+  });
+</script>

@@ -1,0 +1,136 @@
+---
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import StatCard from "@components/dashboard/StatCard.astro";
+import Icon from "@components/ui/Icon.astro";
+
+interface MyReferral {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  stage: "Submitted" | "In review" | "Interview" | "Offer" | "Hired" | "Closed";
+  submitted: string;
+  bonus: string;
+}
+
+const myReferrals: MyReferral[] = [
+  { id: "mr-1", name: "Priya Anand",   role: "Product Manager",     company: "Stripe",  stage: "Interview",   submitted: "5d ago", bonus: "$1,500" },
+  { id: "mr-2", name: "Alex Turner",   role: "Sr. Engineer",         company: "Linear",  stage: "Offer",        submitted: "1w ago", bonus: "$2,500" },
+  { id: "mr-3", name: "Sam Fitzgerald",role: "DevOps Engineer",       company: "Supabase",stage: "Hired",        submitted: "3w ago", bonus: "$3,500" },
+  { id: "mr-4", name: "Ana Rodriguez", role: "Brand Designer",         company: "Figma",   stage: "Closed",       submitted: "2mo ago",bonus: "$0" },
+];
+
+const stats = [
+  { label: "Referrals sent",  value: myReferrals.length,                                        icon: "send",       tone: "brand"   as const },
+  { label: "In pipeline",     value: myReferrals.filter((r) => ["Submitted","In review","Interview","Offer"].includes(r.stage)).length, icon: "sparkles", tone: "info" as const },
+  { label: "Successful hires",value: myReferrals.filter((r) => r.stage === "Hired").length,      icon: "checkCircle", tone: "success" as const },
+  { label: "Earned bonuses",  value: "$3,500",                                                    icon: "wallet",     tone: "accent"  as const },
+];
+
+const stageChip: Record<string, string> = {
+  Submitted: "bg-ink-100 text-ink-700 dark:!bg-white/[0.06] dark:!text-ink-800",
+  "In review":"bg-sky-100 text-sky-700 dark:!bg-sky-500/15 dark:!text-sky-400",
+  Interview: "bg-violet-100 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400",
+  Offer:     "bg-amber-100 text-amber-800 dark:!bg-amber-500/15 dark:!text-amber-400",
+  Hired:     "bg-emerald-100 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400",
+  Closed:    "bg-rose-100 text-rose-700 dark:!bg-rose-500/15 dark:!text-rose-400",
+};
+---
+<DashboardLayout title="Referrals" active="referrals">
+  <header>
+    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Bring your people in</p>
+    <h1 class="mt-2 text-[26px] font-semibold leading-tight tracking-tight text-ink-900 sm:text-[32px]">
+      Refer someone <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">amazing</span>
+    </h1>
+    <p class="mt-2 text-[13.5px] text-ink-500">Your referrals get priority review. You get paid when they succeed.</p>
+  </header>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    {stats.map((s) => <StatCard {...s} />)}
+  </div>
+
+  <!-- Refer form -->
+  <div class="mt-8 grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2 rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 p-6 sm:p-8 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+      <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-brand-700 dark:!text-brand-400">Quick refer</p>
+      <h2 class="mt-2 text-[20px] font-semibold tracking-tight text-ink-900 sm:text-[22px]">Send a referral in 30 seconds</h2>
+      <form class="mt-5 grid gap-3 sm:grid-cols-2">
+        <label class="block sm:col-span-1">
+          <span class="text-[11.5px] font-medium text-ink-700">Their name</span>
+          <input type="text" placeholder="Alex Turner" class="mt-1 h-10 w-full rounded-xl border border-ink-200 bg-white px-3 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+        </label>
+        <label class="block sm:col-span-1">
+          <span class="text-[11.5px] font-medium text-ink-700">Their email</span>
+          <input type="email" placeholder="alex@work.com" class="mt-1 h-10 w-full rounded-xl border border-ink-200 bg-white px-3 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+        </label>
+        <label class="block sm:col-span-2">
+          <span class="text-[11.5px] font-medium text-ink-700">Role or company</span>
+          <input type="text" placeholder="Senior Frontend Engineer at Linear" class="mt-1 h-10 w-full rounded-xl border border-ink-200 bg-white px-3 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+        </label>
+        <label class="block sm:col-span-2">
+          <span class="text-[11.5px] font-medium text-ink-700">Why they'd be a great fit</span>
+          <textarea rows="3" placeholder="Their strengths, what they've built, why they'd thrive here…" class="mt-1 w-full rounded-xl border border-ink-200 bg-white p-3 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+        </label>
+        <div class="sm:col-span-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <button type="submit" class="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-ink-900 px-5 text-[13.5px] font-semibold text-ink-50 hover:bg-brand-600">
+            Send referral
+            <Icon name="send" size={13} />
+          </button>
+          <button type="button" class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-4 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+            Copy invite link
+            <Icon name="arrowUpRight" size={12} />
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <aside class="rounded-2xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">How the bonus works</p>
+      <ol class="mt-4 space-y-3">
+        {[
+          "Send a referral · they get priority review",
+          "They pass the first interview · you earn $500",
+          "They accept an offer · you earn $1,000 more",
+          "They stay 6 months · another $2,000",
+        ].map((t, i) => (
+          <li class="flex items-start gap-2.5 text-[13px] leading-relaxed text-ink-700">
+            <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink-900 text-[10.5px] font-bold text-ink-50 tabular-nums dark:!bg-brand-500 dark:!text-white">
+              {i + 1}
+            </span>
+            {t}
+          </li>
+        ))}
+      </ol>
+    </aside>
+  </div>
+
+  <!-- My referrals list -->
+  <div class="mt-10 rounded-2xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+    <header class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-200 p-5 dark:!border-white/[0.06]">
+      <div>
+        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Your referrals</p>
+        <h2 class="mt-1 text-[17px] font-semibold text-ink-900">Track their progress</h2>
+      </div>
+    </header>
+    <ul class="divide-y divide-ink-100 dark:!divide-white/[0.06]">
+      {myReferrals.map((r) => (
+        <li class="flex flex-wrap items-center gap-3 p-4 sm:p-5">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-[11.5px] font-bold text-ink-50 dark:!bg-brand-500 dark:!text-white">
+            {r.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13.5px] font-semibold text-ink-900">{r.name}</p>
+            <p class="mt-0.5 text-[11.5px] text-ink-500">{r.role} · <span class="font-semibold text-ink-700">{r.company}</span></p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <span class={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${stageChip[r.stage]}`}>
+              {r.stage}
+            </span>
+            <span class="text-[12.5px] font-semibold tabular-nums text-emerald-600 dark:!text-emerald-400 min-w-[56px] text-right">{r.bonus}</span>
+            <span class="hidden text-[11.5px] tabular-nums text-ink-500 sm:inline">{r.submitted}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</DashboardLayout>

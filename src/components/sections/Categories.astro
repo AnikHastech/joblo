@@ -1,0 +1,29 @@
+---
+import Container from "@components/ui/Container.astro";
+import CategoryCard from "@components/cards/CategoryCard.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import { categories } from "@data/categories";
+---
+<section class="section-categories py-20 sm:py-28">
+  <Container size="xl">
+    <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+      <div class="max-w-2xl">
+        <SectionEyebrow number={1} label="Categories" />
+        <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+          Find work in the <span class="font-display italic font-normal text-brand-600">field</span> you love.
+        </h2>
+        <p class="mt-4 text-lg text-ink-600">
+          Curated categories across engineering, design, product, and beyond — updated hourly with fresh opportunities.
+        </p>
+      </div>
+      <a href="/categories" class="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-5 py-3 text-[14.5px] font-medium text-ink-900 transition-all hover:border-ink-900 hover:bg-ink-900 hover:text-ink-50">
+        All categories
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7 3m4 4l-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <div class="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+      {categories.map((c) => <CategoryCard category={c} />)}
+    </div>
+  </Container>
+</section>

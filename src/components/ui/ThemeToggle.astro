@@ -1,0 +1,41 @@
+---
+import Icon from "@components/ui/Icon.astro";
+---
+<div
+  role="group"
+  aria-label="Color theme"
+  class="fixed right-4 top-1/2 z-50 -translate-y-1/2 sm:right-5"
+>
+  <div class="flex flex-col rounded-full border border-ink-200/70 bg-white/80 p-1 shadow-lg shadow-ink-900/10 backdrop-blur-xl">
+    <button
+      type="button"
+      data-theme="light"
+      class="theme-btn group flex h-9 w-9 items-center justify-center rounded-full text-ink-500 transition-all hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+      aria-label="Switch to light mode"
+    >
+      <Icon name="sun" size={16} strokeWidth={1.8} />
+    </button>
+    <button
+      type="button"
+      data-theme="dark"
+      class="theme-btn group flex h-9 w-9 items-center justify-center rounded-full text-ink-500 transition-all hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+      aria-label="Switch to dark mode"
+    >
+      <Icon name="moon" size={16} strokeWidth={1.8} />
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const apply = (theme) => {
+      const html = document.documentElement;
+      html.classList.toggle("dark", theme === "dark");
+      html.dataset.theme = theme;
+      try { localStorage.setItem("theme", theme); } catch (_) {}
+    };
+    document.querySelectorAll(".theme-btn").forEach((btn) => {
+      btn.addEventListener("click", () => apply(btn.dataset.theme));
+    });
+  })();
+</script>

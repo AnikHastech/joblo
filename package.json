@@ -1,0 +1,63 @@
+{
+  "name": "astro-theme-joblo",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Joblo — a premium Astro 7 job-marketplace template with two homepages, full candidate + employer dashboards, verified companies, editorial blog, and structured-data SEO. Tailwind CSS 4, auto-inverting ink tokens, Instrument Serif italic accents, dark-mode first.",
+  "author": {
+    "name": "Aslam Hasib",
+    "email": "hello@hasthemes.com",
+    "url": "https://hasthemes.com"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://hasthemes.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Brandbes-Astro-Themes/joblo"
+  },
+  "bugs": {
+    "url": "https://github.com/Brandbes-Astro-Themes/joblo/issues"
+  },
+  "keywords": [
+    "astro",
+    "astro-theme",
+    "astro-template",
+    "theme",
+    "job-board",
+    "job-marketplace",
+    "recruiting",
+    "hiring",
+    "dashboard",
+    "employer",
+    "candidate",
+    "tailwindcss",
+    "typescript",
+    "responsive",
+    "dark-mode",
+    "seo"
+  ],
+  "engines": {
+    "node": ">=18.14.1"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check",
+    "release:patch": "npm version patch -m \"chore: release %s\" && git push && git push --tags",
+    "release:minor": "npm version minor -m \"chore: release %s\" && git push && git push --tags",
+    "release:major": "npm version major -m \"chore: release %s\" && git push && git push --tags"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.1",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.3"
+  }
+}

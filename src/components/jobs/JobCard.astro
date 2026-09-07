@@ -1,0 +1,100 @@
+---
+import type { Job } from "@types/index";
+import { getCompany } from "@data/companies";
+import Badge from "@components/ui/Badge.astro";
+import Icon from "@components/ui/Icon.astro";
+import CompanyMark from "@components/common/CompanyMark.astro";
+
+interface Props {
+  job: Job;
+  variant?: "default" | "compact" | "feature";
+  class?: string;
+}
+const { job, variant = "default", class: className = "" } = Astro.props;
+const company = getCompany(job.companyId);
+
+const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(0)}k` : `${n}`);
+const salary = `${job.currency === "USD" ? "$" : job.currency === "EUR" ? "€" : job.currency + " "}${fmt(job.salaryMin)}–${fmt(job.salaryMax)}`;
+const posted = job.postedDaysAgo === 0 ? "Today" : job.postedDaysAgo === 1 ? "1d ago" : `${job.postedDaysAgo}d ago`;
+
+const isFeature = variant === "feature";
+const isCompact = variant === "compact";
+---
+<article
+  class={[
+    "group relative flex flex-col rounded-2xl border border-ink-200/70 bg-white p-6 sm:p-7 transition-all duration-300",
+    "dark:border-white/[0.08] dark:!bg-white/[0.035]",
+    "hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg dark:hover:border-white/20 dark:hover:!bg-white/[0.055]",
+    isFeature && "sm:p-8 bg-gradient-to-br from-white to-ink-50/60",
+    className,
+  ].filter(Boolean).join(" ")}
+>
+  <!-- Save button -->
+  {!isCompact && (
+    <button
+      type="button"
+      class="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full text-ink-400 transition-all hover:bg-ink-100 hover:text-brand-600"
+      aria-label={`Save ${job.title}`}
+    >
+      <Icon name="bookmark" size={16} />
+    </button>
+  )}
+
+  {job.featured && !isCompact && (
+    <div class="absolute right-14 top-5">
+      <Badge variant="featured" size="sm" dot>Featured</Badge>
+    </div>
+  )}
+
+  <header class="flex items-start gap-4">
+    <a href={`/companies/${company.slug}`} class="shrink-0" aria-label={company.name}>
+      <CompanyMark slug={company.slug} size={isFeature ? "lg" : "md"} />
+    </a>
+    <div class="min-w-0 flex-1 pr-8">
+      <p class="flex items-center gap-1 text-[13px] text-ink-500">
+        <a href={`/companies/${company.slug}`} class="hover:text-ink-900 transition-colors">{company.name}</a>
+        {company.verified && (
+          <span class="inline-flex text-brand-500" title="Verified employer" aria-label="Verified">
+            <Icon name="checkCircle" size={12} strokeWidth={2} />
+          </span>
+        )}
+      </p>
+      <h3 class={`mt-1 font-semibold tracking-tight text-ink-900 group-hover:text-brand-700 transition-colors ${isFeature ? "text-xl" : "text-[17px]"}`}>
+        <a href={`/jobs/${job.slug}`} class="after:absolute after:inset-0">{job.title}</a>
+      </h3>
+    </div>
+  </header>
+
+  <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-ink-600">
+    <span class="inline-flex items-center gap-1.5">
+      <Icon name="mapPin" size={13} />
+      {job.location}
+    </span>
+    {job.remote && (
+      <span class="inline-flex items-center gap-1.5 text-emerald-700">
+        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Remote
+      </span>
+    )}
+    <span class="inline-flex items-center gap-1.5">
+      <Icon name="briefcase" size={13} />
+      {job.type}
+    </span>
+  </div>
+
+  {!isCompact && (
+    <div class="mt-6 flex flex-wrap gap-1.5">
+      {job.tags.slice(0, 3).map((tag) => <Badge variant="outline" size="sm">{tag}</Badge>)}
+    </div>
+  )}
+
+  <footer class="mt-6 flex items-end justify-between border-t border-ink-100 pt-5 dark:!border-white/[0.06]">
+    <div>
+      <p class="text-[11px] uppercase tracking-wider text-ink-400">Salary</p>
+      <p class="font-semibold tracking-tight text-ink-900 tabular-nums">{salary}<span class="text-xs font-normal text-ink-500">/yr</span></p>
+    </div>
+    <div class="text-right">
+      <p class="text-[11px] uppercase tracking-wider text-ink-400">Posted</p>
+      <p class="text-sm text-ink-700">{posted}</p>
+    </div>
+  </footer>
+</article>

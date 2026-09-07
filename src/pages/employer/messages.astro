@@ -1,0 +1,95 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import Icon from "@components/ui/Icon.astro";
+import { threads, applicantPool, currentEmployer } from "@data/employer";
+import { jobs } from "@data/jobs";
+
+const activeThread = threads[0];
+const activeCandidate = applicantPool.find((c) => c.id === activeThread.candidateId);
+const activeJob = jobs.find((j) => j.id === activeThread.jobId);
+---
+<EmployerLayout
+  title="Messages"
+  subtitle={`${threads.reduce((s, t) => s + t.unread, 0)} unread conversation${threads.reduce((s, t) => s + t.unread, 0) === 1 ? "" : "s"}`}
+  active="messages"
+>
+  <div class="grid gap-0 rounded-3xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.035] lg:grid-cols-[320px_1fr] lg:min-h-[calc(100vh-13rem)]">
+    <!-- Left: thread list -->
+    <aside class="border-b border-ink-100 lg:border-b-0 lg:border-r dark:!border-white/[0.06]">
+      <div class="p-4">
+        <div class="relative">
+          <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400"><Icon name="search" size={13} /></span>
+          <input type="search" placeholder="Search messages…" class="h-10 w-full rounded-full border border-ink-200 bg-white pl-10 pr-4 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]" />
+        </div>
+      </div>
+      <ul class="max-h-[calc(100vh-16rem)] overflow-y-auto lg:max-h-none">
+        {threads.map((t, i) => {
+          const cand = applicantPool.find((c) => c.id === t.candidateId);
+          const job  = jobs.find((j) => j.id === t.jobId);
+          const active = i === 0;
+          return (
+            <li>
+              <a href="#" class={`flex items-start gap-3 border-t border-ink-100 px-4 py-3.5 transition-colors dark:!border-white/[0.06] ${active ? "bg-ink-50 dark:!bg-white/[0.05]" : "hover:bg-ink-50/60 dark:hover:!bg-white/[0.03]"}`}>
+                <div class="relative">
+                  <img src={cand?.avatar} alt={cand?.name} class="h-10 w-10 rounded-xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+                  {t.unread > 0 && <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent-500 px-1 text-[9px] font-bold text-white ring-2 ring-white dark:ring-ink-50">{t.unread}</span>}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-baseline justify-between gap-2">
+                    <p class={`truncate text-[13.5px] ${t.unread ? "font-semibold text-ink-900" : "font-medium text-ink-800"}`}>{cand?.name}</p>
+                    <span class="shrink-0 text-[10.5px] text-ink-500 tabular-nums">{t.lastTime}</span>
+                  </div>
+                  <p class="mt-0.5 truncate text-[11.5px] text-ink-500">{job?.title}</p>
+                  <p class="mt-1 truncate text-[12px] text-ink-600 line-clamp-1">{t.lastMessage}</p>
+                </div>
+                {t.starred && <Icon name="star" size={11} class="mt-1 text-amber-500 shrink-0" />}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </aside>
+
+    <!-- Right: active thread -->
+    <section class="flex flex-col">
+      <!-- Thread header -->
+      {activeCandidate && activeJob && (
+        <header class="flex items-center gap-3 border-b border-ink-100 px-6 py-4 dark:!border-white/[0.06]">
+          <img src={activeCandidate.avatar} alt={activeCandidate.name} class="h-10 w-10 rounded-xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10" />
+          <div class="min-w-0 flex-1">
+            <p class="text-[14.5px] font-semibold text-ink-900">{activeCandidate.name}</p>
+            <p class="mt-0.5 text-[11.5px] text-ink-500 line-clamp-1">{activeThread.subject} · {activeJob.title}</p>
+          </div>
+          <a href={`/employer/applicants/ap-1`} class="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 text-[12.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+            View profile <Icon name="arrowUpRight" size={11} />
+          </a>
+        </header>
+      )}
+
+      <!-- Messages -->
+      <div class="flex-1 space-y-4 overflow-y-auto p-6 max-h-[520px]">
+        {activeThread.messages.map((m) => (
+          <div class={`flex ${m.from === "employer" ? "justify-end" : "justify-start"}`}>
+            <div class={`max-w-[80%] rounded-2xl px-4 py-2.5 ${m.from === "employer" ? "bg-ink-900 text-ink-50 dark:!bg-brand-500" : "bg-ink-100 text-ink-800 dark:!bg-white/[0.06]"}`}>
+              <p class="text-[13.5px] leading-relaxed">{m.body}</p>
+              <p class={`mt-1.5 text-[10.5px] tabular-nums ${m.from === "employer" ? "text-ink-300" : "text-ink-500"}`}>{m.time}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Composer -->
+      <div class="border-t border-ink-100 p-4 dark:!border-white/[0.06]">
+        <form class="flex items-end gap-2">
+          <button type="button" class="flex h-10 w-10 items-center justify-center rounded-full border border-ink-200 text-ink-500 hover:border-ink-400 hover:text-ink-900 dark:!border-white/10" aria-label="Attach">
+            <Icon name="plus" size={13} />
+          </button>
+          <textarea rows="1" placeholder={`Message ${activeCandidate?.name.split(" ")[0]}…`} class="flex-1 resize-none rounded-2xl border border-ink-200 bg-white px-4 py-2.5 text-[13.5px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+          <button type="submit" class="inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+            Send <Icon name="send" size={12} />
+          </button>
+        </form>
+      </div>
+    </section>
+  </div>
+</EmployerLayout>

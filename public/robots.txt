@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Do not index dashboard / employer workspace routes
+Disallow: /dashboard
+Disallow: /employer
+
+Sitemap: https://joblo.example.com/sitemap-index.xml

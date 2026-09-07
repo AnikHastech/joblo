@@ -1,0 +1,32 @@
+---
+import BrandLogo from "@components/common/BrandLogo.astro";
+interface Props {
+  slug?: string;
+  logo?: string;
+  brandColor?: string;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  class?: string;
+}
+const { slug, logo, brandColor, size = "md", class: className = "" } = Astro.props;
+
+// If we have a known brand slug — use the real SVG mark
+// Otherwise fall back to the letter/emoji mark on brandColor
+const sizes = {
+  xs: "h-8 w-8 text-sm rounded-lg",
+  sm: "h-10 w-10 text-base rounded-xl",
+  md: "h-12 w-12 text-lg rounded-xl",
+  lg: "h-16 w-16 text-2xl rounded-2xl",
+  xl: "h-20 w-20 text-3xl rounded-2xl",
+};
+---
+{slug ? (
+  <BrandLogo slug={slug} size={size} class={className} fallbackColor={brandColor} fallbackLetter={logo} />
+) : (
+  <span
+    class={`inline-flex items-center justify-center font-semibold text-white shadow-sm ring-1 ring-black/5 ${sizes[size]} ${className}`}
+    style={`background:${brandColor ?? "#111"}`}
+    aria-hidden="true"
+  >
+    {logo}
+  </span>
+)}

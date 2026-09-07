@@ -1,0 +1,197 @@
+---
+import Container from "@components/ui/Container.astro";
+import Icon from "@components/ui/Icon.astro";
+import Badge from "@components/ui/Badge.astro";
+import CompanyMark from "@components/common/CompanyMark.astro";
+import type { Company } from "@types/index";
+import type { CompanyContent } from "@data/companyContent";
+
+interface Props {
+  company: Company;
+  content: CompanyContent;
+  openingsCount: number;
+}
+const { company, content, openingsCount } = Astro.props;
+
+const followsCount = ((company.id.charCodeAt(1) || 5) * 137).toLocaleString();
+const ratingValue  = (4.4 + (((company.id.charCodeAt(1) || 5) % 5) / 10)).toFixed(1);
+
+const facts = [
+  { label: "Headquarters", value: company.location.split(",")[0], icon: "mapPin",  tone: "brand"   },
+  { label: "Team size",    value: `${company.size}`,              icon: "users",   tone: "violet"  },
+  { label: "Founded",      value: content.founded,                 icon: "clock",   tone: "amber"   },
+  { label: "Funding",      value: content.funding.split(" ·")[0],  icon: "trending",tone: "emerald" },
+];
+
+const toneMap: Record<string, string> = {
+  brand:   "bg-brand-50 text-brand-700 ring-brand-100/60 dark:!bg-brand-500/12 dark:text-brand-400 dark:ring-brand-500/20",
+  emerald: "bg-emerald-50 text-emerald-700 ring-emerald-100/60 dark:!bg-emerald-500/12 dark:text-emerald-400 dark:ring-emerald-500/20",
+  amber:   "bg-amber-50 text-amber-700 ring-amber-100/60 dark:!bg-amber-500/12 dark:text-amber-400 dark:ring-amber-500/20",
+  violet:  "bg-violet-50 text-violet-700 ring-violet-100/60 dark:!bg-violet-500/12 dark:text-violet-400 dark:ring-violet-500/20",
+};
+---
+<section class="section-company-hero relative isolate pt-14 pb-14 sm:pt-20 sm:pb-16">
+  <!-- Brand-tinted ambient cover (uses company brandColor) -->
+  <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] overflow-hidden">
+    <div class="absolute inset-0 bg-grid opacity-25 mask-radial dark:opacity-15"></div>
+    <div
+      class="absolute -top-24 left-1/2 h-[560px] w-[900px] -translate-x-1/2 rounded-full blur-3xl opacity-30 dark:!opacity-25"
+      style={`background: radial-gradient(closest-side, ${company.brandColor}55, transparent 70%)`}
+    ></div>
+    <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-ink-50"></div>
+  </div>
+
+  <Container size="xl">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-500">
+      <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+      <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+      <a href="/companies" class="hover:text-ink-900 transition-colors">Companies</a>
+      <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+      <span class="line-clamp-1 font-medium text-ink-800">{company.name}</span>
+    </nav>
+
+    <!-- Hero card -->
+    <div class="relative mt-8 overflow-hidden rounded-3xl border border-ink-200/70 bg-white/85 p-6 backdrop-blur-md shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.04] sm:p-10">
+      <!-- Subtle brand accent bar on top -->
+      <span
+        class="absolute inset-x-0 top-0 h-1"
+        style={`background: linear-gradient(90deg, ${company.brandColor}, ${company.brandColor}00)`}
+        aria-hidden="true"
+      ></span>
+      <!-- Corner brand glow -->
+      <div
+        class="pointer-events-none absolute -top-32 -right-24 h-72 w-72 rounded-full blur-3xl opacity-40 dark:!opacity-30"
+        style={`background: radial-gradient(closest-side, ${company.brandColor}40, transparent 70%)`}
+        aria-hidden="true"
+      ></div>
+
+      <div class="relative grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
+        <!-- Identity -->
+        <div class="lg:col-span-8">
+          <div class="flex items-start gap-5 sm:gap-6">
+            <div class="relative shrink-0">
+              <span
+                class="absolute -inset-2 rounded-3xl blur opacity-40 dark:!opacity-30"
+                style={`background: linear-gradient(135deg, ${company.brandColor}, ${company.brandColor}55)`}
+                aria-hidden="true"
+              ></span>
+              <div class="relative">
+                <CompanyMark
+                  slug={company.slug}
+                  size="xl"
+                  brandColor={company.brandColor}
+                  logo={company.logo}
+                />
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-1.5">
+                {company.verified && <Badge variant="success" size="sm" dot>Verified employer</Badge>}
+                {company.featured && <Badge variant="featured" size="sm" dot>Featured</Badge>}
+                <Badge variant="outline" size="sm">{company.industry}</Badge>
+              </div>
+              <h1 class="mt-3 text-[32px] font-semibold leading-[1.03] tracking-[-0.02em] text-ink-900 sm:text-[42px] lg:text-[48px]">
+                {company.name}
+              </h1>
+              <p class="mt-3 max-w-xl text-[15.5px] font-display italic text-ink-600 sm:text-[17px]">
+                {content.tagline}
+              </p>
+
+              <!-- Trust bar -->
+              <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12.5px] text-ink-600">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="relative flex h-1.5 w-1.5">
+                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                  </span>
+                  <span class="font-semibold tabular-nums text-ink-900">{openingsCount}</span> open role{openingsCount === 1 ? "" : "s"}
+                </span>
+                <span class="h-1 w-1 rounded-full bg-ink-300"></span>
+                <span class="inline-flex items-center gap-1">
+                  <Icon name="star" size={11} class="text-amber-500" />
+                  <span class="font-semibold tabular-nums text-ink-900">{ratingValue}</span>
+                  <span class="text-ink-500">rating</span>
+                </span>
+                <span class="h-1 w-1 rounded-full bg-ink-300"></span>
+                <span class="inline-flex items-center gap-1">
+                  <Icon name="users" size={11} class="text-ink-500" />
+                  <span class="font-semibold tabular-nums text-ink-900">{followsCount}</span>
+                  <span class="text-ink-500">followers</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Facts grid -->
+          <dl class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {facts.map((f) => (
+              <div class="group flex items-start gap-3 rounded-2xl border border-ink-200/60 bg-white/70 p-3.5 transition-colors hover:border-ink-300 dark:!border-white/[0.06] dark:!bg-white/[0.02]">
+                <span class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ${toneMap[f.tone]}`}>
+                  <Icon name={f.icon as any} size={15} strokeWidth={2} />
+                </span>
+                <div class="min-w-0">
+                  <dt class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-500">{f.label}</dt>
+                  <dd class="mt-0.5 truncate text-[13.5px] font-semibold text-ink-900 tabular-nums">{f.value}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <!-- CTA cluster -->
+        <div class="lg:col-span-4">
+          <div class="rounded-2xl border border-ink-200/70 bg-white/80 p-5 backdrop-blur-md dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-ink-500">Interested?</p>
+            <p class="mt-2 text-[14px] leading-relaxed text-ink-700">
+              Explore all live openings or follow {company.name} to get new-role alerts.
+            </p>
+
+            <div class="mt-4 flex flex-col gap-2.5">
+              <a
+                href="#open-roles"
+                class="group inline-flex h-12 items-center justify-center gap-2 rounded-full text-[14.5px] font-semibold text-white shadow-sm transition-all hover:shadow-lg"
+                style={`background:${company.brandColor}`}
+              >
+                See {openingsCount} open role{openingsCount === 1 ? "" : "s"}
+                <Icon name="arrowRight" size={15} class="transition-transform group-hover:translate-x-0.5" />
+              </a>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 text-[13px] font-medium text-ink-800 transition-colors hover:border-ink-400 hover:bg-ink-50 dark:!border-white/10 dark:!bg-white/[0.03] dark:hover:!bg-white/[0.06]"
+                  aria-label={`Follow ${company.name}`}
+                >
+                  <Icon name="plus" size={14} />
+                  Follow
+                </button>
+                <a
+                  href={content.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  class="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-ink-200 bg-white px-3 text-[13px] font-medium text-ink-800 transition-colors hover:border-ink-400 hover:bg-ink-50 dark:!border-white/10 dark:!bg-white/[0.03] dark:hover:!bg-white/[0.06]"
+                >
+                  <Icon name="arrowUpRight" size={13} />
+                  Website
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reply rate signal -->
+          <div class="mt-3 flex items-center justify-between rounded-2xl border border-emerald-200/60 bg-emerald-50/60 p-4 dark:!border-emerald-500/20 dark:!bg-emerald-500/[0.08]">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-emerald-600 ring-1 ring-emerald-200/60 dark:!bg-emerald-500/15 dark:ring-emerald-500/20 dark:!text-emerald-400">
+                <Icon name="checkCircle" size={16} strokeWidth={2} />
+              </span>
+              <div>
+                <p class="text-[12.5px] font-semibold text-ink-900">Replies to every applicant</p>
+                <p class="text-[11.5px] text-ink-600">Median reply within 3 days</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

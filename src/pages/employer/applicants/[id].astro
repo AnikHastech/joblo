@@ -1,0 +1,152 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import ApplicantStatusPill from "@components/employer/ApplicantStatusPill.astro";
+import Icon from "@components/ui/Icon.astro";
+import { applicants, applicantWithData, pipelineStages } from "@data/employer";
+
+export function getStaticPaths() {
+  return applicants.map((a) => ({ params: { id: a.id }, props: { applicantId: a.id } }));
+}
+
+const { applicantId } = Astro.props;
+const applicant = applicants.find((a) => a.id === applicantId)!;
+const { candidate, job } = applicantWithData(applicant);
+---
+<EmployerLayout
+  title={candidate?.name ?? "Applicant"}
+  subtitle={candidate ? `${candidate.role} · applied to ${job?.title}` : undefined}
+  active="applicants"
+>
+  <!-- Breadcrumb -->
+  <nav aria-label="Breadcrumb" class="mb-4 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-500">
+    <a href="/employer/applicants" class="hover:text-ink-900">Applicants</a>
+    <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+    <span class="font-medium text-ink-800">{candidate?.name}</span>
+  </nav>
+
+  <div class="grid gap-6 lg:grid-cols-12">
+    <!-- LEFT: profile + timeline -->
+    <div class="lg:col-span-8 space-y-6">
+      <!-- Profile card -->
+      {candidate && (
+        <section class="rounded-3xl border border-ink-200/70 bg-white p-6 sm:p-8 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+          <div class="flex flex-wrap items-start gap-5">
+            <img src={candidate.avatar} alt={candidate.name} class="h-20 w-20 shrink-0 rounded-2xl bg-ink-100 ring-1 ring-ink-200 dark:ring-white/10 sm:h-24 sm:w-24" />
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-[24px] font-semibold tracking-tight text-ink-900 sm:text-[28px]">{candidate.name}</h2>
+                <ApplicantStatusPill status={applicant.status} />
+                {candidate.verified && <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700 dark:!bg-emerald-500/15 dark:text-emerald-400"><Icon name="checkCircle" size={10} strokeWidth={2.5} /> Verified</span>}
+              </div>
+              <p class="mt-1 text-[15px] text-ink-700">{candidate.role}</p>
+              <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-ink-500">
+                <span class="inline-flex items-center gap-1.5"><Icon name="mapPin" size={12} /> {candidate.location}</span>
+                <span class="inline-flex items-center gap-1.5"><Icon name="briefcase" size={12} /> {candidate.experienceYears}y experience</span>
+                <span class="inline-flex items-center gap-1.5"><Icon name="wallet" size={12} /> {candidate.rate}</span>
+                <span class="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>{candidate.availability}</span>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-400">Match score</p>
+              <p class="mt-1 text-[32px] font-semibold tracking-tight text-ink-900 tabular-nums">{applicant.matchScore}%</p>
+              {applicant.rating && (
+                <p class="mt-1 flex items-center justify-end gap-0.5 text-[12px] text-amber-500">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Icon name="star" size={11} class={i < applicant.rating! ? "" : "opacity-25"} />
+                  ))}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap gap-1.5">
+            {candidate.skills.map((s) => (
+              <span class="rounded-full border border-ink-200 bg-white px-3 py-1 text-[12.5px] text-ink-700 dark:!border-white/10 dark:!bg-white/[0.03]">{s}</span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Screening / notes -->
+      <section class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Internal notes</p>
+        <p class="mt-3 text-[14px] leading-relaxed text-ink-700">
+          Strong systems thinking and prior work at Linear-adjacent B2B products. Portfolio depth is exceptional — recommend fast-tracking through the initial screen.
+        </p>
+        <div class="mt-4 flex flex-col gap-3 sm:flex-row">
+          <textarea rows="3" placeholder="Add a note (only visible to your team)…" class="flex-1 rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-[13.5px] text-ink-900 placeholder:text-ink-400 focus:border-ink-400 focus:outline-none dark:!border-white/10 dark:!bg-white/[0.04]"></textarea>
+          <button type="button" class="self-start inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">Save note</button>
+        </div>
+      </section>
+
+      <!-- Activity timeline -->
+      <section class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Activity timeline</p>
+        <ol class="relative mt-5 space-y-5">
+          <span class="absolute left-[15px] top-2 bottom-2 w-px bg-ink-200 dark:!bg-white/10" aria-hidden="true"></span>
+          {[
+            { icon: "sparkles",    title: applicant.lastActivity, meta: "Just now", tone: "brand" },
+            { icon: "briefcase",   title: "Application received", meta: applicant.appliedOn, tone: "ink" },
+            { icon: "user",        title: "Portfolio viewed by design lead", meta: `${Math.max(0, applicant.daysAgo - 1)}d ago`, tone: "ink" },
+            { icon: "send",        title: "Auto-reply sent", meta: `${applicant.daysAgo}d ago`, tone: "ink" },
+          ].map((e) => (
+            <li class="relative flex gap-3 pl-1">
+              <span class={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-1 ${e.tone === "brand" ? "bg-brand-500 text-white ring-brand-500" : "bg-white text-ink-700 ring-ink-200 dark:!bg-ink-100 dark:!ring-white/10 dark:!text-ink-800"}`}>
+                <Icon name={e.icon as any} size={12} />
+              </span>
+              <div class="min-w-0 flex-1 pt-1">
+                <p class="text-[13px] font-semibold text-ink-900">{e.title}</p>
+                <p class="mt-0.5 text-[11.5px] text-ink-500">{e.meta}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
+
+    <!-- RIGHT: actions -->
+    <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:h-fit">
+      <!-- Move stage -->
+      <section class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Move to stage</p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          {pipelineStages.map((s) => (
+            <button type="button" class={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-[12.5px] font-semibold transition-all ${s === applicant.status ? "border-ink-900 bg-ink-900 text-ink-50 dark:!bg-brand-500 dark:!border-brand-500" : "border-ink-200 bg-white text-ink-700 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]"}`}>
+              {s}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <!-- Quick actions -->
+      <section class="rounded-3xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-ink-500">Quick actions</p>
+        <div class="mt-4 flex flex-col gap-2">
+          <a href="/employer/messages" class="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink-900 px-4 text-[13.5px] font-semibold text-ink-50 hover:bg-brand-600">
+            <Icon name="send" size={13} /> Message candidate
+          </a>
+          <button type="button" class="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-ink-200 bg-white px-4 text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+            <Icon name="star" size={13} class="text-amber-500" /> {applicant.shortlisted ? "Remove from shortlist" : "Add to shortlist"}
+          </button>
+          <button type="button" class="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-ink-200 bg-white px-4 text-[13.5px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+            <Icon name="arrowUp" size={13} class="rotate-180" /> Download resume
+          </button>
+          <button type="button" class="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-rose-200 bg-white px-4 text-[13.5px] font-medium text-rose-700 hover:border-rose-400 hover:bg-rose-50/40 dark:!border-rose-500/30 dark:!bg-white/[0.03]">
+            <Icon name="close" size={13} /> Reject applicant
+          </button>
+        </div>
+      </section>
+
+      <!-- Rating -->
+      <section class="rounded-3xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-700 dark:text-brand-400">Team rating</p>
+        <div class="mt-3 flex items-center gap-1.5 text-amber-500">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <button type="button" aria-label={`Rate ${i + 1} star`}><Icon name="star" size={22} class={i < (applicant.rating ?? 0) ? "" : "opacity-25 hover:opacity-60"} /></button>
+          ))}
+        </div>
+        <p class="mt-3 text-[12.5px] text-ink-500">Ratings help your team calibrate over time.</p>
+      </section>
+    </aside>
+  </div>
+</EmployerLayout>

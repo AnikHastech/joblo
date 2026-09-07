@@ -1,0 +1,44 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { testimonials } from "@data/testimonials";
+---
+<section class="section-testimonials-2 py-20 sm:py-28 bg-white dark:!bg-white/[0.02]">
+  <Container size="xl">
+    <div class="mx-auto max-w-6xl text-center">
+      <SectionEyebrow number={5} label="Voice" class="justify-center" />
+      <h2 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl">
+        In their words, <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">on the record.</span>
+      </h2>
+    </div>
+
+    <!-- Masonry-ish 3-card grid, alternating sizes -->
+    <div class="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {testimonials.map((t, i) => (
+        <figure
+          class={[
+            "relative flex flex-col rounded-2xl border border-ink-200/70 bg-white p-7 transition-all hover:-translate-y-1 hover:shadow-xl",
+            "dark:border-white/[0.08] dark:!bg-white/[0.035]",
+            i === 1 && "lg:row-span-2 bg-gradient-to-br from-brand-50/70 to-accent-50/50 dark:!from-brand-950/30 dark:!to-accent-900/25",
+          ].filter(Boolean).join(" ")}
+        >
+          <Icon name="quote" size={30} class={i === 1 ? "text-brand-500" : "text-ink-200"} />
+          <blockquote class={`mt-5 flex-1 leading-relaxed text-ink-900 ${i === 1 ? "text-xl sm:text-2xl font-display italic" : "text-[16px]"}`}>
+            "{t.quote}"
+          </blockquote>
+          <figcaption class="mt-8 flex items-center gap-3 border-t border-ink-100 pt-5 dark:border-white/[0.06]">
+            <img src={t.avatarUrl} alt={t.name} width="44" height="44" loading="lazy" class="h-11 w-11 rounded-full bg-ink-100 ring-2 ring-white shadow-sm" />
+            <div class="min-w-0 flex-1">
+              <p class="text-[14.5px] font-semibold text-ink-900 truncate">{t.name}</p>
+              <p class="text-[12.5px] text-ink-500 truncate">{t.role} · {t.company}</p>
+            </div>
+            <div class="flex" aria-label={`${t.rating} stars`}>
+              {Array.from({ length: t.rating }).map(() => <Icon name="star" size={13} class="text-amber-400" />)}
+            </div>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </Container>
+</section>

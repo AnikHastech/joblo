@@ -1,0 +1,50 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import CompanyProfileHero from "@components/companies/CompanyProfileHero.astro";
+import CompanyAbout from "@components/companies/CompanyAbout.astro";
+import CompanyOpenRoles from "@components/companies/CompanyOpenRoles.astro";
+import CompanyTeam from "@components/companies/CompanyTeam.astro";
+import SimilarCompanies from "@components/companies/SimilarCompanies.astro";
+import { companies } from "@data/companies";
+import { jobs } from "@data/jobs";
+import { getCompanyContent } from "@data/companyContent";
+import { site } from "@data/site";
+import { companyOrgSchema, breadcrumbSchema } from "@lib/schema";
+
+export function getStaticPaths() {
+  return companies.map((company) => ({ params: { slug: company.slug }, props: { company } }));
+}
+
+const { company } = Astro.props;
+const content = getCompanyContent(company);
+const openRoles = jobs.filter((j) => j.companyId === company.id);
+
+const similar = companies
+  .filter((c) => c.slug !== company.slug && c.industry === company.industry)
+  .slice(0, 3)
+  .concat(
+    // Top-up with other companies if same-industry pool is small
+    companies.filter((c) => c.slug !== company.slug && c.industry !== company.industry).slice(0, 3)
+  )
+  .slice(0, 3);
+
+const schema = [
+  companyOrgSchema(company, content.about.join(" "), content.website),
+  breadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Companies", url: "/companies" },
+    { name: company.name, url: `/companies/${company.slug}` },
+  ]),
+];
+---
+<BaseLayout
+  title={`${company.name} — ${content.tagline} · ${site.name}`}
+  description={`${company.description ?? content.tagline} Explore ${openRoles.length} open role${openRoles.length === 1 ? "" : "s"} at ${company.name} — ${company.industry}, ${company.size} employees, ${company.location}.`}
+  schema={schema}
+>
+  <CompanyProfileHero company={company} content={content} openingsCount={openRoles.length} />
+  <CompanyAbout company={company} content={content} />
+  <CompanyOpenRoles company={company} jobs={openRoles} />
+  <CompanyTeam company={company} content={content} />
+  <SimilarCompanies companies={similar} />
+</BaseLayout>

@@ -1,0 +1,218 @@
+---
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+
+// Full-width cinema strip. Different visual approach from Home 1:
+// - Dark theatrical backdrop with a single wide 21:9 video card
+// - Chapter timeline below (deep-linkable chapters into the same modal)
+// - Editorial subtitle overlay lockup
+
+const videoId = "qp0HIF3SfI4";
+const poster = "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1800&auto=format&fit=crop&q=75";
+
+const chapters = [
+  { start: "00:00", title: "Why we built Joblo",           note: "The 3-year problem" },
+  { start: "00:38", title: "How AI matching actually works", note: "Not another buzzword" },
+  { start: "01:15", title: "Verified employers, always",     note: "The 48-hour check" },
+  { start: "01:44", title: "What happens after you apply",   note: "The 4-hour promise" },
+];
+
+const stats = [
+  { value: "1:32",  label: "Runtime"       },
+  { value: "24.8k", label: "Views · month" },
+  { value: "4.9",   label: "Avg rating"    },
+];
+---
+<section class="section-video-demo-2 relative isolate overflow-hidden bg-ink-900 py-20 text-white sm:py-28 dark:!bg-[#0c0a09]">
+  <!-- Ambient backdrop -->
+  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 25% 30%, rgba(74,63,230,0.35), transparent 55%), radial-gradient(circle at 80% 70%, rgba(255,90,10,0.28), transparent 55%);"></div>
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml;utf8,<svg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2260%22%20height=%2260%22%20viewBox=%220%200%2060%2060%22><g%20fill=%22none%22%20stroke=%22rgba(255,255,255,0.04)%22%20stroke-width=%221%22><path%20d=%22M60%200H0V60%22/></g></svg>')] opacity-40"></div>
+  </div>
+
+  <Container size="xl">
+    <!-- Header row: eyebrow + short header + right-side stats -->
+    <div class="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
+      <div class="max-w-xl">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
+            <Icon name="play" size={10} class="text-accent-400" />
+            <span class="tabular-nums text-white">04</span>
+            <span class="text-white/40">·</span>
+            <span>Watch it move</span>
+          </span>
+          <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.22em] text-brand-300 backdrop-blur dark:!text-brand-400">
+            <span class="relative flex h-1.5 w-1.5">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-300 opacity-75 dark:!bg-brand-400"></span>
+              <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-400 dark:!bg-brand-500"></span>
+            </span>
+            Screening now
+          </span>
+        </div>
+        <h2 class="mt-4 text-[32px] font-semibold leading-[1] tracking-[-0.02em] sm:text-[44px] lg:text-[56px]">
+          A <span class="font-display italic font-normal bg-gradient-to-br from-brand-400 via-brand-300 to-accent-400 bg-clip-text text-transparent">short film</span> about how work happens on Joblo.
+        </h2>
+      </div>
+      <dl class="grid w-full grid-cols-3 gap-2 sm:w-auto sm:gap-6 lg:gap-8">
+        {stats.map((s) => (
+          <div class="border-l border-white/15 pl-3 sm:pl-6">
+            <dt class="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-white/50 sm:text-[10.5px] sm:tracking-[0.16em]">{s.label}</dt>
+            <dd class="mt-1 text-[18px] font-semibold tabular-nums sm:text-[22px] lg:text-[26px]">{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+
+    <!-- Cinema strip: 21:9 wide -->
+    <button
+      type="button"
+      data-video2-open
+      class="group relative mt-10 block w-full overflow-hidden rounded-3xl border border-white/10 bg-black text-left shadow-2xl shadow-black/50 sm:mt-14"
+      aria-label="Play the Joblo short film"
+    >
+      <div class="relative aspect-[16/10] overflow-hidden sm:aspect-[21/9]">
+        <img
+          src={poster}
+          alt="Cinematic poster for Joblo short film"
+          loading="lazy"
+          class="h-full w-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-[1.03] group-hover:opacity-100"
+        />
+        <!-- Vignette + gradient -->
+        <span class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/40" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute inset-0" style="background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.55) 100%);" aria-hidden="true"></span>
+
+        <!-- Film strip corners -->
+        <span class="pointer-events-none absolute left-3 top-3 h-5 w-5 border-l-2 border-t-2 border-white/60 sm:left-6 sm:top-6 sm:h-8 sm:w-8" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute right-3 top-3 h-5 w-5 border-r-2 border-t-2 border-white/60 sm:right-6 sm:top-6 sm:h-8 sm:w-8" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute left-3 bottom-3 h-5 w-5 border-l-2 border-b-2 border-white/60 sm:left-6 sm:bottom-6 sm:h-8 sm:w-8" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute right-3 bottom-3 h-5 w-5 border-r-2 border-b-2 border-white/60 sm:right-6 sm:bottom-6 sm:h-8 sm:w-8" aria-hidden="true"></span>
+
+        <!-- Center play + editorial title lockup -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center sm:gap-6 sm:px-6">
+          <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-white text-ink-900 shadow-2xl transition-transform group-hover:scale-110 dark:!bg-white dark:!text-[#0c0a09] sm:h-20 sm:w-20 lg:h-28 lg:w-28">
+            <span class="absolute inset-0 rounded-full bg-white/30 opacity-0 transition-opacity group-hover:animate-ping group-hover:opacity-75"></span>
+            <svg width="22" height="26" viewBox="0 0 22 26" fill="currentColor" class="relative ml-1" aria-hidden="true">
+              <path d="M0 0v26l22-13-22-13z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="text-[9.5px] font-bold uppercase tracking-[0.32em] text-white/70 sm:text-[10.5px] sm:tracking-[0.4em]">A Joblo original</p>
+            <p class="mt-1.5 font-display text-[20px] italic leading-tight tracking-tight sm:mt-2 sm:text-[32px] md:text-[42px] lg:text-[56px]">Work, worth showing up for.</p>
+          </div>
+        </div>
+
+        <!-- Subtitle strip -->
+        <div class="absolute inset-x-0 bottom-0 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-black/50 px-3 py-2 backdrop-blur-md sm:gap-3 sm:px-6 sm:py-3">
+          <div class="flex items-center gap-1.5 text-[10px] text-white/70 sm:gap-2 sm:text-[11.5px]">
+            <Icon name="quote" size={11} />
+            <span class="hidden sm:inline">English · 15 subtitle languages</span>
+            <span class="sm:hidden">EN · 15 langs</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-[10px] tabular-nums text-white/70 sm:gap-2 sm:text-[11.5px]">
+            <span class="hidden sm:inline">Directed by</span>
+            <span class="font-semibold text-white">Alex Morgan</span>
+            <span>·</span>
+            <span>2026</span>
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <!-- Chapter deep-links -->
+    <div class="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      {chapters.map((c, i) => (
+        <button
+          type="button"
+          data-video2-open
+          data-video2-start={c.start}
+          class="group flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition-all hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.06]"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[11px] font-bold tabular-nums text-white group-hover:bg-brand-500 group-hover:text-white">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white/50">
+              <span class="tabular-nums">{c.start}</span>
+              <span>·</span>
+              <span>{c.note}</span>
+            </div>
+            <p class="mt-1 text-[13.5px] font-semibold text-white group-hover:text-brand-300 dark:group-hover:!text-brand-400">{c.title}</p>
+          </div>
+          <Icon name="arrowUpRight" size={12} class="mt-1 text-white/50 transition-transform group-hover:translate-x-0.5" />
+        </button>
+      ))}
+    </div>
+  </Container>
+</section>
+
+<!-- Video modal -->
+<div
+  id="video-demo-2-modal"
+  class="fixed inset-0 z-[100] hidden items-center justify-center bg-ink-950/90 p-4 backdrop-blur-sm dark:!bg-[#0c0a09]/95 sm:p-8"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Joblo short film"
+>
+  <div class="relative w-full max-w-6xl">
+    <div class="relative overflow-hidden rounded-2xl bg-black shadow-2xl">
+      <button
+        type="button"
+        data-video2-close
+        class="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink-900 dark:!text-[#0c0a09] shadow-lg transition-transform hover:scale-105 sm:h-11 sm:w-11"
+        aria-label="Close video"
+      >
+        <Icon name="close" size={16} strokeWidth={2} />
+      </button>
+      <div class="relative aspect-video">
+        <iframe
+          id="video-demo-2-iframe"
+          class="absolute inset-0 h-full w-full"
+          src=""
+          title="Joblo short film"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ videoId }}>
+  (function () {
+    const modal = document.getElementById("video-demo-2-modal");
+    const iframe = document.getElementById("video-demo-2-iframe");
+    if (!modal || !iframe) return;
+
+    const openers = document.querySelectorAll("[data-video2-open]");
+    const closers = modal.querySelectorAll("[data-video2-close]");
+
+    const toSeconds = (mmss) => {
+      if (!mmss) return 0;
+      const parts = mmss.split(":").map((n) => parseInt(n, 10));
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      return 0;
+    };
+    const open = (start) => {
+      const s = toSeconds(start);
+      const url = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0" + (s > 0 ? "&start=" + s : "");
+      iframe.setAttribute("src", url);
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      document.body.style.overflow = "hidden";
+    };
+    const close = () => {
+      iframe.setAttribute("src", "");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.body.style.overflow = "";
+    };
+
+    openers.forEach((btn) => btn.addEventListener("click", () => open(btn.getAttribute("data-video2-start"))));
+    closers.forEach((btn) => btn.addEventListener("click", close));
+    modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.classList.contains("hidden")) close(); });
+  })();
+</script>

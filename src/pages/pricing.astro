@@ -1,0 +1,486 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/ui/Container.astro";
+import SectionEyebrow from "@components/ui/SectionEyebrow.astro";
+import Icon from "@components/ui/Icon.astro";
+import { pricingPlans, featureMatrix, pricingFAQs } from "@data/pricing";
+import { site } from "@data/site";
+
+// Compare-plans section — icon + tone per feature category
+const sectionMeta: Record<string, { icon: string; tone: string }> = {
+  "Job postings":            { icon: "briefcase", tone: "brand"   },
+  "Candidate sourcing":      { icon: "users",     tone: "violet"  },
+  "Integrations & security": { icon: "shield",    tone: "info"    },
+  "Support":                 { icon: "sparkles",  tone: "success" },
+};
+const toneChip: Record<string, string> = {
+  brand:   "bg-brand-50 text-brand-700 ring-brand-100/60 dark:!bg-brand-500/15 dark:!text-brand-400 dark:!ring-white/10",
+  violet:  "bg-violet-50 text-violet-700 ring-violet-100/60 dark:!bg-violet-500/15 dark:!text-violet-400 dark:!ring-white/10",
+  info:    "bg-sky-50 text-sky-700 ring-sky-100/60 dark:!bg-sky-500/15 dark:!text-sky-400 dark:!ring-white/10",
+  success: "bg-emerald-50 text-emerald-700 ring-emerald-100/60 dark:!bg-emerald-500/15 dark:!text-emerald-400 dark:!ring-white/10",
+};
+---
+<BaseLayout
+  title={`Pricing · ${site.name}`}
+  description="Simple, transparent pricing for teams of every size. Free forever plan, no credit card required. Upgrade any time."
+>
+  <!-- Hero -->
+  <section class="section-pricing-hero relative isolate pt-14 pb-10 sm:pt-20">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute inset-0 bg-grid opacity-30 mask-radial"></div>
+      <div class="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-200/40 via-accent-200/30 to-transparent blur-3xl dark:!from-brand-500/15 dark:!via-accent-500/10"></div>
+    </div>
+    <Container size="xl">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[12.5px] text-ink-500">
+        <a href="/" class="hover:text-ink-900 transition-colors">Home</a>
+        <Icon name="chevronDown" size={10} class="-rotate-90 text-ink-300" />
+        <span class="font-medium text-ink-800">Pricing</span>
+      </nav>
+      <div class="mt-6 max-w-3xl">
+        <SectionEyebrow number="01" label="Pricing" />
+        <h1 class="mt-4 text-[32px] font-semibold leading-[1.05] tracking-tight text-ink-900 sm:text-4xl md:text-5xl lg:text-6xl">
+          Simple pricing, <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">no theatre</span>.
+        </h1>
+        <p class="mt-4 max-w-xl text-[14.5px] leading-relaxed text-ink-600 sm:text-[16px]">
+          Post your first job free. Upgrade only when you outgrow it. No annual contracts, no seat traps, no gotchas.
+        </p>
+      </div>
+
+      <!-- Billing toggle -->
+      <div class="mt-8 inline-flex items-center gap-1 rounded-full border border-ink-200 bg-white p-1 sm:mt-10 dark:!border-white/10 dark:!bg-white/[0.04]">
+        <button type="button" data-billing="monthly" data-active="false" class="billing-btn rounded-full px-4 py-2 text-[12.5px] font-medium text-ink-700 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 sm:px-5 sm:text-[13px]">
+          Monthly
+        </button>
+        <button type="button" data-billing="yearly" data-active="true" class="billing-btn rounded-full px-4 py-2 text-[12.5px] font-medium text-ink-700 transition-colors data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 sm:px-5 sm:text-[13px]">
+          Yearly
+          <span class="ml-1.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:!bg-emerald-500/20 dark:text-emerald-400">-20%</span>
+        </button>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Plans -->
+  <section class="pb-12 sm:pb-16 lg:pb-20">
+    <Container size="xl">
+      <div class="grid gap-6 lg:grid-cols-3">
+        {pricingPlans.map((p) => (
+          <article
+            class={[
+              "plan-card relative flex flex-col rounded-3xl border p-6 transition-all sm:p-8",
+              p.highlight
+                ? "border-ink-900 bg-ink-900 text-white shadow-2xl shadow-ink-900/20 dark:!border-white/10 dark:!bg-[#1c1917] lg:-translate-y-2"
+                : "border-ink-200/70 bg-white hover:border-ink-300 hover:shadow-md dark:!border-white/[0.08] dark:!bg-white/[0.035]",
+            ].join(" ")}
+          >
+            {p.highlight && (
+              <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent-500 px-3 py-1 text-[10.5px] font-bold uppercase tracking-widest text-white shadow-sm">
+                Most popular
+              </span>
+            )}
+            <header>
+              <h2 class={`text-[22px] font-semibold tracking-tight ${p.highlight ? "text-white" : "text-ink-900"}`}>{p.name}</h2>
+              <p class={`mt-1 text-[13.5px] ${p.highlight ? "text-white/70" : "text-ink-500"}`}>{p.tagline}</p>
+            </header>
+
+            <div class="mt-6 flex items-baseline gap-2">
+              <span class={`text-[42px] font-semibold tracking-tight tabular-nums sm:text-[48px] ${p.highlight ? "text-white" : "text-ink-900"}`}>
+                <span class="text-[22px] align-top sm:text-[24px]">{p.currency}</span>
+                <span class="plan-price" data-monthly={p.monthly} data-yearly={p.yearly}>{p.yearly}</span>
+              </span>
+              <span class={`text-[13.5px] ${p.highlight ? "text-white/70" : "text-ink-500"}`}>
+                / month
+              </span>
+            </div>
+            <p class={`mt-1 text-[12px] ${p.highlight ? "text-white/60" : "text-ink-500"}`}>
+              <span class="plan-billing-note">Billed annually</span> · {p.meta}
+            </p>
+
+            <a
+              href={p.id === "scale" ? "/contact" : "/post-a-job"}
+              class={[
+                "mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-full text-[14px] font-semibold transition-all",
+                p.highlight
+                  ? "bg-accent-500 text-white hover:bg-accent-600 shadow-sm hover:shadow-md"
+                  : "bg-ink-900 text-ink-50 hover:bg-brand-600 shadow-sm hover:shadow-md",
+              ].join(" ")}
+            >
+              {p.cta}
+              <Icon name="arrowRight" size={14} />
+            </a>
+
+            <ul class="mt-8 space-y-3">
+              {p.features.map((f) => (
+                <li class="flex items-start gap-3 text-[13.5px]">
+                  <span class={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${p.highlight ? "bg-emerald-400 text-emerald-950" : "bg-ink-900 text-ink-50 dark:!bg-brand-500 dark:text-white"}`}>
+                    <Icon name="check" size={10} strokeWidth={2.5} />
+                  </span>
+                  <span class={p.highlight ? "text-white/85" : "text-ink-700"}>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Feature matrix -->
+  <section class="pb-12 sm:pb-16 lg:pb-20">
+    <Container size="xl">
+      <div class="grid gap-4 lg:grid-cols-12 lg:items-end lg:gap-6">
+        <div class="lg:col-span-7">
+          <SectionEyebrow number="02" label="Compare plans" />
+          <h2 class="mt-3 text-[28px] font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+            Every feature, <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">side by side</span>
+          </h2>
+        </div>
+        <p class="lg:col-span-5 text-[13.5px] leading-relaxed text-ink-600 sm:text-[14.5px]">
+          Not sure which plan fits? Scan the full matrix — 14 features across 4 categories. <span class="font-semibold text-ink-900">Growth</span> covers 90% of teams.
+        </p>
+      </div>
+
+      <!-- Mobile swipe hint (visible below md) -->
+      <p class="mt-6 flex items-center gap-2 text-[11.5px] text-ink-500 md:hidden">
+        <Icon name="arrowRight" size={11} class="rotate-180" />
+        <span>Swipe to see all plans</span>
+        <Icon name="arrowRight" size={11} />
+      </p>
+
+      <div class="mt-6 overflow-hidden rounded-3xl border border-ink-200/70 bg-white shadow-sm dark:!border-white/[0.08] dark:!bg-white/[0.035] sm:mt-12">
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[820px] text-left text-[13.5px]">
+                <!-- Plan header row: mini cards with price + CTA -->
+                <thead>
+                  <tr>
+                    <th class="w-[38%] border-b border-ink-100 bg-ink-50/60 px-6 py-6 align-bottom text-[11px] font-bold uppercase tracking-widest text-ink-500 dark:!border-white/[0.06] dark:!bg-white/[0.02]">
+                      <span class="inline-flex items-center gap-2">
+                        <Icon name="grid" size={12} class="text-ink-400" />
+                        Features
+                      </span>
+                    </th>
+                    {pricingPlans.map((p) => (
+                      <th class={`border-b border-ink-100 px-5 py-6 align-bottom dark:!border-white/[0.06] ${p.highlight ? "relative bg-gradient-to-b from-brand-50/70 via-white to-white dark:!from-brand-500/10 dark:!via-transparent dark:!to-transparent" : "bg-ink-50/60 dark:!bg-white/[0.02]"}`}>
+                        {p.highlight && (
+                          <span class="absolute left-1/2 top-2 -translate-x-1/2 rounded-full bg-accent-500 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">Popular</span>
+                        )}
+                        <div class="flex flex-col items-center gap-1.5">
+                          <p class={`text-[15px] font-semibold ${p.highlight ? "text-brand-700 dark:!text-brand-400" : "text-ink-900"}`}>{p.name}</p>
+                          <p class="text-[10.5px] uppercase tracking-widest text-ink-400 tabular-nums">
+                            {p.monthly === 0 ? "Free" : `${p.currency}${p.yearly}/mo`}
+                          </p>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {featureMatrix.map((section, si) => {
+                    const meta = sectionMeta[section.section] ?? { icon: "grid", tone: "brand" };
+                    return (
+                      <>
+                        <!-- Category header row (bold, icon-led) -->
+                        <tr class={si === 0 ? "" : "border-t border-ink-100 dark:!border-white/[0.06]"}>
+                          <td colspan={pricingPlans.length + 1} class="px-6 py-5">
+                            <div class="flex items-center gap-3">
+                              <span class={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ${toneChip[meta.tone]}`}>
+                                <Icon name={meta.icon as any} size={13} />
+                              </span>
+                              <h3 class="text-[14px] font-semibold text-ink-900">{section.section}</h3>
+                              <span class="text-[11px] font-medium text-ink-400 tabular-nums">
+                                {section.rows.length} feature{section.rows.length === 1 ? "" : "s"}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+
+                        <!-- Feature rows -->
+                        {section.rows.map((row) => (
+                          <tr class="border-t border-ink-100 transition-colors hover:bg-ink-50/40 dark:!border-white/[0.06] dark:hover:!bg-white/[0.02]">
+                            <td class="px-6 py-3.5 pl-[4.25rem] text-[13.5px] font-medium text-ink-800">{row.label}</td>
+                            {(["starter", "growth", "scale"] as const).map((k) => {
+                              const value = row[k];
+                              const plan = pricingPlans.find((p) => p.id === k);
+                              const isHighlight = plan?.highlight;
+                              return (
+                                <td class={`px-5 py-3.5 text-center ${isHighlight ? "bg-brand-50/40 dark:!bg-brand-500/[0.06]" : ""}`}>
+                                  {typeof value === "boolean" ? (
+                                    value ? (
+                                      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-100 dark:!ring-emerald-500/20">
+                                        <Icon name="check" size={12} strokeWidth={2.6} />
+                                      </span>
+                                    ) : (
+                                      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink-100 text-ink-400 dark:!bg-white/[0.06] dark:!text-white/30">
+                                        <span class="h-0.5 w-2.5 rounded-full bg-current"></span>
+                                      </span>
+                                    )
+                                  ) : (
+                                    <span class={`inline-flex items-center gap-1 tabular-nums ${
+                                      value === "Unlimited"
+                                        ? "rounded-full bg-gradient-to-br from-brand-50 to-accent-50 px-2.5 py-1 text-[12px] font-semibold text-brand-700 ring-1 ring-brand-100/60 dark:!from-brand-500/15 dark:!to-accent-500/15 dark:!text-brand-400 dark:!ring-white/10"
+                                        : value === "Priority" || String(value).includes("<")
+                                          ? "rounded-full bg-amber-50 px-2.5 py-1 text-[12px] font-semibold text-amber-700 ring-1 ring-amber-100/60 dark:!bg-amber-500/15 dark:!text-amber-400 dark:!ring-white/10"
+                                          : "text-[13px] font-medium text-ink-800"
+                                    }`}>
+                                      {value === "Unlimited" && <Icon name="sparkles" size={10} />}
+                                      {value}
+                                    </span>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </>
+                    );
+                  })}
+                </tbody>
+
+                <!-- Footer row: quick CTA per plan -->
+                <tfoot>
+                  <tr class="border-t border-ink-200 bg-ink-50/60 dark:!border-white/10 dark:!bg-white/[0.02]">
+                    <td class="px-6 py-5 text-[11.5px] uppercase tracking-widest text-ink-500 font-semibold">
+                      Ready to start?
+                    </td>
+                    {pricingPlans.map((p) => (
+                      <td class={`px-5 py-5 text-center ${p.highlight ? "bg-brand-50/40 dark:!bg-brand-500/[0.06]" : ""}`}>
+                        <a
+                          href={p.id === "scale" ? "/contact" : "/post-a-job"}
+                          class={`inline-flex h-9 items-center gap-1 rounded-full px-3.5 text-[12px] font-semibold transition-colors ${
+                            p.highlight
+                              ? "bg-ink-900 text-ink-50 hover:bg-brand-600"
+                              : "border border-ink-200 bg-white text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.04]"
+                          }`}
+                        >
+                          {p.monthly === 0 ? "Start free" : p.id === "scale" ? "Talk to sales" : "Try 14 days"}
+                          <Icon name="arrowRight" size={11} />
+                        </a>
+                      </td>
+                    ))}
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- FAQ -->
+  <section class="pb-12 sm:pb-16 lg:pb-20">
+    <Container size="xl">
+      <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
+        <!-- Left: Sticky sidebar with title + contact + category count -->
+        <aside class="lg:col-span-5 lg:sticky lg:top-28 lg:h-fit">
+          <SectionEyebrow number="03" label="Common questions" />
+          <h2 class="mt-3 text-[28px] font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-4xl lg:text-5xl">
+            Anything else <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">on your mind</span>?
+          </h2>
+          <p class="mt-4 text-[14.5px] leading-relaxed text-ink-600">
+            <span class="font-semibold text-ink-900 tabular-nums">{pricingFAQs.length}</span> quick answers below. Can't find yours? A real person replies within a few hours.
+          </p>
+
+          <!-- Category filter chips -->
+          <div class="mt-6 flex flex-wrap gap-1.5">
+            {(() => {
+              const cats = ["All", ...Array.from(new Set(pricingFAQs.map((f) => f.category)))];
+              return cats.map((c, i) => (
+                <button
+                  type="button"
+                  data-faq-cat={c}
+                  data-active={i === 0 ? "true" : "false"}
+                  class="faq-cat inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 transition-all hover:border-ink-400 data-[active=true]:!border-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 dark:!border-white/10 dark:!bg-white/[0.04]"
+                >
+                  {c}
+                  <span class="text-[10.5px] tabular-nums opacity-60">
+                    {c === "All" ? pricingFAQs.length : pricingFAQs.filter((f) => f.category === c).length}
+                  </span>
+                </button>
+              ));
+            })()}
+          </div>
+
+          <!-- Contact card -->
+          <div class="mt-8 rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 p-5 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+            <div class="flex items-center gap-2 text-brand-700 dark:!text-brand-400">
+              <Icon name="send" size={13} />
+              <p class="text-[10.5px] font-bold uppercase tracking-[0.22em]">Still stuck?</p>
+            </div>
+            <p class="mt-3 text-[13.5px] leading-relaxed text-ink-700">
+              Send us a message — median reply time is under 4 hours during business hours.
+            </p>
+            <a
+              href="/contact"
+              class="mt-4 inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[12.5px] font-semibold text-ink-50 shadow-sm hover:bg-brand-600"
+            >
+              Contact sales
+              <Icon name="arrowRight" size={12} />
+            </a>
+          </div>
+        </aside>
+
+        <!-- Right: FAQ items -->
+        <div class="lg:col-span-7">
+          <ul id="faq-list" class="space-y-3">
+            {pricingFAQs.map((f, i) => (
+              <li
+                class="faq-item"
+                data-cat={f.category}
+              >
+                <details
+                  open={i === 0}
+                  class="faq-details group relative rounded-2xl border border-ink-200/70 bg-white transition-[border-color,box-shadow] duration-300 open:border-ink-900 open:shadow-md hover:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.035] dark:open:!border-brand-500/40"
+                >
+                  <summary class="flex cursor-pointer items-start gap-3 list-none p-4 pr-5 select-none sm:gap-4 sm:p-5 sm:pr-6">
+                    <!-- Number badge -->
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-ink-100 text-[11.5px] font-bold tabular-nums text-ink-700 transition-colors duration-300 group-open:!bg-ink-900 group-open:!text-ink-50 dark:!bg-white/[0.06] dark:group-open:!bg-brand-500 dark:group-open:!text-white sm:h-9 sm:w-9 sm:text-[12px]">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+
+                    <div class="min-w-0 flex-1 pt-1 sm:pt-1.5">
+                      <!-- Category tag -->
+                      <span class={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-widest sm:text-[10px] ${
+                        f.category === "Billing"  ? "bg-emerald-50 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400" :
+                        f.category === "Plans"    ? "bg-brand-50 text-brand-700 dark:!bg-brand-500/15 dark:!text-brand-400" :
+                        f.category === "Features" ? "bg-violet-50 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400" :
+                                                    "bg-amber-50 text-amber-700 dark:!bg-amber-500/15 dark:!text-amber-400"
+                      }`}>{f.category}</span>
+                      <p class="mt-1.5 text-[14px] font-semibold text-ink-900 leading-snug sm:text-[15px]">{f.q}</p>
+                    </div>
+
+                    <!-- Toggle chevron (rotates when open) -->
+                    <span class="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-all duration-300 group-hover:border-ink-400 group-open:!bg-ink-900 group-open:!border-ink-900 group-open:!text-ink-50 dark:!border-white/10 dark:group-open:!bg-brand-500 dark:group-open:!border-brand-500 dark:group-open:!text-white sm:h-8 sm:w-8">
+                      <Icon name="chevronDown" size={12} class="transition-transform duration-300 group-open:rotate-180" />
+                    </span>
+                  </summary>
+
+                  <!-- Animated content wrapper (grid-template-rows trick for smooth expand/collapse) -->
+                  <div class="faq-body grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
+                    <div class="overflow-hidden">
+                      <div class="px-4 pb-4 pl-[3.5rem] sm:px-5 sm:pb-5 sm:pl-[4.75rem]">
+                        <p class="text-[13.5px] leading-[1.7] text-ink-600 border-l-2 border-ink-200 pl-3 dark:!border-white/10 sm:text-[14px] sm:pl-4">{f.a}</p>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              </li>
+            ))}
+          </ul>
+
+          <!-- Empty state (JS toggles when no matches) -->
+          <div id="faq-empty" hidden class="mt-6 rounded-2xl border border-dashed border-ink-200 bg-ink-50/40 p-8 text-center dark:!border-white/10 dark:!bg-white/[0.02]">
+            <p class="text-[13.5px] text-ink-500">No questions in this category yet.</p>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <script>
+      const catBtns = document.querySelectorAll<HTMLButtonElement>(".faq-cat");
+      const items   = document.querySelectorAll<HTMLElement>(".faq-item");
+      const empty   = document.getElementById("faq-empty");
+
+      // Category filter
+      catBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          catBtns.forEach((b) => (b.dataset.active = String(b === btn)));
+          const cat = btn.dataset.faqCat;
+          let visible = 0;
+          items.forEach((it) => {
+            const show = cat === "All" || it.dataset.cat === cat;
+            it.hidden = !show;
+            if (show) visible++;
+          });
+          if (empty) empty.hidden = visible > 0;
+        });
+      });
+
+      // ── Smooth accordion (grid-template-rows animation + single-open behavior) ──
+      const allDetails = document.querySelectorAll<HTMLDetailsElement>("#faq-list details");
+
+      // Set initial state for the default-open item (row expanded from the start)
+      allDetails.forEach((d) => {
+        const body = d.querySelector<HTMLElement>(".faq-body");
+        if (d.open && body) body.style.gridTemplateRows = "1fr";
+      });
+
+      const openDetails = (d: HTMLDetailsElement) => {
+        const body = d.querySelector<HTMLElement>(".faq-body");
+        if (!body) return;
+        d.open = true;
+        // Force reflow, then animate to 1fr
+        requestAnimationFrame(() => {
+          body.style.gridTemplateRows = "1fr";
+        });
+      };
+
+      const closeDetails = (d: HTMLDetailsElement) => {
+        const body = d.querySelector<HTMLElement>(".faq-body");
+        if (!body) return;
+        body.style.gridTemplateRows = "0fr";
+        // Wait for the transition to finish before flipping the `open` attribute
+        body.addEventListener("transitionend", function once(e) {
+          if (e.propertyName !== "grid-template-rows") return;
+          body.removeEventListener("transitionend", once);
+          d.open = false;
+        });
+      };
+
+      allDetails.forEach((d) => {
+        const summary = d.querySelector<HTMLElement>("summary");
+        summary?.addEventListener("click", (e) => {
+          e.preventDefault();  // intercept native toggle so we can animate
+          if (d.open) {
+            closeDetails(d);
+          } else {
+            // Single-open behavior — close others (with animation), then open this
+            allDetails.forEach((other) => {
+              if (other !== d && other.open) closeDetails(other);
+            });
+            openDetails(d);
+          }
+        });
+      });
+    </script>
+  </section>
+
+  <!-- CTA -->
+  <section class="pb-16 sm:pb-24 lg:pb-32">
+    <Container size="xl">
+      <div class="relative overflow-hidden rounded-3xl bg-ink-900 p-8 text-center text-white shadow-2xl shadow-ink-900/20 dark:!bg-[#0c0a09] sm:p-10 lg:p-16">
+        <div class="pointer-events-none absolute -top-32 left-1/2 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-500/40 via-accent-500/30 to-transparent blur-3xl"></div>
+        <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-grid opacity-15 mix-blend-overlay"></div>
+        <div class="relative">
+          <h2 class="text-[26px] font-semibold leading-[1.1] tracking-tight text-white sm:text-3xl lg:text-[42px]">
+            Start free. <span class="font-display italic font-normal text-accent-400">Upgrade if you love it.</span>
+          </h2>
+          <p class="mx-auto mt-3 max-w-xl text-[13.5px] text-white/70 sm:text-[15px]">No credit card. Full access to Growth for 14 days.</p>
+          <div class="mt-6 flex flex-col justify-center gap-2.5 sm:mt-7 sm:flex-row sm:flex-wrap sm:gap-3">
+            <a href="/post-a-job" class="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-accent-500 px-5 text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-accent-600 sm:h-12 sm:px-6 sm:text-[14.5px]">
+              Post your first job<Icon name="arrowRight" size={14} />
+            </a>
+            <a href="/contact" class="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/[0.05] px-5 text-[14px] font-medium text-white backdrop-blur transition-colors hover:border-white/40 hover:bg-white/[0.12] sm:h-12 sm:px-6 sm:text-[14.5px]">
+              Talk to sales
+            </a>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>(".billing-btn");
+  const prices  = document.querySelectorAll<HTMLElement>(".plan-price");
+  const notes   = document.querySelectorAll<HTMLElement>(".plan-billing-note");
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.billing;
+      buttons.forEach((b) => (b.dataset.active = String(b === btn)));
+      prices.forEach((p) => {
+        const v = mode === "monthly" ? p.dataset.monthly : p.dataset.yearly;
+        if (v !== undefined) p.textContent = v!;
+      });
+      notes.forEach((n) => { n.textContent = mode === "monthly" ? "Billed monthly" : "Billed annually"; });
+    });
+  });
+</script>

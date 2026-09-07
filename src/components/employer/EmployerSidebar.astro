@@ -1,0 +1,118 @@
+---
+import Icon from "@components/ui/Icon.astro";
+import { currentEmployer, employerStats } from "@data/employer";
+import { getCompany } from "@data/companies";
+import CompanyMark from "@components/common/CompanyMark.astro";
+
+interface Props { active?: string }
+const { active } = Astro.props;
+const company = getCompany(currentEmployer.companyId);
+
+const nav = [
+  { key: "home",        label: "Dashboard",       href: "/employer",                icon: "home"       },
+  { key: "jobs",        label: "Manage jobs",     href: "/employer/jobs",           icon: "briefcase", badge: employerStats.activeJobs },
+  { key: "applicants",  label: "Applicants",      href: "/employer/applicants",     icon: "users",     badge: employerStats.totalApplicants },
+  { key: "shortlisted", label: "Shortlisted",     href: "/employer/shortlisted",    icon: "star",      badge: employerStats.shortlisted },
+  { key: "interviews",  label: "Interviews",      href: "/employer/interviews",     icon: "sparkles"   },
+  { key: "scheduling",  label: "Scheduling",      href: "/employer/scheduling",     icon: "clock"      },
+  { key: "assessments", label: "Assessments",     href: "/employer/assessments",    icon: "award"      },
+  { key: "referrals",   label: "Referrals",       href: "/employer/referrals",      icon: "send"       },
+  { key: "talent",      label: "Talent search",   href: "/employer/talent",         icon: "search"     },
+  { key: "pool",        label: "Talent pool",     href: "/employer/talent-pool",    icon: "users"      },
+  { key: "analytics",   label: "Analytics",       href: "/employer/analytics",      icon: "trending"   },
+  { key: "messages",    label: "Messages",        href: "/employer/messages",       icon: "send",      badge: 1 },
+  { key: "templates",   label: "Templates",       href: "/employer/templates",      icon: "quote"      },
+  { key: "notifications", label: "Notifications", href: "/employer/notifications",  icon: "bell"       },
+  { key: "company",     label: "Company profile", href: "/employer/company",        icon: "building"   },
+  { key: "post",        label: "Post a job",      href: "/employer/post-a-job",     icon: "plus"       },
+  { key: "billing",     label: "Billing",         href: "/employer/billing",        icon: "wallet"     },
+  { key: "settings",    label: "Settings",        href: "/employer/settings",       icon: "filter"     },
+];
+---
+<aside class="employer-sidebar flex h-full flex-col justify-between gap-6 px-4 py-6 lg:px-5">
+  <div>
+    <!-- Brand -->
+    <div class="flex items-center justify-between gap-2 pb-6 border-b border-ink-200 dark:!border-white/10">
+      <a href="/" class="flex items-center gap-2 px-2">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-ink-900 text-ink-50 font-bold dark:!bg-brand-500">J</span>
+        <span class="text-[16px] font-semibold tracking-tight text-ink-900">Joblo <span class="ml-1 rounded-md bg-accent-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-700">Hire</span></span>
+      </a>
+      <button
+        type="button"
+        id="emp-sidebar-close"
+        class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 transition-colors hover:border-ink-400 hover:text-ink-900 lg:hidden dark:!border-white/10 dark:hover:!bg-white/[0.06]"
+        aria-label="Close menu"
+      >
+        <Icon name="close" size={14} />
+      </button>
+    </div>
+
+    <!-- Company switcher -->
+    <a href="/employer/company" class="mt-4 group flex items-center gap-3 rounded-2xl border border-ink-200/70 bg-white p-3 transition-colors hover:border-ink-300 dark:!border-white/[0.08] dark:!bg-white/[0.035]">
+      <CompanyMark slug={company.slug} size="sm" brandColor={company.brandColor} logo={company.logo} />
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13.5px] font-semibold text-ink-900">{company.name}</p>
+        <p class="mt-0.5 truncate text-[11.5px] text-ink-500">{currentEmployer.role}</p>
+      </div>
+      <Icon name="chevronDown" size={12} class="text-ink-400" />
+    </a>
+
+    <!-- Nav -->
+    <nav class="mt-6 space-y-0.5" aria-label="Employer">
+      {nav.map((item) => {
+        const isActive = active === item.key;
+        return (
+          <a
+            href={item.href}
+            aria-current={isActive ? "page" : undefined}
+            class={[
+              "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium transition-colors",
+              isActive
+                ? "bg-ink-900 text-ink-50 dark:!bg-brand-500 dark:text-white"
+                : "text-ink-700 hover:bg-ink-100 dark:hover:!bg-white/[0.06] dark:text-ink-800",
+            ].join(" ")}
+          >
+            <Icon name={item.icon as any} size={15} class={isActive ? "text-ink-50 dark:text-white" : "text-ink-500 group-hover:text-ink-900"} />
+            <span class="flex-1">{item.label}</span>
+            {item.badge !== undefined && item.badge > 0 && (
+              <span class={[
+                "rounded-full px-2 py-0.5 text-[10.5px] font-semibold tabular-nums",
+                isActive ? "bg-white/20 text-white" : "bg-ink-100 text-ink-700 dark:!bg-white/[0.08] dark:text-ink-800",
+              ].join(" ")}>
+                {item.badge}
+              </span>
+            )}
+          </a>
+        );
+      })}
+    </nav>
+
+    <!-- Upgrade nudge -->
+    <div class="mt-6 rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/70 via-white to-accent-50/40 p-4 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+      <p class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-400">
+        <Icon name="sparkles" size={12} />
+        Growth plan · 10 active
+      </p>
+      <p class="mt-2 text-[12px] text-ink-600">Unlock unlimited postings, ATS integrations, and priority placement with Scale.</p>
+      <a href="/pricing" class="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-ink-900 hover:text-brand-700 transition-colors">
+        Upgrade to Scale
+        <Icon name="arrowRight" size={11} />
+      </a>
+    </div>
+  </div>
+
+  <div class="border-t border-ink-200 pt-4 dark:!border-white/10">
+    <a href="/dashboard" class="flex items-center gap-2 rounded-xl px-3 py-2 text-[12.5px] text-ink-500 hover:bg-ink-100 hover:text-ink-900 dark:hover:!bg-white/[0.06]">
+      <Icon name="user" size={12} />
+      Candidate view
+    </a>
+    <a href="/" class="flex items-center gap-2 rounded-xl px-3 py-2 text-[12.5px] text-ink-500 hover:bg-ink-100 hover:text-ink-900 dark:hover:!bg-white/[0.06]">
+      <Icon name="arrowUpRight" size={12} />
+      Back to site
+    </a>
+    <button type="button" class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-[12.5px] text-ink-500 hover:bg-ink-100 hover:text-ink-900 dark:hover:!bg-white/[0.06]">
+      <Icon name="close" size={12} />
+      Sign out
+    </button>
+  </div>
+</aside>

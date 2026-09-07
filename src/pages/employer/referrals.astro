@@ -1,0 +1,178 @@
+---
+import EmployerLayout from "@layouts/EmployerLayout.astro";
+import StatCard from "@components/dashboard/StatCard.astro";
+import Icon from "@components/ui/Icon.astro";
+
+interface Referral {
+  id: string;
+  referrer: string;
+  candidate: string;
+  role: string;
+  stage: "New" | "Interview" | "Offer" | "Hired" | "Rejected";
+  submitted: string;
+  bonus: string;
+}
+
+const referrals: Referral[] = [
+  { id: "r-1", referrer: "Maya Okonkwo",    candidate: "Alex Turner",   role: "Sr. Frontend Engineer",   stage: "Interview", submitted: "2d ago", bonus: "$2,500" },
+  { id: "r-2", referrer: "Rafael Chen",     candidate: "Priya Sharma",  role: "Product Manager",          stage: "Offer",     submitted: "5d ago", bonus: "$3,000" },
+  { id: "r-3", referrer: "Devon Park",      candidate: "Jordan Lee",     role: "Growth Lead",                stage: "Hired",     submitted: "3w ago", bonus: "$3,500" },
+  { id: "r-4", referrer: "Kenji Watanabe",  candidate: "Sam Fitzgerald", role: "ML Engineer",                stage: "New",       submitted: "1d ago", bonus: "$2,500" },
+  { id: "r-5", referrer: "Elena Marquez",   candidate: "Ana Rodriguez",  role: "Brand Designer",             stage: "Rejected",  submitted: "1w ago", bonus: "$0" },
+  { id: "r-6", referrer: "Maya Okonkwo",    candidate: "Leo Nakamura",   role: "Sr. Product Designer",       stage: "Interview", submitted: "4d ago", bonus: "$2,500" },
+];
+
+const stats = [
+  { label: "Total referrals", value: referrals.length,                                                    icon: "users",     tone: "brand"   as const, change: 22 },
+  { label: "In pipeline",     value: referrals.filter((r) => ["New","Interview","Offer"].includes(r.stage)).length, icon: "sparkles",  tone: "info"    as const, change: 18 },
+  { label: "Hired via referral", value: referrals.filter((r) => r.stage === "Hired").length,               icon: "checkCircle", tone: "success" as const, change: 40 },
+  { label: "Bonus paid",      value: "$3,500",                                                             icon: "wallet",    tone: "accent"  as const, change: 12 },
+];
+
+const stageChip: Record<string, string> = {
+  New:       "bg-sky-100 text-sky-700 dark:!bg-sky-500/15 dark:!text-sky-400",
+  Interview: "bg-violet-100 text-violet-700 dark:!bg-violet-500/15 dark:!text-violet-400",
+  Offer:     "bg-amber-100 text-amber-800 dark:!bg-amber-500/15 dark:!text-amber-400",
+  Hired:     "bg-emerald-100 text-emerald-700 dark:!bg-emerald-500/15 dark:!text-emerald-400",
+  Rejected:  "bg-rose-100 text-rose-700 dark:!bg-rose-500/15 dark:!text-rose-400",
+};
+
+const topReferrers = [
+  { name: "Maya Okonkwo",    referrals: 8, hires: 3, bonus: "$8,500" },
+  { name: "Rafael Chen",     referrals: 6, hires: 2, bonus: "$6,000" },
+  { name: "Devon Park",      referrals: 5, hires: 2, bonus: "$5,500" },
+  { name: "Elena Marquez",   referrals: 4, hires: 1, bonus: "$3,500" },
+];
+---
+<EmployerLayout title="Referrals" active="referrals">
+  <header class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Talent through your network</p>
+      <h1 class="mt-2 text-[26px] font-semibold leading-tight tracking-tight text-ink-900 sm:text-[32px]">
+        Employee <span class="font-display italic font-normal bg-gradient-to-br from-brand-600 to-accent-500 bg-clip-text text-transparent">referrals</span>
+      </h1>
+      <p class="mt-2 text-[13.5px] text-ink-500">Track candidates your team introduced. Referrals convert 4× better than public applications.</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3.5 text-[13px] font-medium text-ink-800 hover:border-ink-400 dark:!border-white/10 dark:!bg-white/[0.03]">
+        <Icon name="wallet" size={13} />
+        Bonus rules
+      </button>
+      <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full bg-ink-900 px-4 text-[13px] font-semibold text-ink-50 hover:bg-brand-600">
+        <Icon name="send" size={13} />
+        Invite team
+      </button>
+    </div>
+  </header>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    {stats.map((s) => <StatCard {...s} />)}
+  </div>
+
+  <!-- Program card -->
+  <div class="mt-8 grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2 rounded-2xl border border-ink-200/70 bg-gradient-to-br from-brand-50/60 via-white to-accent-50/40 p-6 dark:!border-white/[0.08] dark:!from-brand-500/10 dark:!via-white/[0.02] dark:!to-accent-500/10">
+      <p class="text-[10.5px] font-bold uppercase tracking-[0.22em] text-brand-700 dark:!text-brand-400">Bonus structure</p>
+      <h2 class="mt-2 text-[20px] font-semibold tracking-tight text-ink-900">How bonuses pay out</h2>
+      <div class="mt-5 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-ink-500">On interview</p>
+          <p class="mt-1 text-[20px] font-semibold tabular-nums text-ink-900">$500</p>
+          <p class="mt-0.5 text-[11.5px] text-ink-500">Paid within 7 days</p>
+        </div>
+        <div class="rounded-xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-ink-500">On offer accept</p>
+          <p class="mt-1 text-[20px] font-semibold tabular-nums text-ink-900">$1,000</p>
+          <p class="mt-0.5 text-[11.5px] text-ink-500">Paid on start date</p>
+        </div>
+        <div class="rounded-xl border border-ink-200/70 bg-white p-4 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-ink-500">6-month tenure</p>
+          <p class="mt-1 text-[20px] font-semibold tabular-nums text-ink-900">$2,000</p>
+          <p class="mt-0.5 text-[11.5px] text-ink-500">Paid after 6 months</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-ink-200/70 bg-white p-6 dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Top referrers</p>
+      <ul class="mt-4 space-y-3">
+        {topReferrers.map((r, i) => (
+          <li class="flex items-center gap-3">
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink-900 text-[11px] font-bold text-ink-50 tabular-nums dark:!bg-brand-500 dark:!text-white">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[13px] font-semibold text-ink-900">{r.name}</p>
+              <p class="mt-0.5 text-[11.5px] text-ink-500 tabular-nums">{r.referrals} referrals · {r.hires} hires</p>
+            </div>
+            <span class="text-[12.5px] font-semibold tabular-nums text-emerald-600 dark:!text-emerald-400">{r.bonus}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Referral list -->
+  <div class="mt-8 rounded-2xl border border-ink-200/70 bg-white dark:!border-white/[0.08] dark:!bg-white/[0.03]">
+    <header class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-200 p-5 dark:!border-white/[0.06]">
+      <div>
+        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-500">Referral pipeline</p>
+        <h2 class="mt-1 text-[17px] font-semibold text-ink-900">All referrals</h2>
+      </div>
+      <div class="flex flex-wrap gap-1.5">
+        {["All", "New", "Interview", "Offer", "Hired"].map((s, i) => (
+          <button type="button" data-ref-filter={s} data-active={i === 0 ? "true" : "false"} class="ref-tab inline-flex h-8 items-center rounded-full border border-ink-200 bg-white px-3 text-[12px] font-medium text-ink-800 transition-colors hover:border-ink-400 data-[active=true]:!border-ink-900 data-[active=true]:!bg-ink-900 data-[active=true]:!text-ink-50 dark:!border-white/10 dark:!bg-white/[0.03]">
+            {s}
+          </button>
+        ))}
+      </div>
+    </header>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-ink-100 text-[10.5px] font-semibold uppercase tracking-widest text-ink-500 dark:!border-white/[0.06]">
+            <th class="px-5 py-3">Candidate</th>
+            <th class="px-5 py-3">Referred by</th>
+            <th class="px-5 py-3">Stage</th>
+            <th class="px-5 py-3 tabular-nums">Bonus</th>
+            <th class="px-5 py-3">Submitted</th>
+            <th class="px-5 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="text-[13px] text-ink-800 divide-y divide-ink-100 dark:!divide-white/[0.06]">
+          {referrals.map((r) => (
+            <tr class="ref-row" data-stage={r.stage}>
+              <td class="px-5 py-4">
+                <p class="font-semibold text-ink-900">{r.candidate}</p>
+                <p class="mt-0.5 text-[11.5px] text-ink-500">{r.role}</p>
+              </td>
+              <td class="px-5 py-4 text-[12.5px] text-ink-700">{r.referrer}</td>
+              <td class="px-5 py-4">
+                <span class={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${stageChip[r.stage]}`}>
+                  {r.stage}
+                </span>
+              </td>
+              <td class="px-5 py-4 tabular-nums font-semibold text-ink-900">{r.bonus}</td>
+              <td class="px-5 py-4 text-[12px] text-ink-500 tabular-nums">{r.submitted}</td>
+              <td class="px-5 py-4 text-right">
+                <a href="/employer/applicants" class="text-[12px] font-medium text-brand-700 hover:underline">View</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll<HTMLButtonElement>(".ref-tab");
+    const rows = document.querySelectorAll<HTMLElement>(".ref-row");
+    tabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabs.forEach((b) => (b.dataset.active = String(b === btn)));
+        const f = btn.dataset.refFilter;
+        rows.forEach((r) => { r.hidden = !(f === "All" || r.dataset.stage === f); });
+      });
+    });
+  </script>
+</EmployerLayout>
