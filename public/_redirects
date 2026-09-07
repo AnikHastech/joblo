@@ -1,5 +1,0 @@
-# Cloudflare Pages / Netlify — redirects
-# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
-
-# Any unknown route → static 404 page (rendered from src/pages/404.astro)
-/*   /404.html   404
