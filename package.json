@@ -45,6 +45,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
+    "shots": "node scripts/responsive-shots.mjs",
     "release:patch": "npm version patch -m \"chore: release %s\" && git push && git push --tags",
     "release:minor": "npm version minor -m \"chore: release %s\" && git push && git push --tags",
     "release:major": "npm version major -m \"chore: release %s\" && git push && git push --tags"
