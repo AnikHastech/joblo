@@ -1,8 +1,14 @@
-# GitHub Actions — build check on push + PR + deploy to GitHub Pages
-# To use GitHub Pages, enable Pages in your repo Settings → Pages → Source: GitHub Actions
-# For Netlify / Vercel / Cloudflare, connect the repo in their dashboard instead — no workflow needed.
+# GitHub Actions — build check on every push + PR.
+#
+# The actual production deployment is handled by whichever host you connect
+# the repo to (Cloudflare Pages / Vercel / Netlify / Render — see README).
+# This workflow just verifies the build succeeds so a broken commit can't
+# ship without a warning first.
+#
+# Want auto-deploy to GitHub Pages instead? Uncomment the `deploy` job below
+# and enable Pages under Settings → Pages → Source: GitHub Actions.
 
-name: Build & Deploy
+name: Build Check
 
 on:
   push:
@@ -10,15 +16,6 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -35,20 +32,39 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - name: Upload artifact
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-  deploy:
-    if: github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+# ─────────────────────────────────────────────────────────────────
+# Optional: deploy to GitHub Pages
+# 1. Repo → Settings → Pages → Source: "GitHub Actions"
+# 2. Uncomment the block below and the `permissions` + `concurrency`
+#    keys at the top-level of this file.
+# ─────────────────────────────────────────────────────────────────
+#
+# permissions:
+#   contents: read
+#   pages: write
+#   id-token: write
+#
+# concurrency:
+#   group: "pages"
+#   cancel-in-progress: false
+#
+#   deploy:
+#     if: github.ref == 'refs/heads/main'
+#     needs: build
+#     runs-on: ubuntu-latest
+#     environment:
+#       name: github-pages
+#       url: ${{ steps.deployment.outputs.page_url }}
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: "22"
+#           cache: "npm"
+#       - run: npm ci
+#       - run: npm run build
+#       - uses: actions/upload-pages-artifact@v3
+#         with:
+#           path: ./dist
+#       - id: deployment
+#         uses: actions/deploy-pages@v4
