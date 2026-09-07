@@ -33,3 +33,11 @@ pnpm-debug.log*
 # internal working docs — not shipped to buyers
 CLAUDE.md
 master_prompt.md
+
+# deploy configs — kept locally, not tracked in the marketplace repo
+LICENSE
+netlify.toml
+vercel.json
+render.yaml
+.nvmrc
+.node-version
