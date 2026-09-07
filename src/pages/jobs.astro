@@ -46,13 +46,25 @@ const getLocSlug = (loc: string): string => {
     <Container size="xl">
       <div class="grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
         <!-- Sidebar (sticky on desktop) -->
-        <div class="hidden lg:sticky lg:top-28 lg:col-span-3 lg:block lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pb-4 lg:pr-1">
+        <div class="hidden lg:sticky lg:top-28 lg:col-span-3 lg:block lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pb-4 lg:pr-1 lg:[scrollbar-width:thin]">
           <FilterSidebar />
         </div>
 
         <!-- Results column -->
         <div class="lg:col-span-9" data-per-page={perPage} data-total-jobs={totalJobs}>
           <JobsToolbar total={totalJobs} showing={Math.min(perPage, totalJobs)} />
+
+          <!-- Restore saved view (grid/list) before paint to avoid FOUC -->
+          <script is:inline>
+            (function () {
+              try {
+                var v = localStorage.getItem("joblo:jobs-view");
+                if (v === "list" || v === "grid") {
+                  document.documentElement.dataset.jobsView = v;
+                }
+              } catch (e) {}
+            })();
+          </script>
 
           <!-- Job cards grid -->
           <div id="jobs-grid" class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -104,6 +116,15 @@ const getLocSlug = (loc: string): string => {
   </section>
 </BaseLayout>
 
+<!-- Overrides the Tailwind grid classes when user has selected List view -->
+<style is:global>
+  html[data-jobs-view="list"] #jobs-grid {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+</style>
+
 <script>
   // ═══ Client-side pagination ═══════════════════════════════════
   const resultsColumn = document.querySelector<HTMLElement>("[data-per-page]");
@@ -112,9 +133,11 @@ const getLocSlug = (loc: string): string => {
   const perPage = Number(resultsColumn?.dataset.perPage ?? 12);
   const jobItems = document.querySelectorAll<HTMLElement>("#jobs-grid .job-item");
 
+  const filteredList = () => Array.from(jobItems).filter((i) => i.dataset.filteredOut !== "true");
+
   const getPage = () => {
     const p = parseInt(new URLSearchParams(window.location.search).get("page") ?? "1", 10) || 1;
-    const totalPages = Math.max(1, Math.ceil(jobItems.length / perPage));
+    const totalPages = Math.max(1, Math.ceil(filteredList().length / perPage));
     return Math.min(Math.max(1, p), totalPages);
   };
 
@@ -122,10 +145,16 @@ const getLocSlug = (loc: string): string => {
     const page = getPage();
     const start = (page - 1) * perPage;
     const end   = start + perPage;
-    jobItems.forEach((item, i) => {
-      // Only paginate items that haven't been filtered out
-      if (item.dataset.filteredOut === "true") return;
-      item.hidden = i < start || i >= end;
+    let filteredIdx = 0;
+    jobItems.forEach((item) => {
+      // Filtered-out items stay hidden regardless of page
+      if (item.dataset.filteredOut === "true") {
+        item.hidden = true;
+        return;
+      }
+      // Paginate against filtered-in position, not original
+      item.hidden = filteredIdx < start || filteredIdx >= end;
+      filteredIdx++;
     });
 
     // Update pagination active state
@@ -151,12 +180,16 @@ const getLocSlug = (loc: string): string => {
       if (nums[0]) nums[0].textContent = String(page);
     }
 
-    // Update visible count in toolbar
-    const visibleCount = Array.from(jobItems).filter((item) =>
+    // Update visible count in toolbar (jobs shown on this page)
+    const onPage = Array.from(jobItems).filter((item) =>
       item.dataset.filteredOut !== "true" && !item.hidden
     ).length;
     const visibleEl = document.querySelector<HTMLElement>("#jobs-visible-count");
-    if (visibleEl) visibleEl.textContent = visibleCount.toString();
+    if (visibleEl) visibleEl.textContent = onPage.toString();
+
+    // Hide the whole pagination nav if only one filtered page remains
+    const totalPagesNow = Math.max(1, Math.ceil(filteredList().length / perPage));
+    if (paginationNav) paginationNav.hidden = totalPagesNow <= 1;
   };
 
   // Intercept pagination clicks — update URL without full reload
@@ -304,5 +337,45 @@ const getLocSlug = (loc: string): string => {
 
     // Apply once on load in case ?q= / ?location= came in via SearchBar
     if (qText || locText) applyFilters();
+
+    // ═══ City search inside FilterSidebar — filters the location checkboxes list
+    const citySearch = sidebar.querySelector<HTMLInputElement>('input[type="search"][placeholder*="cities" i], input[type="search"][placeholder*="city" i]');
+    if (citySearch) {
+      const cityLabels = sidebar.querySelectorAll<HTMLElement>('input[name="location"]');
+      citySearch.addEventListener("input", () => {
+        const q = citySearch.value.toLowerCase().trim();
+        cityLabels.forEach((input) => {
+          const li = input.closest("li, label, div");
+          const label = (li?.textContent ?? "").toLowerCase();
+          if (li) (li as HTMLElement).hidden = q.length > 0 && !label.includes(q);
+        });
+      });
+    }
   }
+
+  // ═══ Sort — reorder grid DOM based on JobsToolbar dispatch ═══
+  const gridEl = document.getElementById("jobs-grid");
+  const sortItems = () => Array.from(gridEl?.children ?? []) as HTMLElement[];
+
+  const sorters: Record<string, (a: HTMLElement, b: HTMLElement) => number> = {
+    recent:  (a, b) => Number(a.dataset.postedDays) - Number(b.dataset.postedDays),
+    salary:  (a, b) => Number(b.dataset.salaryMax) - Number(a.dataset.salaryMax),
+    match:   (a, b) => (b.dataset.search ?? "").length - (a.dataset.search ?? "").length,
+    applied: (a, b) => Number(b.dataset.salaryMin) - Number(a.dataset.salaryMin),  // proxy: high-min → high demand
+    az:      (a, b) => (a.dataset.search ?? "").localeCompare(b.dataset.search ?? ""),
+  };
+
+  document.addEventListener("jobs:sort", (e: Event) => {
+    const value = (e as CustomEvent<{ value: string }>).detail?.value ?? "recent";
+    const sorter = sorters[value];
+    if (!gridEl || !sorter) return;
+    const frag = document.createDocumentFragment();
+    sortItems().sort(sorter).forEach((n) => frag.appendChild(n));
+    gridEl.appendChild(frag);
+    // Reset to page 1 after sort
+    if (window.location.search.includes("page=")) {
+      history.replaceState({}, "", window.location.pathname);
+    }
+    applyPagination();
+  });
 </script>

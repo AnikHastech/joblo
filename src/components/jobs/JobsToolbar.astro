@@ -93,21 +93,27 @@ const sortOptions = [
 </div>
 
 <script>
-  // ── View toggle (grid/list) ─────────────────────────────────────
+  // ── View toggle (grid/list) — persists across reloads, FOUC-free ─
+  // Layout swap happens via a CSS override keyed to html[data-jobs-view]
+  // (set by an inline script in jobs.astro before paint). Here we sync
+  // the active-button state and persist on click.
   const viewButtons = document.querySelectorAll<HTMLButtonElement>("#view-toggle .view-btn");
-  const jobsGrid = document.getElementById("jobs-grid");
+  const VIEW_KEY = "joblo:jobs-view";
+
+  const setActive = (view: string) => {
+    viewButtons.forEach((b) => (b.dataset.active = String(b.dataset.view === view)));
+  };
+
+  // Initial button state — respect data-jobs-view already set on <html>
+  const initial = document.documentElement.dataset.jobsView === "list" ? "list" : "grid";
+  setActive(initial);
 
   viewButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const view = btn.dataset.view;
-      viewButtons.forEach((b) => b.dataset.active = String(b === btn));
-      if (jobsGrid) {
-        if (view === "grid") {
-          jobsGrid.className = "mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3";
-        } else {
-          jobsGrid.className = "mt-6 grid gap-3";
-        }
-      }
+      const view = btn.dataset.view ?? "grid";
+      document.documentElement.dataset.jobsView = view;
+      setActive(view);
+      try { localStorage.setItem(VIEW_KEY, view); } catch {}
     });
   });
 
@@ -148,6 +154,9 @@ const sortOptions = [
         .filter(Boolean)
         .join(" ") || opt.textContent?.trim() || "";
       if (sortLabel) sortLabel.textContent = label;
+      // Notify the jobs page to reorder the grid
+      const value = opt.dataset.value ?? "recent";
+      document.dispatchEvent(new CustomEvent("jobs:sort", { detail: { value } }));
       closeSort();
     });
   });
